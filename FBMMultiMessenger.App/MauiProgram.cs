@@ -53,11 +53,12 @@ namespace FBMMultiMessenger
             builder.Services.AddScoped<IChatMessagesService, ChatMessageService>();
             builder.Services.AddScoped<IExtensionService, ExtensionService>();
             builder.Services.AddScoped<ISubscriptionSerivce, SubscriptionService>();
-            builder.Services.AddSingleton<BackButtonService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-
-            builder.Services.AddSingleton<SignalRChatService>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<OneSignalService>();
+
+            builder.Services.AddSingleton<BackButtonService>();
+            builder.Services.AddSingleton<SignalRChatService>();
 
             builder.Services.AddHttpClient();
             builder.Services.AddMudServices();

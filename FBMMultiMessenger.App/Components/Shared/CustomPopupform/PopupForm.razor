@@ -1,7 +1,4 @@
-﻿@using FBMMultiMessenger.Models.Shared
-@using MudBlazor
-
-<div style="overflow-y : auto; width: @Setting.ContentWidth; max-width: 100%">
+﻿<div style="overflow-y : auto; width: @Setting.ContentWidth; max-width: 100%">
     <div @onclick="OnAvatarClick" style="position : absolute; top:-70px; right : calc(50% - 60px); border : 10px solid white; border-radius : 50%; background-color: white; z-index : 1">
         @if (Setting.AvatarContent == AvatarContent.RenderFragenment)
         {

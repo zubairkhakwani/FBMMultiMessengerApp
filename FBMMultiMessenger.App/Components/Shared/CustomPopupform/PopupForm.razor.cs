@@ -1,4 +1,4 @@
-﻿using FBMMultiMessenger.Models.Shared;
+﻿using FBMMultiMessenger.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 

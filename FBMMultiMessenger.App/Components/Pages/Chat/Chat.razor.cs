@@ -2,6 +2,7 @@
 using FBMMultiMessenger.Contracts.Contracts.Chat;
 using FBMMultiMessenger.Contracts.Contracts.Extension;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Notification;
 using FBMMultiMessenger.Services;
 using FBMMultiMessenger.Services.IServices;
@@ -47,6 +48,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [Inject]
         private OneSignalService OneSignalService { get; set; }
 
+        [Inject]
+        private ICurrentUserService CurrentUserService { get; set; }
+
+
         [SupplyParameterFromQuery]
         public string IsNotification { get; set; } //this bit tells if the user opens the notification from his app and we have to show him the right chat.
 
@@ -67,7 +72,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private bool IsLoading = true;
 
         private string? SelectedFbChatId = null;
-        private string currentUserId = "User123"; //TODO - Authentication
+        private CurrentUser CurrentUser = new();
         private bool isAndriodPlatform;
 
         private string _filterKeyword = string.Empty;
@@ -97,10 +102,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public List<GeChatMessagesHttpResponse> ChatMessages = new List<GeChatMessagesHttpResponse>();
         protected override async Task OnInitializedAsync()
         {
+            CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
             isAndriodPlatform =  DeviceInfo.Platform != DevicePlatform.WinUI;
 
             BackButtonService.BackButtonPressed+= OnBackButtonPressed;
 
+
+            //if a user opened notification so we have to open the right chat.
             if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
             {
                 await LoadChatMessage(FbChatId);
@@ -483,11 +491,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task ConnectToSignalR()
         {
+            var currentUserId = $"User_{CurrentUser.Id}";
+
             if (!SignalRChatService.IsConnected)
             {
                 await SignalRChatService.ConnectAsync(currentUserId);
 
-                SignalRChatService.OnMessageReceived += async (msg) => await HandleMessageReceivedAsync(msg);
+                SignalRChatService.OnHandleMessage += async (msg) => await HandleMessageReceivedAsync(msg);
             }
         }
 

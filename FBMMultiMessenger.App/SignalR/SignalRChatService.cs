@@ -14,12 +14,11 @@ namespace FBMMultiMessenger.SignalR
     public class SignalRChatService
     {
         private HubConnection _hubConnection;
-        public event Func<HandleChatHttpResponse, Task> OnMessageReceived;
+        public event Func<HandleChatHttpResponse, Task> OnHandleMessage;
 
         public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
 
         private readonly string _baseURL;
-        private string _currentUserId;
 
         public SignalRChatService(IConfiguration configuration)
         {
@@ -30,21 +29,20 @@ namespace FBMMultiMessenger.SignalR
         {
             try
             {
-                _currentUserId = userId;
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl($"{_baseURL}chathub")
                     .Build();
 
-                _hubConnection.On<HandleChatHttpResponse>("ReceiveMessage", async (messageData) =>
+                _hubConnection.On<HandleChatHttpResponse>("HandleMessage", async (messageData) =>
                 {
-                    if (OnMessageReceived != null)
+                    if (OnHandleMessage != null)
                     {
-                        await OnMessageReceived.Invoke(messageData);
+                        await OnHandleMessage.Invoke(messageData);
                     }
                 });
 
                 await _hubConnection.StartAsync();
-                await _hubConnection.SendAsync("RegisterUser", userId);
+                await _hubConnection.SendAsync("RegisterUser", $"App_{userId}");
 
             }
             catch (Exception ex)

@@ -22,8 +22,8 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Account Name">@context.Name</MudTd>
-            <MudTd DataLabel="Account Cookie">@context.Cookie</MudTd>
-            <MudTd DataLabel="Account Cookie">@context.IsActive</MudTd>
+            <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Cookie">@context.Cookie</MudTd>
+            <MudTd DataLabel="State of the account">@context.IsActive</MudTd>
             <MudTd DataLabel="Account Created At">@context.CreatedAt</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">
                 @{
