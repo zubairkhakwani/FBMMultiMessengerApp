@@ -20,7 +20,7 @@ namespace FBMMultiMessenger.Services
             this._baseService=baseService;
 
         }
-        public async Task<T> UpsertAccountAsync<T>(UpsertAccountHttpRequest httpRequest, int? accountId) where T : class
+        public async Task<T> UpsertAccountAsync<T>(UpsertAccountHttpRequest httpRequest, int? accountId) where T : class, new()
         {
             var apiType = SD.ApiType.POST;
             var url = "api/account";
@@ -41,7 +41,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<UpsertAccountHttpRequest, T>(request);
         }
 
-        public async Task<T> GetMyAccounts<T>() where T : class
+        public async Task<T> GetMyAccountsAsync<T>() where T : class, new()
         {
             var request = new ApiRequest<object>()
             {
@@ -52,24 +52,36 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<object, T>(request);
         }
 
-        public async Task<T> ToggleAccountStatus<T>(int accountId) where T : class
+        public async Task<T> RemoveAccountAsync<T>(int accountId) where T : class, new()
         {
-            var request = new ApiRequest<ToggleAccountStatusHttpRequest>()
+            var request = new ApiRequest<RemoveAccountHttpRequest>()
             {
                 ApiType = SD.ApiType.PUT,
                 Url = $"api/account/{accountId}/status",
                 Data = null
             };
 
-            return await _baseService.SendAsync<ToggleAccountStatusHttpRequest, T>(request);
+            return await _baseService.SendAsync<RemoveAccountHttpRequest, T>(request);
         }
 
-        public async Task<T> GetMyChats<T>() where T : class
+        public async Task<T> GetMyChatsAsync<T>() where T : class, new()
         {
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
                 Url = "api/account/me/chats",
+                Data = null
+            };
+
+            return await _baseService.SendAsync<object, T>(request);
+        }
+
+        public async Task<T> OpenInBrowserAsync<T>(int accountId) where T : class, new()
+        {
+            var request = new ApiRequest<object>()
+            {
+                ApiType = SD.ApiType.POST,
+                Url = $"api/account/{accountId}/open-in-browser",
                 Data = null
             };
 

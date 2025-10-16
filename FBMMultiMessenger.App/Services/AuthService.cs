@@ -27,7 +27,7 @@ namespace FBMMultiMessenger.Services
             this.TokenProvider =tokenProvider;
 
         }
-        public async Task<T> LoginAsync<T>(LoginHttpRequest httpRequest) where T : class
+        public async Task<T> LoginAsync<T>(LoginHttpRequest httpRequest) where T : class, new()
         {
             var apiRequest = new ApiRequest<LoginHttpRequest>()
             {
@@ -45,7 +45,7 @@ namespace FBMMultiMessenger.Services
             ((CustomAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
         }
 
-        public async Task<T> RegisterAsync<T>(RegisterHttpRequest httpRequest) where T : class
+        public async Task<T> RegisterAsync<T>(RegisterHttpRequest httpRequest) where T : class, new()
         {
             var apiRequest = new ApiRequest<RegisterHttpRequest>()
             {

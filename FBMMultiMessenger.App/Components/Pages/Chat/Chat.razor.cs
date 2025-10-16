@@ -143,7 +143,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task GetAccountChats()
         {
-            var response = await AccountService.GetMyChats<BaseResponse<GetAllMyAccountsChatsHttpResponse>>();
+            var response = await AccountService.GetMyChatsAsync<BaseResponse<GetAllMyAccountsChatsHttpResponse>>();
             IsLoading = false;
             if (response is null ||  !response.IsSuccess)
             {

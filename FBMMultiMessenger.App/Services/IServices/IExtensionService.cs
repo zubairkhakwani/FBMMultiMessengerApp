@@ -9,6 +9,6 @@ namespace FBMMultiMessenger.Services.IServices
 {
     public interface IExtensionService
     {
-        Task<T> Notify<T>(NotifyExtensionRequest httpRequest) where T : class;
+        Task<T> Notify<T>(NotifyExtensionRequest httpRequest) where T : class, new();
     }
 }

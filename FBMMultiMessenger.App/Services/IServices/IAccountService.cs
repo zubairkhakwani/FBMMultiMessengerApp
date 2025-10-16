@@ -9,13 +9,12 @@ namespace FBMMultiMessenger.Services.IServices
 {
     public interface IAccountService
     {
-        Task<T> UpsertAccountAsync<T>(UpsertAccountHttpRequest httpRequest, int? accountId) where T : class;
+        Task<T> UpsertAccountAsync<T>(UpsertAccountHttpRequest httpRequest, int? accountId) where T : class, new();
+        Task<T> RemoveAccountAsync<T>(int accountId) where T : class, new();
+        Task<T> OpenInBrowserAsync<T>(int accountId) where T : class, new();
 
-        Task<T> GetMyAccounts<T>() where T : class;
+        Task<T> GetMyAccountsAsync<T>() where T : class, new();
 
-        Task<T> ToggleAccountStatus<T>(int accountId) where T : class;
-
-
-        Task<T> GetMyChats<T>() where T : class;
+        Task<T> GetMyChatsAsync<T>() where T : class, new();
     }
 }

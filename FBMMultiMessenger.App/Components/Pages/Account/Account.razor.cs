@@ -25,7 +25,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
         [Inject]
         private ISnackbar Snackbar { get; set; }
 
-        private bool IsMobilePlatform = true;
+        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
         [SupplyParameterFromQuery]
         public string? Message { get; set; }
@@ -49,7 +49,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private async Task<TableData<GetMyAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
         {
-            var response = await AccountService.GetMyAccounts<BaseResponse<List<GetMyAccountsHttpResponse>>>();
+            var response = await AccountService.GetMyAccountsAsync<BaseResponse<List<GetMyAccountsHttpResponse>>>();
             int totalItems = 0;
             List<GetMyAccountsHttpResponse> data = new List<GetMyAccountsHttpResponse>();
             if (response.IsSuccess && response.Data is not null)
@@ -65,7 +65,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             table.Items = data;
             return new TableData<GetMyAccountsHttpResponse>() { TotalItems = totalItems, Items = data };
         }
-        public async Task AddNewAccount()
+        public async Task AddNewAccountAsync()
         {
             if (IsMobilePlatform)
             {
@@ -83,7 +83,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public async Task EditAccount(int accountId, string Name, string Cookie)
+        public async Task EditAccountAsync(int accountId, string Name, string Cookie)
         {
             if (IsMobilePlatform)
             {
@@ -103,24 +103,23 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public async Task ToggleAccountStatus(int accountId, bool isActive)
+        public async Task RemoveAccountAsync(int accountId)
         {
             var parameters = new DialogParameters();
-            var lockStatus = isActive ? "deaactivate" : "activate";
-            parameters.Add("ContentText", $"Do you want to {lockStatus} this account?");
-            parameters.Add("ButtonText", $"{lockStatus}");
+            parameters.Add("ContentText", $"Do you want to delete this account?");
+            parameters.Add("ButtonText", $"Delete it");
             parameters.Add("Color", Color.Primary);
 
             var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
-            var dialog = await DialogService.Show<ConfirmationDialog>($"Do you want to {lockStatus} this user?", parameters, options).Result;
+            var dialog = await DialogService.Show<ConfirmationDialog>($"Do you want to delete this account?", parameters, options).Result;
 
             if (dialog.Canceled)
             {
                 return;
             }
 
-            var resposne = await AccountService.ToggleAccountStatus<BaseResponse<ToggleAccountStatusHttpResponse>>(accountId);
+            var resposne = await AccountService.RemoveAccountAsync<BaseResponse<RemoveAccountHttpResponse>>(accountId);
 
             if (resposne is not null && resposne.IsSuccess)
             {
@@ -131,6 +130,12 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 Snackbar.Add(resposne?.Message ?? "Something went wrong, please try later", Severity.Error);
             }
+        }
+
+        public void OpenBrowser(int accountId)
+        {
+            AccountService.OpenInBrowserAsync<object>(accountId);
+            Snackbar.Add("The account has been opened in your browser.", Severity.Success);
         }
     }
 }

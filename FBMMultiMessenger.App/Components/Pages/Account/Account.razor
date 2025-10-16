@@ -7,7 +7,7 @@
     <div class="neeleez-page-header">
         <h3 class="page-title">Account Management</h3>
         <div class="neeleez-page-header--actions">
-            <button @onclick="AddNewAccount" class="add-account-btn">+ Add Account</button>
+            <button @onclick="AddNewAccountAsync" class="add-account-btn">+ Add Account</button>
         </div>
     </div>
 
@@ -15,7 +15,6 @@
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Cookie</MudTh>
-            <MudTh>Activated</MudTh>
             <MudTh>CreatedAt</MudTh>
             <MudTh>Actions</MudTh>
 
@@ -23,30 +22,24 @@
         <RowTemplate>
             <MudTd DataLabel="Account Name">@context.Name</MudTd>
             <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Cookie">@context.Cookie</MudTd>
-            <MudTd DataLabel="State of the account">@context.IsActive</MudTd>
             <MudTd DataLabel="Account Created At">@context.CreatedAt</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">
-                @{
-                    var lockIcon = context.IsActive ? @Icons.Material.Filled.Lock : @Icons.Material.Filled.LockOpen;
-                    var lockIconColor = context.IsActive ? Color.Error : Color.Success;
-                    var stateOfAccount = context.IsActive ? "Deactivate" : "Activate";
 
-                }
                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                     <MudMenu Icon="@Icons.Material.Filled.MoreHoriz" Dense="true" AnchorOrigin="Origin.BottomLeft" Style="align-self: auto;">
                         <MudPaper Style="min-width: 200px; max-width: 235px; box-shadow:none !important; padding:0 8px;">
-                            <MudButton OnClick="@(e => ToggleAccountStatus(context.Id, context.IsActive))"
+
+                            <MudButton OnClick="@(e => OpenBrowser(context.Id))"
                                        Size="Size.Small"
-                                       StartIcon="@lockIcon"
-                                       Color="@lockIconColor"
+                                       StartIcon="@Icons.Material.Filled.OpenInBrowser"
+                                       Color="Color.Success"
                                        Variant="Variant.Text"
                                        Class="px-3 py-1 mb-1"
                                        FullWidth="true"
                                        Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
-                                <span style="margin-left: 8px;">@stateOfAccount</span>
+                                <span style="margin-left: 8px;">Open Browser</span>
                             </MudButton>
-
-                            <MudButton OnClick="@(e => EditAccount(context.Id, context.Name, context.Cookie))"
+                            <MudButton OnClick="@(e => EditAccountAsync(context.Id, context.Name, context.Cookie))"
                                        Size="Size.Small"
                                        StartIcon="@Icons.Material.Filled.ReceiptLong"
                                        Color="Color.Success"
@@ -56,6 +49,20 @@
                                        Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
                                 <span style="margin-left: 8px;">Edit</span>
                             </MudButton>
+
+                            <MudButton OnClick="@(e => RemoveAccountAsync(context.Id))"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.PersonRemove"
+                                       Color="Color.Error"
+                                       Variant="Variant.Text"
+                                       Class="px-3 py-1 mb-1"
+                                       FullWidth="true"
+                                       Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
+                                <span style="margin-left: 8px;">Delete</span>
+                            </MudButton>
+
+
+
 
                         </MudPaper>
                     </MudMenu>
@@ -77,7 +84,7 @@
         </PagerContent>
     </MudTable>
 
-    <button @onclick="AddNewAccount" class="add-new-account-container">
+    <button @onclick="AddNewAccountAsync" class="add-new-account-container">
         <i class="fa-solid fa-plus"></i>
     </button>
 </MudPaper>

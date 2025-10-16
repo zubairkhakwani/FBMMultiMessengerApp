@@ -2,6 +2,7 @@
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -20,18 +21,21 @@ namespace FBMMultiMessenger.Services
     {
         public IHttpClientFactory httpClient { get; set; }
         private readonly ITokenProvider _tokenProvider;
+        private readonly NavigationManager _navigationManager;
         private readonly string _baseUrl;
 
-        public BaseService(IHttpClientFactory httpClientFactory, ITokenProvider tokenProvider, IConfiguration configuration)
+        public BaseService(IHttpClientFactory httpClientFactory, ITokenProvider tokenProvider, NavigationManager navigationManager, IConfiguration configuration)
         {
             httpClient = httpClientFactory;
             this._tokenProvider=tokenProvider;
+            this._navigationManager=navigationManager;
             this._baseUrl = configuration.GetValue<string>("Urls:BaseUrl")!;
 
         }
         public async Task<TResponse> SendAsync<TRequest, TResponse>(ApiRequest<TRequest> apiRequest, bool withBearer = true)
             where TRequest : class
-            where TResponse : class
+            where TResponse : class, new()
+
         {
             try
             {
@@ -50,7 +54,7 @@ namespace FBMMultiMessenger.Services
 
                 if (apiRequest.ContentType == ContentType.MultipartFormData)
                 {
-                    message.Content = await CreateMultipartContentAsync(apiRequest);
+                    message.Content =  CreateMultipartContent(apiRequest);
                 }
 
                 else
@@ -84,15 +88,19 @@ namespace FBMMultiMessenger.Services
                         break;
                 }
 
-
-
                 HttpResponseMessage responseMessage = await client.SendAsync(message);
 
                 var apiContent = await responseMessage.Content.ReadAsStringAsync();
 
+                if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _tokenProvider.RemoveTokenAsync();
+                    _navigationManager.NavigateTo("/login");
+                }
+
                 var APIResponse = JsonConvert.DeserializeObject<TResponse>(apiContent);
 
-                return APIResponse;
+                return APIResponse ??  new TResponse();
 
             }
             catch (Exception ex)
@@ -101,11 +109,11 @@ namespace FBMMultiMessenger.Services
                 var res = JsonConvert.SerializeObject(data);
                 var APIResponse = JsonConvert.DeserializeObject<TResponse>(res);
 
-                return APIResponse;
+                return APIResponse ?? new TResponse();
             }
         }
 
-        private async Task<MultipartFormDataContent> CreateMultipartContentAsync<TRequest>(ApiRequest<TRequest> apiRequest)
+        private MultipartFormDataContent CreateMultipartContent<TRequest>(ApiRequest<TRequest> apiRequest)
         where TRequest : class
         {
             var content = new MultipartFormDataContent();

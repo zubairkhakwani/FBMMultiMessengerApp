@@ -20,7 +20,7 @@ namespace FBMMultiMessenger.Services
         {
             this._baseService=baseService;
         }
-        public async Task<T> Notify<T>(NotifyExtensionRequest httpRequest) where T : class
+        public async Task<T> Notify<T>(NotifyExtensionRequest httpRequest) where T : class, new()
         {
             var request = new ApiRequest<NotifyExtensionRequest>()
             {

@@ -17,7 +17,7 @@ namespace FBMMultiMessenger.Services
         {
             this._baseService=baseService;
         }
-        public async Task<T> GetMySubscription<T>() where T : class
+        public async Task<T> GetMySubscription<T>() where T : class, new()
         {
             var apiRequest = new ApiRequest<object>()
             {

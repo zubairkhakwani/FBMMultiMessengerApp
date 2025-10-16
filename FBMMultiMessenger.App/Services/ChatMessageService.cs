@@ -19,7 +19,7 @@ namespace FBMMultiMessenger.Services
         {
             this._baseService=baseService;
         }
-        public async Task<T> GetChatMessages<T>(string fbChatId) where T : class
+        public async Task<T> GetChatMessages<T>(string fbChatId) where T : class, new()
         {
             var request = new ApiRequest<object>()
             {

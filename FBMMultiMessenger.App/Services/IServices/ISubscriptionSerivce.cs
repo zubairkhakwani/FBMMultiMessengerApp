@@ -8,6 +8,6 @@ namespace FBMMultiMessenger.Services.IServices
 {
     public interface ISubscriptionSerivce
     {
-        Task<T> GetMySubscription<T>() where T : class;
+        Task<T> GetMySubscription<T>() where T : class, new();
     }
 }

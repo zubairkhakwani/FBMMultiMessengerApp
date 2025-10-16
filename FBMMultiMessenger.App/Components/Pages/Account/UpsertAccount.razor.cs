@@ -43,7 +43,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
         [Inject]
         private IJSRuntime JS { get; set; }
 
-        private bool IsMobilePlatform = true;
+        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
         private string Title = "Create Account";
         private string SubTitle = "Join our comunity today";
@@ -81,10 +81,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             var response = await AccountService.UpsertAccountAsync<BaseResponse<UpsertAccountHttpResponse>>(model, accountId);
 
-            mudDialog?.Close(DialogResult.Ok(true));
 
             if (!response.IsSuccess && response.Data is not null && response.Data.IsLimitExceeded)
             {
+                mudDialog?.Close(DialogResult.Ok(true));
                 await JS.InvokeVoidAsync("myInterop.showSweetAlert", "Limit Exceeded", response.Message, true, "Click here to upgrade from the available packages", "/packages");
             }
 
@@ -97,14 +97,18 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             else
             {
-                Snackbar.Add(response?.Message ?? "Something went wrong when adding account, please try later.", Severity.Success);
+                Snackbar.Add(response.Message, response.IsSuccess ? Severity.Success : Severity.Error);
+
                 if (IsMobilePlatform)
                 {
                     Navigation.NavigateTo("/Account");
                 }
-                return;
-            }
 
+                if (response.IsSuccess)
+                {
+                    mudDialog?.Close(DialogResult.Ok(true));
+                }
+            }
         }
 
         public void Cancel()

@@ -9,6 +9,6 @@ namespace FBMMultiMessenger.Services.IServices
 {
     public interface IChatMessagesService
     {
-        Task<T> GetChatMessages<T>(string fbChatId) where T : class;
+        Task<T> GetChatMessages<T>(string fbChatId) where T : class, new();
     }
 }
