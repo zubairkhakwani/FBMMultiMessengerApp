@@ -8,7 +8,7 @@
     <div class="mobile-container">
         <div class="header">
             <div class="logo-circle">
-               @*  <div class="logo">
+                @*  <div class="logo">
                     FBM
                 </div> *@
                 <svg viewBox="0 0 24 24" fill="white" width="28" height="28">
@@ -62,7 +62,10 @@ else
 
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
                 <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="me-2" />
-                Add
+                @{
+                    var buttonText = AccountId is null ? "Add" : "Update";
+                }
+                @buttonText
             </MudButton>
 
             <MudButton OnClick="Cancel" Color="Color.Primary">Cancel</MudButton>
