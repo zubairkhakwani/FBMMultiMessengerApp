@@ -65,6 +65,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         //The actual message 
         private string Message = string.Empty;
+        private string? UserProfileImage; 
 
         private List<FileData> PreviewMediaFiles { get; set; } = new List<FileData>();
         private List<FileData> PreviewMediaInMessagesContainer = new List<FileData>();
@@ -91,9 +92,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private int MainChatZIndex = 0;
 
         //Selected Message Header
-        private string selectedListingTitle = "John Doe";
-        private string selectedListingLocation = "London";
-        private string selectedListingPrice = "100";
+        private string selectedListingTitle = string.Empty;
+        private string selectedListingImage = string.Empty;
+        private string selectedListingLocation = string.Empty;
+        private string selectedListingPrice = string.Empty;
+
 
 
         public List<GetMyChatsHttpResponse> FilteredAccountChats = new List<GetMyChatsHttpResponse>();
@@ -153,6 +156,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             FilteredAccountChats = AccountChats = response?.Data?.Chats ?? new List<GetMyChatsHttpResponse>();
+        
         }
 
 
@@ -196,7 +200,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 var newChat = new GetMyChatsHttpResponse()
                 {
                     Id = receivedChat.ChatId,
-                    FbLisFbListingTitle = receivedChat.FbListingTitle,
+                    FbListingTitle = receivedChat.FbListingTitle,
                     FbListingLocation = receivedChat.FbListingLocation,
                     FbListingPrice = receivedChat.FbListingPrice,
                     FbChatId = receivedChat.FbChatId,
@@ -264,6 +268,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 //Making the unread messages to read
                 myAccountChats.UnReadCount = 0;
+                UserProfileImage = myAccountChats.UserProfileImage;
                 await InvokeAsync(StateHasChanged);
             }
 
@@ -446,14 +451,15 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private void HandleSelectedChat(string fbChatId)
         {
-            // Updates the main chat header with the listing details (title, location, and price)
+            // Updates the main chat header with the listing details (title,image, location, and price)
             // of the chat selected by the user.
 
             var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (chat is not null)
             {
-                selectedListingTitle = chat.FbLisFbListingTitle;
-                selectedListingLocation = chat.FbListingLocation;
+                selectedListingTitle = chat.FbListingTitle ?? "No Title";
+                selectedListingImage = chat.FbListingImage ?? "" ;
+                selectedListingLocation = chat.FbListingLocation ?? "No Location";
                 selectedListingPrice  = chat.FbListingPrice.ToString();
             }
         }
@@ -503,7 +509,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private void FilterChat()
         {
-            var filteredAccountChats = AccountChats.Where(x => x.FbLisFbListingTitle.ToLower().Contains(FilterKeyword)
+            var filteredAccountChats = AccountChats.Where(x => x.FbListingTitle.ToLower().Contains(FilterKeyword)
                                         ||
                                         x.FbListingPrice.ToString().Contains(FilterKeyword)
                                         ||

@@ -42,7 +42,7 @@ namespace FBMMultiMessenger.Services
                 var client = httpClient.CreateClient("MagicAPI");
                 HttpRequestMessage message = new HttpRequestMessage();
                 message.Headers.Add("Accept", "application/json");
-                var url = $"{_baseUrl}{apiRequest.Url}";
+                var url = $"{_baseUrl}/{apiRequest.Url}";
                 message.RequestUri = new Uri(url);
 
                 var token = await _tokenProvider.GetTokenAsync();

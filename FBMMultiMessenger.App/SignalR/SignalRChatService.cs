@@ -30,7 +30,7 @@ namespace FBMMultiMessenger.SignalR
             try
             {
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl($"{_baseURL}chathub")
+                    .WithUrl($"{_baseURL}/chathub")
                     .Build();
 
                 _hubConnection.On<HandleChatHttpResponse>("HandleMessage", async (messageData) =>
