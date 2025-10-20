@@ -47,17 +47,13 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
         public string FbUserId { get; set; } = null!;
 
         public string FbChatId { get; set; } = null!;
-
         public string FbListingId { get; set; } = null!;
-
         public string FbAccountId { get; set; } = null!;
-
-        public string FbListingTitle { get; set; } = null!;
-
-        public string FbListingLocation { get; set; } = null!;
-
-        public decimal FbListingPrice { get; set; }
-
+        public string? FbListingTitle { get; set; }
+        public string? FbListingLocation { get; set; } 
+        public decimal? FbListingPrice { get; set; }
+        public string? FbListingImage { get; set; }
+        public string? UserProfileImage { get; set; }
         public string Message { get; set; } = null!;
 
         public bool IsRead { get; set; }

@@ -13,7 +13,6 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using OneSignalSDK.DotNet;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 
 namespace FBMMultiMessenger.Components.Pages.Chat
@@ -92,10 +91,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private int MainChatZIndex = 0;
 
         //Selected Message Header
-        private string selectedListingTitle = string.Empty;
-        private string selectedListingImage = string.Empty;
-        private string selectedListingLocation = string.Empty;
-        private string selectedListingPrice = string.Empty;
+        private string? selectedListingTitle;
+        private string? selectedListingImage;
+        private string? selectedListingLocation;
+        private string? selectedListingPrice;
 
 
 
@@ -201,6 +200,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     Id = receivedChat.ChatId,
                     FbListingTitle = receivedChat.FbListingTitle,
+                    FbListingImage = receivedChat.FbListingImage,
+                    UserProfileImage = receivedChat.UserProfileImage,
                     FbListingLocation = receivedChat.FbListingLocation,
                     FbListingPrice = receivedChat.FbListingPrice,
                     FbChatId = receivedChat.FbChatId,
@@ -457,10 +458,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (chat is not null)
             {
-                selectedListingTitle = chat.FbListingTitle ?? "No Title";
-                selectedListingImage = chat.FbListingImage ?? "" ;
-                selectedListingLocation = chat.FbListingLocation ?? "No Location";
-                selectedListingPrice  = chat.FbListingPrice.ToString();
+                selectedListingTitle = chat.FbListingTitle ;
+                selectedListingLocation = chat.FbListingLocation;
+                selectedListingPrice  = chat.FbListingPrice?.ToString();
+                selectedListingImage = chat.FbListingImage ;
             }
         }
 
@@ -524,7 +525,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public void Dispose()
         {
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
-            SignalRChatService.DisconnectAsync();
+            SignalRChatService?.DisconnectAsync();
         }
     }
 }

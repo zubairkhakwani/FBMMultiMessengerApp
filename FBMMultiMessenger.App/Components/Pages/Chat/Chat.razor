@@ -46,8 +46,11 @@
                     var fbChatId = FilteredAccountChats[i].FbChatId;
                     var chat = FilteredAccountChats[i];
                     var fbListingImage = chat.FbListingImage;
-                    var fbListingTitle = chat.FbListingTitle is null ? "No Title" : chat.FbListingTitle;
-                    var fbListingLocation = chat.FbListingLocation is null ? "No Location" : chat.FbListingLocation;
+                    var fbListingTitle = chat.FbListingTitle ?? "Loading";
+                    var fbListingLocation = chat.FbListingLocation;
+                    var lastMesasge = chat.LastMessage;
+                    var lastMessageFrom = chat.LastMessageFrom;
+                    var fbListingPrice = chat.FbListingPrice;
                     var unreadCount = chat.UnReadCount;
                     var hide = unreadCount == 0 ? "hide" : "";
 
@@ -69,11 +72,21 @@
                         <div class="chat-info">
                             <div class="chat-name">@fbListingTitle</div>
                             <div class="chat-listing-info">
-                                <div class="listing-location">@fbListingLocation</div>
-                                <div class="listing-price">$@chat.FbListingPrice</div>
+                                @if (lastMesasge is not null)
+                                {
+                                    <div class="listing-location">@lastMessageFrom: @lastMesasge</div>
+                                }
+                                else if (fbListingLocation is not null)
+                                {
+                                    <div class="listing-location">@fbListingLocation</div>
+                                }
+                                @if (fbListingPrice is not null)
+                                {
+                                    <div class="listing-price">$@fbListingPrice</div>
+                                }
                             </div>
                         </div>
-                        <div class="chat-time">2m</div>
+                        @* <div class="chat-time">2m</div> *@
                     </div>
                 }
             </div>
@@ -120,11 +133,30 @@
                     </div>
                 }
 
-                <div class="avatar" style="margin-left:@avatarMargin"><img src="@selectedListingImage" /></div>
+                <div class="avatar" style="margin-left:@avatarMargin">
+                    @if (selectedListingImage is not null)
+                    {
+                        <img src="@selectedListingImage" />
+
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+
+                </div>
                 <div class="header-info">
 
-                    <h3>@selectedListingTitle</h3>
-                    <p>@selectedListingLocation - @selectedListingPrice</p>
+                    @if (selectedListingTitle is not null)
+                    {
+                        <h3>@selectedListingTitle</h3>
+
+                    }
+                    @if (selectedListingLocation is not null && selectedListingPrice is not null)
+                    {
+                        <p>@selectedListingLocation - @selectedListingPrice</p>
+                    }
+                   
                 </div>
             </div>
         }
@@ -181,12 +213,12 @@
                                         @chatMessage.Message
                                     }
                                 </div>
-                                @if (!isReceived)
+                                @* @if (!isReceived)
                                 {
                                     <div class="profile-picture-container">
                                         <span>Me</span>
                                     </div>
-                                }
+                                } *@
 
                             </div>
 
@@ -216,15 +248,13 @@
                     @if (chatMessage.FileData.Any())
                     {
                         var row = chatMessage.FileData.Count > 1 ? "flex-row" : "";
-                        var lastIndex = chatMessage.FileData.Count-1;
                         <div class="@row @messageClass">
-                            @for (int j = 0;  j < chatMessage.FileData.Count; j++)
+                            @for (int j = 0; j < chatMessage.FileData.Count; j++)
                             {
                                 var file = chatMessage.FileData[j];
-
                                 <div class="message @messageClass  @failedMessageClass">
                                     <div class="message-container">
-                                        @if (isReceived && UserProfileImage is not null && j==lastIndex)
+                                        @if (isReceived && UserProfileImage is not null && j==0)
                                         {
                                             <div class="profile-picture-container">
                                                 <img class="profile-picture" src="@UserProfileImage" />
@@ -243,12 +273,12 @@
                                                 <img class="image-message" src="@file.FileUrl" />
                                             }
                                         </div>
-                                        @if (!isReceived &&  j==lastIndex)
+                                        @* @if (!isReceived &&  j==0 )
                                         {
                                             <div class="profile-picture-container">
                                                 <span>Me</span>
                                             </div>
-                                        }
+                                        } *@
 
                                     </div>
                                     <div class="message-footer">

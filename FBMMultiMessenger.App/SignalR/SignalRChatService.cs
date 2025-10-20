@@ -42,7 +42,7 @@ namespace FBMMultiMessenger.SignalR
                 });
 
                 await _hubConnection.StartAsync();
-                await _hubConnection.SendAsync("RegisterUser", $"App_{userId}");
+                await _hubConnection.SendAsync("RegisterUser", $"{userId}");
 
             }
             catch (Exception ex)
