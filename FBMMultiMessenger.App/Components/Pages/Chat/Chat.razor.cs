@@ -64,7 +64,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         //The actual message 
         private string Message = string.Empty;
-        private string? UserProfileImage; 
+        private string? UserProfileImage;
 
         private List<FileData> PreviewMediaFiles { get; set; } = new List<FileData>();
         private List<FileData> PreviewMediaInMessagesContainer = new List<FileData>();
@@ -155,7 +155,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             FilteredAccountChats = AccountChats = response?.Data?.Chats ?? new List<GetMyChatsHttpResponse>();
-        
+
         }
 
 
@@ -204,24 +204,26 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     UserProfileImage = receivedChat.UserProfileImage,
                     FbListingLocation = receivedChat.FbListingLocation,
                     FbListingPrice = receivedChat.FbListingPrice,
+                    LastMessage = receivedChat.Message,
+                    LastMessageFrom = receivedChat.FbListingTitle?.Split(" ")[0],
                     FbChatId = receivedChat.FbChatId,
                     StartedAt = receivedChat.StartedAt,
-                    IsRead = receivedChat.IsRead,
+                    IsRead = false,
                 };
 
                 FilteredAccountChats.Insert(0, newChat);
-
             }
 
             //If the message that we received fbChatId is not opened so we add an unread badge and show it on top of the chat.
+            var myAccountChat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId);
             if (receivedChat.FbChatId != SelectedFbChatId)
             {
-                var myAccountChat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId);
                 if (myAccountChat is not null)
                 {
                     FilteredAccountChats.Remove(myAccountChat);
                     myAccountChat.UnReadCount += 1;
-                    FilteredAccountChats.Insert(0, myAccountChat); //new message should display on top.
+                    FilteredAccountChats.Insert(0, myAccountChat); //new message must display on top.
+
                     await JS.InvokeVoidAsync("myInterop.playNotificationSound", 1);
                 }
             }
@@ -230,11 +232,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 //actual chat message
                 var receivedMessage = new GeChatMessagesHttpResponse()
                 {
-                    IsReceived = !receivedChat.IsSent,
+                    IsReceived = receivedChat.IsReceived,
                     IsTextMessage = receivedChat.IsTextMessage,
                     IsImageMessage = receivedChat.IsImageMessage,
                     IsVideoMessage = receivedChat.IsVideoMessage,
                     IsAudioMessage = receivedChat.IsAudioMessage,
+                    IsSent = true,
                     CreatedAt = receivedChat.StartedAt
                 };
 
@@ -248,6 +251,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 }
 
                 ChatMessages.Add(receivedMessage);
+            }
+            if (myAccountChat is not null)
+            {
+                myAccountChat.LastMessage = receivedChat.Message;
+                myAccountChat.LastMessageFrom = receivedChat.FbListingTitle?.Split(" ")[0];
+                myAccountChat.IsRead = receivedChat.FbChatId == SelectedFbChatId;
             }
 
             await InvokeAsync(StateHasChanged);
@@ -269,6 +278,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 //Making the unread messages to read
                 myAccountChats.UnReadCount = 0;
+                myAccountChats.IsRead = true;
                 UserProfileImage = myAccountChats.UserProfileImage;
                 await InvokeAsync(StateHasChanged);
             }
@@ -278,7 +288,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             if (response is null || !response.IsSuccess)
             {
                 Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
-
+                    
                 return;
             }
 
@@ -346,7 +356,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 FbChatId = SelectedFbChatId!,
                 Message = newChat.Message,
-                Files = newChat.FileData.Select(x => x.File).ToList()
+                Files = newChat.FileData.Select(x => x.File).ToList(),
+                
             };
 
             var response = await ExtensionService.Notify<BaseResponse<NotifyExtensionHttpResponse>>(request);
@@ -458,10 +469,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (chat is not null)
             {
-                selectedListingTitle = chat.FbListingTitle ;
+                selectedListingTitle = chat.FbListingTitle;
                 selectedListingLocation = chat.FbListingLocation;
                 selectedListingPrice  = chat.FbListingPrice?.ToString();
-                selectedListingImage = chat.FbListingImage ;
+                selectedListingImage = chat.FbListingImage;
             }
         }
 
@@ -525,7 +536,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public void Dispose()
         {
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
-            SignalRChatService?.DisconnectAsync();
+            // SignalRChatService?.DisconnectAsync();
         }
     }
 }

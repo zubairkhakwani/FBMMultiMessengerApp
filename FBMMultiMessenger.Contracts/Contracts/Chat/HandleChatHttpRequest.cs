@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FBMMultiMessenger.Contracts.Contracts.Chat
+﻿namespace FBMMultiMessenger.Contracts.Contracts.Chat
 {
     public class HandleChatHttpRequest
     {
@@ -63,7 +54,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
         public bool IsImageMessage { get; set; }
         public bool IsAudioMessage { get; set; }
 
-        public bool IsSent { get; set; }
+        public bool IsReceived { get; set; }
 
         public DateTime StartedAt { get; set; }
 

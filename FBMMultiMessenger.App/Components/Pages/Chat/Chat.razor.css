@@ -163,7 +163,6 @@ body {
 }
 
 .chat-listing-info {
-    color: #65676b;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -180,6 +179,22 @@ body {
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
+}
+.preview {
+    font-size: 13px;
+    color: #65676b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chat-listing-info.unread .preview {
+    color: #000;
+    font-weight: 500;
+}
+
+.chat-listing-info.read .preview {
+    color: #65676b;
+    font-weight: normal;
 }
 
 .listing-price {
@@ -246,13 +261,15 @@ body {
 
 .messages-container {
     overflow-y: auto;
+    overflow-x:hidden;
     padding: 16px;
     background: #f0f2f5;
 }
 .message-container{
     display:flex;
     align-items:end;
-    gap:5px
+    gap:5px;
+    max-width:650px;
 }
 
 .message-footer {
@@ -272,8 +289,6 @@ body {
 
     .message .image-message {
         display: block;
-        width: 180px;
-        height: 180px;
         object-fit: cover;
         max-width: 100%;
     }
@@ -288,11 +303,10 @@ body {
         
 
 .message-bubble {
-    max-width: 100%;
     padding: 8px 12px;
     border-radius: 18px;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.6;
     word-wrap: break-word;
     white-space: pre-wrap;
     position: relative;

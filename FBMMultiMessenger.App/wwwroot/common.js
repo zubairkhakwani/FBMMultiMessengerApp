@@ -9,7 +9,7 @@
         localStorage.removeItem(key);
     },
     playNotificationSound: function (volume) {
-        const audio = new Audio('/sounds/notification.mp3');
+        const audio = new Audio('/sounds/threads.mp3');
         audio.volume = volume;
         audio.play();
     },
