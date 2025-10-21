@@ -269,7 +269,7 @@ body {
     display:flex;
     align-items:end;
     gap:5px;
-    max-width:650px;
+    max-width:600px;
 }
 
 .message-footer {

@@ -13,6 +13,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Extension
     {
         [Required]
         public string FbChatId { get; set; } = null!;
+        public string OfflineUniqueId { get; set; } = string.Empty;
 
         public string? Message { get; set; }
 
@@ -25,7 +26,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Extension
         [Required]
         public string FbChatId { get; set; } = null!;
 
-
+        public string OfflineUniqueId { get; set; } = string.Empty;
         [Required]
         public string Message { get; set; } = null!;
 

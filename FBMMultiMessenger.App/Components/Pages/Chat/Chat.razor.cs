@@ -192,6 +192,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task HandleMessageReceivedAsync(HandleChatHttpResponse receivedChat)
         {
+            var chatMessage = ChatMessages.FirstOrDefault(x => !x.IsReceived && x.UniqueId == receivedChat.OfflineUniqueId && x.Message == receivedChat.Message);
+            if (chatMessage is not null)
+            {
+                chatMessage.Sending = false;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
             var isChatPresent = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId);
             if (isChatPresent is null)
             {
@@ -288,7 +295,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             if (response is null || !response.IsSuccess)
             {
                 Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
-                    
+
                 return;
             }
 
@@ -357,7 +364,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 FbChatId = SelectedFbChatId!,
                 Message = newChat.Message,
                 Files = newChat.FileData.Select(x => x.File).ToList(),
-                
+                OfflineUniqueId = newChat.UniqueId
             };
 
             var response = await ExtensionService.Notify<BaseResponse<NotifyExtensionHttpResponse>>(request);

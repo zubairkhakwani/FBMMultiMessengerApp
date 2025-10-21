@@ -46,7 +46,7 @@
         public string? FbListingImage { get; set; }
         public string? UserProfileImage { get; set; }
         public string Message { get; set; } = null!;
-
+        public string? OfflineUniqueId { get; set; }
         public bool IsRead { get; set; }
 
         public bool IsTextMessage { get; set; }
