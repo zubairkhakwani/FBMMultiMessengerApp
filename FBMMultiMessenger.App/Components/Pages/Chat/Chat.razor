@@ -37,7 +37,7 @@
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
                     <input @bind-value="FilterKeyword"
-                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
+                    @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
                 </div>
             </div>
             <div class="chat-list" style="height:@sideBarHeight">
@@ -53,7 +53,7 @@
                     var isRead = chat.IsRead ? "read" : "unread";
                     var fbListingPrice = chat.FbListingPrice;
                     var unreadCount = chat.UnReadCount;
-                    var hide = unreadCount == 0 ? "hide" : "";
+                    var hide = (unreadCount == 0 || chat.IsRead) ? "hide" : "";
 
                     <div @onclick="() => LoadChatMessage(fbChatId)" class="chat-item unread">
 
@@ -106,7 +106,7 @@
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
                     <input @bind-value="FilterKeyword"
-                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
+                    @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
                 </div>
             </div>
             <div class="empty-state-sidebar">
@@ -157,7 +157,7 @@
                     {
                         <p>@selectedListingLocation - @selectedListingPrice</p>
                     }
-                   
+
                 </div>
             </div>
         }
@@ -186,7 +186,7 @@
                     var isReceived = chatMessage.IsReceived;
                     var messageClass = isReceived ? "received" : "sent";
                     var isSent = !isReceived;
-                    var isMessageFailedToSend = !chatMessage.IsSent && !isReceived;
+                    var isMessageFailedToSend = !chatMessage.IsSent && isSent;
                     var failedMessageClass = isMessageFailedToSend ? "failed" : "";
 
                     @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
@@ -249,6 +249,9 @@
                     @if (chatMessage.FileData.Any())
                     {
                         var row = chatMessage.FileData.Count > 1 ? "flex-row" : "";
+                        var filesCount = chatMessage.FileData.Count;
+                        var imageWidthStyle = "width: " + (filesCount == 1 ? 429 : filesCount == 2 ? 190 : 125) +"px";
+
                         <div class="@row @messageClass">
                             @for (int j = 0; j < chatMessage.FileData.Count; j++)
                             {
@@ -271,7 +274,7 @@
                                             }
                                             else
                                             {
-                                                <img class="image-message" src="@file.FileUrl" />
+                                                <img class="image-message" src="@file.FileUrl" style="@imageWidthStyle" />
                                             }
                                         </div>
                                         @* @if (!isReceived &&  j==0 )
@@ -282,25 +285,28 @@
                                         } *@
 
                                     </div>
-                                    <div class="message-footer">
-                                        <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
-                                        @if (isSent)
-                                        {
-                                            @if (chatMessage.Sending)
+                                    @if (j == (chatMessage.FileData.Count - 1))
+                                    {
+                                        <div class="message-footer">
+                                            <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
+                                            @if (isSent)
                                             {
-                                                <span class="message-status sending">
-                                                    <span class="status-icon">⏱</span> Sending...
-                                                </span>
+                                                @if (chatMessage.Sending)
+                                                {
+                                                    <span class="message-status sending">
+                                                        <span class="status-icon">⏱</span> Sending...
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="message-status sent">
+                                                        <span class="status-icon">✓</span> Sent
+                                                    </span>
+                                                }
                                             }
-                                            else
-                                            {
-                                                <span class="message-status sent">
-                                                    <span class="status-icon">✓</span> Sent
-                                                </span>
-                                            }
-                                        }
 
-                                    </div>
+                                        </div>                                        
+                                    }
                                 </div>
                             }
                         </div>
@@ -338,8 +344,8 @@
                 <div class="input-container">
                     <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
                     <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
-                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1"></textarea>
-                    <button @onclick="() => NotifyExtension()" class="send-button">➤</button>
+                    <textarea @bind="Message" @ref="textArea" @onfocusout="FocusTextArea" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                    <button @onclick="() => NotifyExtension(Message)" class="send-button">➤</button>
                 </div>
             }
 

@@ -105,7 +105,10 @@ namespace FBMMultiMessenger.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"{ex.Message} inner => {ex.InnerException?.Message}");
                 var data = BaseResponse<TResponse>.Error("Something went wrong, please try later.");
+                data.APIRequestFailed = true;
+
                 var res = JsonConvert.SerializeObject(data);
                 var APIResponse = JsonConvert.DeserializeObject<TResponse>(res);
 

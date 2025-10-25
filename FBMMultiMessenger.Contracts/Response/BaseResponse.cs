@@ -14,6 +14,8 @@ namespace FBMMultiMessenger.Contracts.Response
         public bool IsSuccess { get; set; } = true;
         public bool RedirectToPackages { get; set; }
         public string Message { get; set; } = string.Empty;
+        public bool APIRequestFailed { get; set; }
+
 
         public T? Data { get; set; }
 

@@ -19,6 +19,9 @@ namespace FBMMultiMessenger.SignalR
         public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
 
         private readonly string _baseURL;
+        private bool _isReconnecting = false;
+        private bool _shouldReconnect = true;
+        private string userId;
 
         public SignalRChatService(IConfiguration configuration)
         {
@@ -27,6 +30,9 @@ namespace FBMMultiMessenger.SignalR
 
         public async Task ConnectAsync(string userId)
         {
+            this.userId = userId;
+            _shouldReconnect = true; // ← Add this line
+
             try
             {
                 _hubConnection = new HubConnectionBuilder()
@@ -44,11 +50,49 @@ namespace FBMMultiMessenger.SignalR
                 await _hubConnection.StartAsync();
                 await _hubConnection.SendAsync("RegisterUser", $"{userId}");
 
+                _hubConnection.Closed += async (error) =>
+                {
+                    if(_shouldReconnect)
+                    {
+                        Console.WriteLine("SignalR disconnected, attempting to reconnect...");
+                        await AttemptReconnect();
+                    }
+                };
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Something went wrong when connecting user to signalR");
             }
+        }
+
+        private async Task AttemptReconnect()
+        {
+            if (_isReconnecting || !_shouldReconnect) return;
+
+            _isReconnecting = true;
+
+            while (_hubConnection?.State != HubConnectionState.Connected && _shouldReconnect)
+            {
+                try
+                {
+                    Console.WriteLine("Reconnecting...");
+                    await Task.Delay(5000); // Wait 5 seconds
+
+                    await _hubConnection.StartAsync();
+                    await _hubConnection.SendAsync("RegisterUser", userId);
+
+                    Console.WriteLine("Reconnected successfully!");
+                    _isReconnecting = false;
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Reconnection failed: {ex.Message}, retrying in 5 seconds...");
+                }
+            }
+
+            _isReconnecting = false;
         }
 
         public async Task HandleNotification(string deviceId, string fbChatId)
@@ -58,6 +102,8 @@ namespace FBMMultiMessenger.SignalR
 
         public async Task DisconnectAsync()
         {
+            _shouldReconnect = false;
+
             if (_hubConnection != null)
             {
                 await _hubConnection.StopAsync();

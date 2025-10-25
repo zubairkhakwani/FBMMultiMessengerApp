@@ -50,6 +50,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [Inject]
         private ICurrentUserService CurrentUserService { get; set; }
 
+        private ElementReference? textArea;
 
         [SupplyParameterFromQuery]
         public string IsNotification { get; set; } //this bit tells if the user opens the notification from his app and we have to show him the right chat.
@@ -192,17 +193,47 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task HandleMessageReceivedAsync(HandleChatHttpResponse receivedChat)
         {
-            var chatMessage = ChatMessages.FirstOrDefault(x => !x.IsReceived && x.UniqueId == receivedChat.OfflineUniqueId && x.Message == receivedChat.Message);
-            if (chatMessage is not null)
+            var chatExistInSidebar = FilteredAccountChats.Any(x => x.FbChatId == receivedChat.FbChatId);
+            var notificationSound = true;
+
+            if(receivedChat.FbChatId == SelectedFbChatId)
             {
-                chatMessage.Sending = false;
-                await InvokeAsync(StateHasChanged);
-                return;
+                notificationSound = false;
+
+                var chatMessage = ChatMessages.FirstOrDefault(x => !x.IsReceived && !string.IsNullOrWhiteSpace(receivedChat.OfflineUniqueId) && x.UniqueId == receivedChat.OfflineUniqueId);
+
+                if (chatMessage is not null)
+                {
+                    chatMessage.Sending = false;
+                }
+                else
+                {
+                    var receivedMessage = new GeChatMessagesHttpResponse()
+                    {
+                        IsReceived = receivedChat.IsReceived,
+                        IsTextMessage = receivedChat.IsTextMessage,
+                        IsImageMessage = receivedChat.IsImageMessage,
+                        IsVideoMessage = receivedChat.IsVideoMessage,
+                        IsAudioMessage = receivedChat.IsAudioMessage,
+                        IsSent = true,
+                        CreatedAt = receivedChat.StartedAt
+                    };
+
+                    if (receivedChat.IsImageMessage || receivedChat.IsVideoMessage)
+                    {
+                        receivedMessage.FileData = GetFileData(receivedChat.Message);
+                    }
+                    else
+                    {
+                        receivedMessage.Message = receivedChat.Message;
+                    }
+
+                    ChatMessages.Add(receivedMessage);
+                }
             }
-            var isChatPresent = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId);
-            if (isChatPresent is null)
+            else if (!chatExistInSidebar)
             {
-                //sidebar account chat
+
                 var newChat = new GetMyChatsHttpResponse()
                 {
                     Id = receivedChat.ChatId,
@@ -221,56 +252,57 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 FilteredAccountChats.Insert(0, newChat);
             }
 
-            //If the message that we received fbChatId is not opened so we add an unread badge and show it on top of the chat.
-            var myAccountChat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId);
-            if (receivedChat.FbChatId != SelectedFbChatId)
+            if(notificationSound)
             {
-                if (myAccountChat is not null)
-                {
-                    FilteredAccountChats.Remove(myAccountChat);
-                    myAccountChat.UnReadCount += 1;
-                    FilteredAccountChats.Insert(0, myAccountChat); //new message must display on top.
-
-                    await JS.InvokeVoidAsync("myInterop.playNotificationSound", 1);
-                }
+                await JS.InvokeVoidAsync("myInterop.playNotificationSound", 1);
             }
-            else
-            {
-                //actual chat message
-                var receivedMessage = new GeChatMessagesHttpResponse()
-                {
-                    IsReceived = receivedChat.IsReceived,
-                    IsTextMessage = receivedChat.IsTextMessage,
-                    IsImageMessage = receivedChat.IsImageMessage,
-                    IsVideoMessage = receivedChat.IsVideoMessage,
-                    IsAudioMessage = receivedChat.IsAudioMessage,
-                    IsSent = true,
-                    CreatedAt = receivedChat.StartedAt
-                };
 
-                if (receivedChat.IsImageMessage || receivedChat.IsVideoMessage)
-                {
-                    receivedMessage.FileData = GetFileData(receivedChat.Message);
-                }
-                else
-                {
-                    receivedMessage.Message = receivedChat.Message;
-                }
+            var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId);
 
-                ChatMessages.Add(receivedMessage);
-            }
-            if (myAccountChat is not null)
-            {
-                myAccountChat.LastMessage = receivedChat.Message;
-                myAccountChat.LastMessageFrom = receivedChat.FbListingTitle?.Split(" ")[0];
-                myAccountChat.IsRead = receivedChat.FbChatId == SelectedFbChatId;
-            }
+            chat.LastMessage = receivedChat.Message;
+            chat.LastMessageFrom = receivedChat.FbListingTitle?.Split(" ")[0];
+            chat.IsRead = receivedChat.FbChatId == SelectedFbChatId;
+
+            FilteredAccountChats.Remove(chat);
+            chat.UnReadCount += receivedChat.IsReceived ? 1 : 0;
+            FilteredAccountChats.Insert(0, chat);
 
             await InvokeAsync(StateHasChanged);
         }
 
+        private async Task FocusTextArea()
+        {
+            try
+            {
+                while(true)
+                {
+                    if (textArea != null)
+                    {
+                        await textArea.Value.FocusAsync();
+                        break;
+                    }
+
+                    await Task.Delay(100);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         public async Task LoadChatMessage(string fbChatId)
         {
+            var previousSelectedChatId = SelectedFbChatId;
+            SelectedFbChatId = fbChatId;
+            
+            if(previousSelectedChatId != SelectedFbChatId)
+            {
+                ChatMessages.Clear();
+            }
+
+            await FocusTextArea();
+
             HandleSelectedChat(fbChatId);
 
             if (isAndriodPlatform)
@@ -295,11 +327,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             if (response is null || !response.IsSuccess)
             {
                 Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
-
+                SelectedFbChatId = previousSelectedChatId;
                 return;
             }
-
-            SelectedFbChatId = fbChatId;
 
             var responseChatMesasge = response?.Data ?? new List<GeChatMessagesHttpResponse>();
 
@@ -323,74 +353,100 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
-        public async Task NotifyExtension()
+        public async Task NotifyExtension(string msg)
         {
-            var isValidRequest = IsValidRequest();
+            await FocusTextArea();
+
+            var isValidRequest = IsValidRequest(msg);
             if (!isValidRequest)
             {
                 return;
             }
 
-            Message = Message.Trim();
+            msg = msg.Trim();
 
-            //This is for UI.
-            var newChat = new GeChatMessagesHttpResponse()
-            {
-                FBChatId = SelectedFbChatId!,
-                Message = Message,
-                IsReceived = false,
-                IsSent = true,
-                IsTextMessage = !string.IsNullOrWhiteSpace(Message),
-                IsImageMessage = PreviewMediaFiles.Count > 0,
-                IsVideoMessage = false,
-                IsAudioMessage = false,
-                CreatedAt = DateTime.UtcNow,
-                Sending = true,
-                UniqueId = Guid.NewGuid().ToString()
-            };
+            var messages = new List<GeChatMessagesHttpResponse>();
 
-            if (newChat.IsImageMessage)
+            if(!string.IsNullOrWhiteSpace(msg))
             {
-                newChat.FileData = PreviewMediaFiles;
-                PreviewMediaFiles = new();
+                var textMessage = new GeChatMessagesHttpResponse
+                {
+                    FBChatId = SelectedFbChatId!,
+                    Message = msg,
+                    IsReceived = false,
+                    IsSent = true,
+                    IsTextMessage = true,
+                    IsImageMessage = false,
+                    IsVideoMessage = false,
+                    IsAudioMessage = false,
+                    CreatedAt = DateTime.UtcNow,
+                    Sending = true,
+                    UniqueId = Guid.NewGuid().ToString()
+                };
+
+                messages.Add(textMessage);
+                ChatMessages.Add(textMessage);
             }
 
-            ChatMessages.Add(newChat);
             Message = string.Empty;
 
-            //This is to call API 
-            var request = new NotifyExtensionRequest()
+            if (PreviewMediaFiles.Count > 0)
             {
-                FbChatId = SelectedFbChatId!,
-                Message = newChat.Message,
-                Files = newChat.FileData.Select(x => x.File).ToList(),
-                OfflineUniqueId = newChat.UniqueId
-            };
+                var FilesMessage = new GeChatMessagesHttpResponse()
+                {
+                    FBChatId = SelectedFbChatId!,
+                    Message = string.Empty,
+                    IsReceived = false,
+                    IsSent = true,
+                    IsTextMessage = false,
+                    IsImageMessage = true,
+                    IsVideoMessage = false,
+                    IsAudioMessage = false,
+                    CreatedAt = DateTime.UtcNow,
+                    Sending = true,
+                    UniqueId = Guid.NewGuid().ToString()
+                };
 
-            var response = await ExtensionService.Notify<BaseResponse<NotifyExtensionHttpResponse>>(request);
+                FilesMessage.FileData = PreviewMediaFiles;
+                PreviewMediaFiles = new();
 
-            if (!response.IsSuccess && response.RedirectToPackages)
-            {
-                var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;
-                Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
-                return;
+                messages.Add(FilesMessage);
+                ChatMessages.Add(FilesMessage);
             }
 
-            else if (response.IsSuccess)
+            foreach (var chat in messages)
             {
-                //Snackbar.Add(response.Message, Severity.Success);
-                //Message = string.Empty;
-                PreviewMediaFiles = new List<FileData>();
-                return;
+                var ms = $"message: {Message}, UniqueId: {chat.UniqueId}";
+                _ = JS.InvokeVoidAsync("console.log", ms);
+
+                //This is to call API 
+                var request = new NotifyExtensionRequest()
+                {
+                    FbChatId = SelectedFbChatId!,
+                    Message = chat.Message,
+                    Files = chat.FileData.Select(x => x.File).ToList(),
+                    OfflineUniqueId = chat.UniqueId
+                };
+
+                var response = await ExtensionService.Notify<BaseResponse<NotifyExtensionHttpResponse>>(request);
+
+                if (!response.IsSuccess && response.RedirectToPackages)
+                {
+                    var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;
+                    Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
+                    return;
+                }
+
+                if (!response.IsSuccess)
+                {
+                    Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
+                }
             }
-
-
-            Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
         }
 
-        public bool IsValidRequest()
+        public bool IsValidRequest(string message)
         {
-            if (PreviewMediaFiles.Count == 0 && string.IsNullOrWhiteSpace(Message))
+            if (PreviewMediaFiles.Count == 0 && string.IsNullOrWhiteSpace(message))
             {
                 return false;
             }
@@ -463,8 +519,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [JSInvokable]
         public async Task HandleEnterKey(string message)
         {
-            Message = message;
-            await NotifyExtension();
+            await NotifyExtension(message);
             await InvokeAsync(StateHasChanged);
         }
 
@@ -522,7 +577,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 await SignalRChatService.ConnectAsync(currentUserId);
 
-                SignalRChatService.OnHandleMessage += async (msg) => await HandleMessageReceivedAsync(msg);
+                SignalRChatService.OnHandleMessage += HandleMessageReceivedAsync;
             }
         }
 
@@ -543,7 +598,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public void Dispose()
         {
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
-            // SignalRChatService?.DisconnectAsync();
+            SignalRChatService.OnHandleMessage -= HandleMessageReceivedAsync;
+            SignalRChatService?.DisconnectAsync();
         }
     }
 }

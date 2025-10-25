@@ -17,7 +17,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
         public bool IsVideoMessage { get; set; }
         public bool IsImageMessage { get; set; }
         public bool IsAudioMessage { get; set; }
-        public bool IsSent { get; set; }
+        public bool IsSent { get; set; } // message status
         public DateTime CreatedAt { get; set; }
         public string UniqueId { get; set; } = string.Empty;
         public bool Sending { get; set; }
