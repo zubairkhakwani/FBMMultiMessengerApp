@@ -1,4 +1,4 @@
-﻿using FBMMultiMessenger.Components.Shared.CustomPopupform;
+﻿using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Services.IServices;

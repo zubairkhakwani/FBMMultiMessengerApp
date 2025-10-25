@@ -41,8 +41,8 @@ namespace FBMMultiMessenger.Services
             CurrentUser = new CurrentUser
             {
                 Id = int.Parse(idClaim),
-                Name = authState?.User?.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
-                Email = authState?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty,
+                Name = authState?.User?.FindFirst("unique_name")?.Value ?? string.Empty,
+                Email = authState?.User?.FindFirst("email")?.Value ?? string.Empty,
             };
 
             return CurrentUser;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace FBMMultiMessenger.Components.Shared.CustomPopupform
+namespace FBMMultiMessenger.Components.Pages.Shared.CustomPopupform
 {
     public partial class ConfirmationDialog
     {

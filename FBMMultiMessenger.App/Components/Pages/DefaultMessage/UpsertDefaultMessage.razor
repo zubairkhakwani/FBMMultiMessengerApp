@@ -1,0 +1,132 @@
+﻿@page "/create/defaultmessage"
+@page "/edit/{DefaultMessageId}/defaultmessage"
+
+@if (IsMobilePlatform)
+{
+    <div class="mobile-container">
+        <div class="header">
+            <div class="logo-circle">
+                @*  <div class="logo">
+                    FBM
+                </div> *@
+                <svg viewBox="0 0 24 24" fill="white" width="28" height="28">
+                    <path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15h-2v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95 0-5.52-4.48-10-10-10z" />
+                </svg>
+            </div>
+            <h1 class="title">@Title</h1>
+            <p class="subtitle">@SubTitle</p>
+        </div>
+
+        <div class="form-container">
+            <div class="form-intro">
+                <h2>@Heading</h2>
+                <p>@Description</p>
+            </div>
+
+            <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label for="name" class="form-label">Default Message</label>
+                    <InputTextArea id="name"
+                                   class="form-input"
+                                   @bind-Value="model.Message"
+                                   placeholder="Please enter default message"
+                                   Rows="3"
+                                   style="resize: none;">
+                    </InputTextArea>
+                    <ValidationMessage For="@(() => model.Message)" class="validation-message" />
+                </div>
+
+                <div class="form-group">
+                    <label for="cookies" class="form-label">Cookies</label>
+                    <MudSelect T="string" Dense=true Variant="Variant.Outlined" MultiSelection="true" SelectAll="true" SelectAllText="Select all accounts" HelperText="Select one or more accounts that will use this default message" @bind-SelectedValues="Options" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" Label="Account" AdornmentIcon="@Icons.Material.Filled.Search">
+                @foreach (var account in DefaultMessagesAccounts)
+                {
+                    var isTaken = account.IsTaken;
+                    var accountName = account.Name;
+                    @if (isTaken)
+                    {
+                        var toolTip = $"{accountName} has already taken for the default message";
+                        <MudTooltip Class="block-tooltip"
+                                    Arrow="true"
+                                    Placement="Placement.Top"
+                                    ShowOnClick="true"
+                                    ShowOnFocus="true"
+                                    ShowOnHover="true"
+                                    Text="@toolTip">
+                            <MudSelectItem T="string" Disabled Value="@account.Id.ToString()">
+                                @account.Name
+                            </MudSelectItem>
+                        </MudTooltip>
+
+                    }
+
+                    else
+                    {
+                        <MudSelectItem T="string" Value="@account.Id.ToString()">@accountName</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+                    <ValidationMessage For="@(() => model.SelectedAccounts)" class="validation-message" />
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span>+ @ButtonText</span>
+                    
+                </button>
+            </EditForm>
+        </div>
+
+    </div>
+}
+else
+{
+    <PopupForm Model="@model" OnValidSubmit="OnValidSubmit" Setting="popupFormSettings">
+        <div>
+            <MudTextField @bind-Value="model.Message" Label="Default Message" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.TwoTone.Markunread" />
+            <MudSelect T="string" Dense=true Variant="Variant.Outlined" MultiSelection="true" SelectAll="true" SelectAllText="Select all accounts" HelperText="Select one or more accounts that will use this default message" @bind-SelectedValues="Options" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" Label="Account" AdornmentIcon="@Icons.Material.Filled.Search">
+                @foreach (var account in DefaultMessagesAccounts)
+                {
+                    var isTaken = account.IsTaken;
+                    var accountName = account.Name;
+                    @if (isTaken)
+                    {
+                        var toolTip = $"{accountName} has already taken for the default message";
+                        <MudTooltip Class="block-tooltip"
+                                    Arrow="true"
+                                    Placement="Placement.Top"
+                                    ShowOnClick="true"
+                                    ShowOnFocus="true"
+                                    ShowOnHover="true"
+                                    Text="@toolTip">
+                            <MudSelectItem T="string" Disabled Value="@account.Id.ToString()">
+                                @account.Name
+                            </MudSelectItem>
+                        </MudTooltip>
+
+                    }
+
+                    else
+                    {
+                        <MudSelectItem T="string" Value="@account.Id.ToString()">@accountName</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+
+        </div>
+        <CustomPopupFormActions>
+
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+                <MudIcon Icon="@Icons.Material.TwoTone.Markunread" Class="me-2" />
+                @{
+                    var buttonText = DefaultMessageId is null ? "Add" : "Edit";
+                }
+                @buttonText
+            </MudButton>
+
+            <MudButton OnClick="Cancel" Color="Color.Primary">Cancel</MudButton>
+        </CustomPopupFormActions>
+    </PopupForm>
+}
+

@@ -77,14 +77,22 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         public async Task OnValidSubmit()
         {
+            var isValidReqeust = ValidateCookie(model.Cookie);
+            if (!isValidReqeust)
+            {
+                Snackbar.Add("The cookie you provided is not valid. Please provide a valid facebook cookie.", Severity.Info);
+                return;
+            }
+
             int? accountId = string.IsNullOrWhiteSpace(AccountId) ? null : Convert.ToInt32(AccountId);
 
             var response = await AccountService.UpsertAccountAsync<BaseResponse<UpsertAccountHttpResponse>>(model, accountId);
 
 
+            mudDialog?.Close(DialogResult.Ok(true));
+
             if (!response.IsSuccess && response.Data is not null && response.Data.IsLimitExceeded)
             {
-                mudDialog?.Close(DialogResult.Ok(true));
                 await JS.InvokeVoidAsync("myInterop.showSweetAlert", "Limit Exceeded", response.Message, true, "Click here to upgrade from the available packages", "/packages");
             }
 
@@ -99,14 +107,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 Snackbar.Add(response.Message, response.IsSuccess ? Severity.Success : Severity.Error);
 
-                if (IsMobilePlatform)
+                if (IsMobilePlatform && response.IsSuccess)
                 {
                     Navigation.NavigateTo("/Account");
-                }
-
-                if (response.IsSuccess)
-                {
-                    mudDialog?.Close(DialogResult.Ok(true));
                 }
             }
         }
@@ -114,6 +117,29 @@ namespace FBMMultiMessenger.Components.Pages.Account
         public void Cancel()
         {
             mudDialog.Cancel();
+        }
+
+        private bool ValidateCookie(string cookieString)
+        {
+            try
+            {
+                // Parse cookies into dictionary
+                var cookies = cookieString
+                    .Split(';')
+                    .Select(x => x.Trim().Split('=', 2))
+                    .Where(x => x.Length == 2)
+                    .ToDictionary(x => x[0], x => x[1]);
+
+
+                if (!cookies.ContainsKey("c_user") || !cookies.ContainsKey("xs"))
+                    return false;
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

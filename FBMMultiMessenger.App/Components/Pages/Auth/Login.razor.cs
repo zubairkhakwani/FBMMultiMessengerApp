@@ -41,11 +41,8 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
         public string? ResponseError;
         private bool ShowLoader = false;
-
-        protected override async Task OnInitializedAsync()
-        {
-
-        }
+        private bool ShowPassword = false;
+        private string PasswordType = "password";
 
         public async Task OnValidPost()
         {
@@ -81,6 +78,13 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
             ShowLoader = false;
             ResponseError = response.Message;
+        }
+
+        public void HandlePasswordToggle()
+        {
+            ShowPassword = !ShowPassword;
+            PasswordType =  ShowPassword ? "text" : "password";
+
         }
     }
 }

@@ -1,0 +1,198 @@
+﻿@page "/Profile"
+<div class="container">
+    <a class="back-button" href="/account">
+        ← Back to Dashboard
+    </a>
+    @* <div class="profile-header">
+        <div class="profile-avatar">@ShortName</div>
+        <div class="profile-header-info">
+            <h1>Shaheer Ahmad</h1>
+            <p>Premium Member • Joined January 15, 2025</p>
+        </div>
+    </div> *@
+
+    <div class="cards-grid">
+        <!-- Personal Information Card -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">👤</div>
+                <h3>Personal Information</h3>
+            </div>
+            <EditForm id="personalInfoForm" Model="@ProfileModel" OnValidSubmit="OnValidProfileSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label class="form-label" for="fullName">Full Name <span class="aestaric">*</span></label>
+                    <InputText id="fullName"
+                               class="form-input"
+                               @bind-Value="ProfileModel.Name"
+                               required />
+                    <ValidationMessage For="@(() => ProfileModel.Name)" class="validation-message" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address <span class="aestaric">*</span></label>
+                    <InputText id="email"
+                               class="form-input"
+                               @bind-Value="ProfileModel.Email"
+                               required />
+                    <ValidationMessage For="@(() => ProfileModel.Email)" class="validation-message" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number <span class="aestaric">*</span></label>
+                    <InputText id="phone"
+                               @bind-Value="ProfileModel.PhoneNumber"
+                               class="form-input" />
+                    <ValidationMessage For="@(() => ProfileModel.PhoneNumber)" class="validation-message" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="member">Member Since </label>
+                    <input type="text"
+                           id="member"
+                           Value="@JoinedAt"
+                           class="form-input"
+                           disabled />
+                </div>
+                @if (ShowProfileLoader)
+                {
+                        <button disabled class="btn-primary">
+                            <div class="loader"></div>
+                        </button>
+                }
+                else
+                {
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                }
+                
+            </EditForm>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">🔒</div>
+                <h3>Change Password</h3>
+            </div>
+            <EditForm id="changePasswordForm" Model="@PasswordModel" OnValidSubmit="OnValidPasswordSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label class="form-label" for="currentPassword">Current Password <span class="aestaric">*</span></label>
+                    <div class="password-input-wrapper">
+                        <InputText id="currentPassword"
+                                   class="form-input"
+                                   @bind-Value="PasswordModel.CurrentPassword"
+                                   required
+                                   placeholder="Enter your current password" />
+                        <ValidationMessage For="@(() => PasswordModel.CurrentPassword)" class="validation-message" />
+                        <button type="button" class="toggle-password">
+                            @* 👁️ *@
+                        </button>
+                    </div>
+                </div>
+
+                 <PasswordRequirement Password="@Password"/>
+
+                <div class="form-group">
+                    <label class="form-label" for="newPassword">New Password <span class="aestaric">*</span></label>
+                    <div class="password-input-wrapper">
+                        <InputText id="newPassword"
+                                   @bind-Value="PasswordModel.NewPassword"
+                                   @oninput="(e) => IsStrongPassword(e)"
+                                   class="form-input"
+                                   required
+                                   placeholder="Enter your new password" />
+
+                        <ValidationMessage For="@(() => PasswordModel.NewPassword)" class="validation-message" />
+
+                        <button type="button" class="toggle-password">
+                           @*  👁️ *@
+                        </button>
+                    </div>
+                   
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirm New Password <span class="aestaric">*</span></label>
+                    <div class="password-input-wrapper">
+                        <InputText id="confirmPassword"
+                                   @bind-Value="PasswordModel.ConfirmPassword"
+                                   class="form-input"
+                                   required
+                                   placeholder="Re-enter your new password" />
+                        <ValidationMessage For="@(() => PasswordModel.ConfirmPassword)" class="validation-message" />
+
+                        <button type="button" class="toggle-password">
+                            @* 👁️ *@
+                        </button>
+                    </div>
+                    <div class="validation-message" id="match-error">
+                        Passwords do not match
+                    </div>
+                </div>
+                @if (ShowPasswordLoader)
+                {
+                        <button disabled class="btn-primary">
+                            <div class="loader"></div>
+                        </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn-primary">Change Password</button>
+                }
+               
+            </EditForm>
+        </div>
+
+        <!-- Account Statistics Card -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">📊</div>
+                <h3>Account Statistics</h3>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Account Status</span>
+                <span class="stat-value" style="color: #2ed573;">Active</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Member Since</span>
+                <span class="stat-value">Jan 15, 2025</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Sessions</span>
+                <span class="stat-value">142</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Last Active</span>
+                <span class="stat-value">Today at 3:45 PM</span>
+            </div>
+        </div>
+
+        <!-- Subscription Plan Card -->
+        <div class="subscription-card-wrapper">
+            <div class="card-header" style="margin: 0; padding: 20px 25px; border-bottom: 2px solid #e8ecef;">
+                <div class="card-icon">💳</div>
+                <h3>Subscription Plan</h3>
+            </div>
+            <div class="subscription-card">
+                <div class="sub-details">
+                    <div class="sub-item">
+                        <div class="sub-item-label">Plan Type</div>
+                        <div class="sub-item-value">Premium</div>
+                    </div>
+                    <div class="sub-item">
+                        <div class="sub-item-label">Start Date</div>
+                        <div class="sub-item-value">Jan 15, 2025</div>
+                    </div>
+                    <div class="sub-item">
+                        <div class="sub-item-label">End Date</div>
+                        <div class="sub-item-value">Jan 15, 2026</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">83 days remaining (77% of subscription period left)</div>
+            </div>
+        </div>
+    </div>
+</div>

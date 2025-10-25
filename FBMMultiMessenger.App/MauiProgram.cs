@@ -45,7 +45,7 @@ namespace FBMMultiMessenger
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<IBaseService, BaseService>();
 
-            builder.Services.AddHttpClient<IAuthService, AuthService>();
+            //builder.Services.AddHttpClient<IAuthService, AuthService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             builder.Services.AddScoped<IAccountService, AccountService>();
@@ -56,6 +56,8 @@ namespace FBMMultiMessenger
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<OneSignalService>();
+            builder.Services.AddScoped<IDefaultMessageService, DefaultMessageService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
 
             builder.Services.AddSingleton<BackButtonService>();
             builder.Services.AddSingleton<SignalRChatService>();
