@@ -109,7 +109,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-.mobile-menu-item {
+::deep .mobile-menu-item {
     padding: 14px 20px;
     display: flex;
     align-items: center;
@@ -124,7 +124,7 @@ body {
     font-size: 15px;
 }
 
-    .mobile-menu-item:hover {
+    ::deep .mobile-menu-item:hover {
         background: #f2f3f5;
     }
 

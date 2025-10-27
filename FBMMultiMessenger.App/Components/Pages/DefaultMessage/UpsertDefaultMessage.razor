@@ -1,5 +1,5 @@
 ﻿@page "/create/defaultmessage"
-@page "/edit/{DefaultMessageId}/defaultmessage"
+@page "/edit/{DefaultMessageId}/defaultmessage/{DefaultMessage}"
 
 @if (IsMobilePlatform)
 {
@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="cookies" class="form-label">Cookies</label>
+                    <label for="Accounts" class="form-label">Accounts</label>
                     <MudSelect T="string" Dense=true Variant="Variant.Outlined" MultiSelection="true" SelectAll="true" SelectAllText="Select all accounts" HelperText="Select one or more accounts that will use this default message" @bind-SelectedValues="Options" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" Label="Account" AdornmentIcon="@Icons.Material.Filled.Search">
                 @foreach (var account in DefaultMessagesAccounts)
                 {

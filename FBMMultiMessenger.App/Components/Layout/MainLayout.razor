@@ -5,9 +5,12 @@
 
     <div class="page">
 
-        <div class="sidebar">
-            <NavMenu />
-        </div>
+        @if (!isMobilePlatform)
+        {
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+        }
         <main>
 
             @if (isMobilePlatform)
@@ -16,7 +19,7 @@
             }
             else
             {
-                    <TopBar></TopBar>
+               <TopBar></TopBar>
             }
 
             <article class="content px-4">

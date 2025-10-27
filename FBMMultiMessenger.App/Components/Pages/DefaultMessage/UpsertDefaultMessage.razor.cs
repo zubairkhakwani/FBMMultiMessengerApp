@@ -36,7 +36,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
         private NavigationManager Navigation { get; set; }
 
 
-        private bool IsMobilePlatform = true;
+        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
         private string Title = "Add Default Message";
         private string SubTitle = "Create an automatic reply for your connected accounts";
@@ -102,7 +102,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
                                         });
 
 
-                   
+
                 DefaultMessagesAccounts.AddRange(remainingAccounts);
             }
 
@@ -129,31 +129,13 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
             }
         }
 
-        public bool IsValidRequest()
-        {
-            if (string.IsNullOrWhiteSpace(model.Message))
-            {
-                Snackbar.Add("Please enter default message to continue", Severity.Info);
-                return false;
-            }
-
-            if (Options.Count() == 0)
-            {
-                Snackbar.Add("Please select at least one account to continue", Severity.Info);
-                return false;
-            }
-
-            return true;
-        }
 
         public async Task OnValidSubmit()
         {
             var IsValid = IsValidRequest();
 
-            if (!IsValid)
-            {
-                return;
-            }
+            if (!IsValid) return;
+
 
             var selectedAccountIds = Options.SelectMany(x => new List<int>()
             {
@@ -170,13 +152,38 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
             if (response.IsSuccess)
             {
                 Snackbar.Add(response.Message, Severity.Success);
+
+                if (IsMobilePlatform)
+                {
+                    Navigation.NavigateTo($"/Default-Messages");
+                }
+
                 mudDialog?.Close(DialogResult.Ok(true));
+
+                return;
             }
 
             Snackbar.Add(response.Message ?? "Something went wrong while adding default message, please try later.", Severity.Error);
-
         }
 
+
+
+        public bool IsValidRequest()
+        {
+            if (string.IsNullOrWhiteSpace(model.Message))
+            {
+                Snackbar.Add("Please enter default message to continue", Severity.Info);
+                return false;
+            }
+
+            if (Options.Count() == 0)
+            {
+                Snackbar.Add("Please select at least one account to continue", Severity.Info);
+                return false;
+            }
+
+            return true;
+        }
 
         private string GetMultiSelectionText(List<string> selectedValues)
         {
