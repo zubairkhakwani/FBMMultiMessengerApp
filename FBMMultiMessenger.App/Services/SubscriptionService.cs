@@ -1,11 +1,5 @@
 ﻿using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.Services
 {
@@ -22,7 +16,7 @@ namespace FBMMultiMessenger.Services
             var apiRequest = new ApiRequest<object>()
             {
                 ApiType = Utility.SD.ApiType.GET,
-                Url ="api/subscription/me"
+                Url = "subscription/me"
 
             };
             return await _baseService.SendAsync<object, T>(apiRequest);

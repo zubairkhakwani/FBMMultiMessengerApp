@@ -1,4 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
+using FBMMultiMessenger.Contracts.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace FBMMultiMessenger.Services.IServices
     public interface IAccountService
     {
         Task<T> UpsertAccountAsync<T>(UpsertAccountHttpRequest httpRequest, int? accountId) where T : class, new();
+        Task<BaseResponse<object>> Import(List<UpsertAccountHttpRequest> httpRequest);
+
         Task<T> RemoveAccountAsync<T>(int accountId) where T : class, new();
         Task<T> OpenInBrowserAsync<T>(int accountId) where T : class, new();
 

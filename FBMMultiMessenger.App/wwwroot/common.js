@@ -32,18 +32,23 @@
             return null;
         }
     },
-   
-    showSweetAlert: function (title, message, showFooter = false, footerText = "Help", footerLink = "#", icon = "error") {
+
+    showSweetAlert: function (title, message, showFooter = false, footerText = "Help", footerLink = "#", icon = "error", confirmBtnText = "Yes", showCancelBtn = false, cancelBtnText = "No") {
         const config = {
             icon: icon,
             title: title || "Error",
-            text: message || "Something went wrong."
+            text: message || "Something went wrong.",
+            showCancelButton: showCancelBtn,
+            confirmButtonText: confirmBtnText,
+            cancelButtonText: cancelBtnText,
         };
 
         if (showFooter) {
             config.footer = `<a href="${footerLink}">${footerText}</a>`;
         }
 
-        Swal.fire(config);
+        return Swal.fire(config).then((result) => {
+            return result.isConfirmed;
+        });
     }
 };

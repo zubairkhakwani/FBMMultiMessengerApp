@@ -99,6 +99,21 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
 
 
+        //Carousel
+        private MudCarousel<string> _carousel = null!;
+
+        public bool _arrows { get; set; } = true;
+
+        public bool _bullets { get; set; } = true;
+
+        public bool _enableSwipeGesture { get; set; } = true;
+
+        public bool _autocycle { get; set; } = false;
+        public List<FileData> _carouselItems { get; set; } = new List<FileData>();
+        public bool _showCarousel;
+
+
+
         public List<GetMyChatsHttpResponse> FilteredAccountChats = new List<GetMyChatsHttpResponse>();
         public List<GetMyChatsHttpResponse> AccountChats = new List<GetMyChatsHttpResponse>();
 
@@ -196,7 +211,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             var chatExistInSidebar = FilteredAccountChats.Any(x => x.FbChatId == receivedChat.FbChatId);
             var notificationSound = true;
 
-            if(receivedChat.FbChatId == SelectedFbChatId)
+            if (receivedChat.FbChatId == SelectedFbChatId)
             {
                 notificationSound = false;
 
@@ -252,7 +267,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 FilteredAccountChats.Insert(0, newChat);
             }
 
-            if(notificationSound)
+            if (notificationSound)
             {
                 await JS.InvokeVoidAsync("myInterop.playNotificationSound", 1);
             }
@@ -274,7 +289,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             try
             {
-                while(true)
+                while (true)
                 {
                     if (textArea != null)
                     {
@@ -295,8 +310,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             var previousSelectedChatId = SelectedFbChatId;
             SelectedFbChatId = fbChatId;
-            
-            if(previousSelectedChatId != SelectedFbChatId)
+
+            if (previousSelectedChatId != SelectedFbChatId)
             {
                 ChatMessages.Clear();
             }
@@ -367,7 +382,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             var messages = new List<GeChatMessagesHttpResponse>();
 
-            if(!string.IsNullOrWhiteSpace(msg))
+            if (!string.IsNullOrWhiteSpace(msg))
             {
                 var textMessage = new GeChatMessagesHttpResponse
                 {
@@ -593,6 +608,50 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             StateHasChanged();
 
+        }
+
+        private void ShowCarousal(List<FileData> selectedChatFiles, string selectedChatFileUrl, bool isVideo = false)
+        {
+            _showCarousel = true;
+
+            var shallowCopy = selectedChatFiles.Select(x => new FileData()
+            {
+                Id = x.Id,
+                FileName = x.FileName,
+                File = x.File,
+                FileUrl = x.FileUrl,
+                IsVideo = x.IsVideo
+
+            }).ToList();
+
+            var selcetedFileIndex = shallowCopy.FindIndex(x => x.FileUrl == selectedChatFileUrl);
+
+            shallowCopy.RemoveAt(selcetedFileIndex);
+
+            shallowCopy.Insert(0, new FileData() { FileUrl = selectedChatFileUrl, IsVideo = isVideo });
+
+            _carouselItems = shallowCopy.Select(x => new FileData()
+            {
+                Id = x.Id,
+                FileName = x.FileName,
+                FileUrl =x.FileUrl,
+                IsVideo = x.IsVideo,
+                File = x.File,
+
+            }).ToList();
+
+            var allFileData = ChatMessages.Where(x => x.FileData.Count > 0)
+                                          .SelectMany(x => x.FileData)
+                                          .ToList();
+
+            var remainingFileData = allFileData.Where(x => !shallowCopy.Any(s => s.FileUrl == x.FileUrl)).ToList();
+
+            _carouselItems.AddRange(remainingFileData);
+        }
+
+        private void CloseCarousel()
+        {
+            _showCarousel = false;
         }
 
         public void Dispose()

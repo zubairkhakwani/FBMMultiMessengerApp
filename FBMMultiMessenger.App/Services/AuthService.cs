@@ -32,7 +32,7 @@ namespace FBMMultiMessenger.Services
             var apiRequest = new ApiRequest<LoginHttpRequest>()
             {
                 ApiType = SD.ApiType.POST,
-                Url ="api/auth/login",
+                Url ="auth/login",
                 Data = httpRequest
             };
 
@@ -50,7 +50,7 @@ namespace FBMMultiMessenger.Services
             var apiRequest = new ApiRequest<RegisterHttpRequest>()
             {
                 ApiType  = SD.ApiType.POST,
-                Url = "api/auth/register",
+                Url = "auth/register",
                 Data  = httpRequest
             };
 

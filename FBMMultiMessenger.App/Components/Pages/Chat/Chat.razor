@@ -1,6 +1,6 @@
 ﻿@page "/"
 @page "/Chat"
-@using Microsoft.AspNetCore.Authorization
+
 @layout EmptyLayout
 
 
@@ -37,7 +37,7 @@
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
                     <input @bind-value="FilterKeyword"
-                    @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
+                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
                 </div>
             </div>
             <div class="chat-list" style="height:@sideBarHeight">
@@ -106,7 +106,7 @@
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
                     <input @bind-value="FilterKeyword"
-                    @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
+                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
                 </div>
             </div>
             <div class="empty-state-sidebar">
@@ -274,7 +274,7 @@
                                             }
                                             else
                                             {
-                                                <img class="image-message" src="@file.FileUrl" style="@imageWidthStyle" />
+                                                <img @onclick="() => ShowCarousal(chatMessage.FileData, file.FileUrl)" class="image-message" src="@file.FileUrl" style="@imageWidthStyle" />
                                             }
                                         </div>
                                         @* @if (!isReceived &&  j==0 )
@@ -305,7 +305,7 @@
                                                 }
                                             }
 
-                                        </div>                                        
+                                        </div>
                                     }
                                 </div>
                             }
@@ -350,9 +350,58 @@
             }
 
         </div>
-
     </div>
 </div>
+
+@if (_showCarousel)
+{
+    <div class="carousel-overlay">
+        <div class="carousel-close-container" @onclick="CloseCarousel">
+            <MudIcon Icon="@Icons.Material.Filled.Close"
+                     Color="@Color.Error"
+                     Size="@Size.Large" />
+        </div>
+        <MudCarousel  ItemsSource="@_carouselItems"  NavigationButtonsClass="navigation-btns" Class="mud-width-full" Style="height:100vh;" AutoCycle="false">
+            <BulletTemplate Context="selected">
+                <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+                    <span class="mud-icon-button-label">
+                        <MudIcon Icon="@(selected? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Circle)" Color="@Color.Inherit" />
+                    </span>
+                </div>
+            </BulletTemplate>
+            <PreviousButtonTemplate>
+                <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+                    <span class="mud-icon-button-label">
+                        <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@Icons.Material.Filled.SkipPrevious" Color="@Color.Inherit" />
+                    </span>
+                </div>
+            </PreviousButtonTemplate>
+            <NextButtonTemplate>
+                <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+                    <span class="mud-icon-button-label">
+                        <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@Icons.Material.Filled.SkipNext" Color="@Color.Inherit" />
+                    </span>
+                </div>
+            </NextButtonTemplate>
+            <ItemTemplate >
+
+                <div style="display:flex; justify-content:center;align-items:center;">
+                    @if(context.IsVideo)
+                    {
+                        <video width="450" height="340" controls>
+                                <source src="@context.FileUrl" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    }
+                    else
+                    {
+                    <img  src="@context.FileUrl" alt="Image"/>
+                    }
+                </div>
+            </ItemTemplate>
+        </MudCarousel>
+    </div>
+}
 
 @if (isAndriodPlatform && SidebarZIndex > MainChatZIndex)
 {

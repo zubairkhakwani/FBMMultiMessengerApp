@@ -6,12 +6,15 @@
 <MudPaper Elevation="0" Style="display: flex; flex-direction: column;" Height="100%" Width="100%">
     <div class="neeleez-page-header">
         <h3 class="page-title">Account Management</h3>
-        <div class="neeleez-page-header--actions">
-            <button @onclick="AddNewAccountAsync" class="add-account-btn">+ Add Account</button>
+        <div class="account-header--actions">
+            <button @onclick="AddNewAccountAsync" class="account-header--btn">+ Add Account</button>
+            <InputFile type="file" id="fileInput" style="display: none;" onchange="HandleImportFile" />
+            <label class="account-header--btn" for="fileInput" title="Attach files">Import File </label>
+
         </div>
     </div>
 
-    <MudTable ServerData="ServerReload" Dense="true" Hover="true" @ref="table">
+    <MudTable  ServerData="ServerReload" Dense="true" Hover="true" @ref="table">
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Cookie</MudTh>

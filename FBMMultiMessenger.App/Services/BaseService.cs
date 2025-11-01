@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -32,76 +33,61 @@ namespace FBMMultiMessenger.Services
             this._baseUrl = configuration.GetValue<string>("Urls:BaseUrl")!;
 
         }
-        public async Task<TResponse> SendAsync<TRequest, TResponse>(ApiRequest<TRequest> apiRequest, bool withBearer = true)
-            where TRequest : class
-            where TResponse : class, new()
-
+        public async Task<TResponse> SendAsync<TRequest, TResponse>(
+       ApiRequest<TRequest> apiRequest, bool withBearer = true)
+       where TRequest : class
+       where TResponse : class, new()
         {
             try
             {
                 var client = httpClient.CreateClient("MagicAPI");
                 HttpRequestMessage message = new HttpRequestMessage();
                 message.Headers.Add("Accept", "application/json");
-                var url = $"{_baseUrl}/{apiRequest.Url}";
+
+                var url = $"{_baseUrl}/api/{apiRequest.Url}";
                 message.RequestUri = new Uri(url);
 
                 var token = await _tokenProvider.GetTokenAsync();
-
                 if (token is not null && withBearer)
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
 
-                if (apiRequest.ContentType == ContentType.MultipartFormData)
+                if (apiRequest.ApiType != SD.ApiType.GET)
                 {
-                    message.Content =  CreateMultipartContent(apiRequest);
+                    if (apiRequest.ContentType == ContentType.MultipartFormData)
+                    {
+                        message.Content = CreateMultipartContent(apiRequest);
+                    }
+                    else
+                    {
+                        message.Content = new StringContent(
+                            JsonConvert.SerializeObject(apiRequest.Data),
+                            Encoding.UTF8,
+                            "application/json"
+                        );
+                    }
                 }
 
-                else
+                message.Method = apiRequest.ApiType switch
                 {
-                    message.Content = new StringContent(
-                        JsonConvert.SerializeObject(apiRequest.Data),
-                        Encoding.UTF8,
-                        "application/json"
-                    );
-                }
-
-                switch (apiRequest.ApiType)
-                {
-                    case SD.ApiType.POST:
-                        message.Method = HttpMethod.Post;
-                        break;
-
-                    case SD.ApiType.PUT:
-                        message.Method = HttpMethod.Put;
-                        break;
-
-                    case SD.ApiType.DELETE:
-                        message.Method = HttpMethod.Delete;
-                        break;
-
-                    case SD.ApiType.GET:
-                        break;
-
-                    default:
-                        message.Method = HttpMethod.Get;
-                        break;
-                }
+                    SD.ApiType.POST => HttpMethod.Post,
+                    SD.ApiType.PUT => HttpMethod.Put,
+                    SD.ApiType.DELETE => HttpMethod.Delete,
+                    _ => HttpMethod.Get
+                };
 
                 HttpResponseMessage responseMessage = await client.SendAsync(message);
-
                 var apiContent = await responseMessage.Content.ReadAsStringAsync();
 
-                if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     await _tokenProvider.RemoveTokenAsync();
                     _navigationManager.NavigateTo("/login");
                 }
 
                 var APIResponse = JsonConvert.DeserializeObject<TResponse>(apiContent);
-
-                return APIResponse ??  new TResponse();
-
+                return APIResponse ?? new TResponse();
             }
             catch (Exception ex)
             {
@@ -111,10 +97,10 @@ namespace FBMMultiMessenger.Services
 
                 var res = JsonConvert.SerializeObject(data);
                 var APIResponse = JsonConvert.DeserializeObject<TResponse>(res);
-
                 return APIResponse ?? new TResponse();
             }
         }
+
 
         private MultipartFormDataContent CreateMultipartContent<TRequest>(ApiRequest<TRequest> apiRequest)
         where TRequest : class

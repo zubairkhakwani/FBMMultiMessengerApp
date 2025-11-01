@@ -141,14 +141,16 @@ body {
     margin-right: 12px;
     flex-shrink: 0;
 }
-.avatar img{
-    max-width:100%;
-    aspect-ratio:1/1;
-    border-radius:100%;
-}
-.avatar span{
-    font-size:8px;
-}
+
+    .avatar img {
+        max-width: 100%;
+        aspect-ratio: 1/1;
+        border-radius: 100%;
+    }
+
+    .avatar span {
+        font-size: 8px;
+    }
 
 .chat-info {
     flex: 1;
@@ -180,6 +182,7 @@ body {
     white-space: nowrap;
     min-width: 0;
 }
+
 .preview {
     font-size: 13px;
     color: #65676b;
@@ -187,6 +190,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .chat-listing-info.unread .preview {
     color: #000;
     font-weight: 500;
@@ -261,15 +265,16 @@ body {
 
 .messages-container {
     overflow-y: auto;
-    overflow-x:hidden;
+    overflow-x: hidden;
     padding: 16px;
     background: #f0f2f5;
 }
-.message-container{
-    display:flex;
-    align-items:end;
-    gap:5px;
-    max-width:600px;
+
+.message-container {
+    display: flex;
+    align-items: end;
+    gap: 5px;
+    max-width: 600px;
 }
 
 .message-footer {
@@ -290,7 +295,8 @@ body {
     .message .image-message {
         display: block;
         object-fit: cover;
-        max-width: 100%;
+        aspect-ratio: 1/1;
+        cursor: pointer;
     }
 
     .message.received {
@@ -300,7 +306,7 @@ body {
     .message.sent {
         align-items: flex-end;
     }
-        
+
 
 .message-bubble {
     padding: 8px 12px;
@@ -311,6 +317,7 @@ body {
     white-space: pre-wrap;
     position: relative;
 }
+
 .profile-picture-container {
     width: 30px;
     height: 30px;
@@ -329,10 +336,11 @@ body {
     align-self: flex-end;
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
-.profile-picture-container .profile-picture{
-    display:block;
-    max-width:100%;
-    border-radius:100%;
+
+.profile-picture-container .profile-picture {
+    display: block;
+    max-width: 100%;
+    border-radius: 100%;
 }
 
 .message.received .message-bubble {
@@ -833,3 +841,20 @@ body {
     .messages-container::-webkit-scrollbar-thumb:hover {
         background: #8a8d91;
     }
+
+
+/*Carousel*/
+.carousel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+}
+.carousel-close-container{
+    cursor:pointer;
+}
+
+::deep .navigation-btns {
+    color: blue;
+}

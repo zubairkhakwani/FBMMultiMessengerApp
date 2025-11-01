@@ -24,7 +24,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url = $"api/chat/{fbChatId}/chatmessages",
+                Url = $"chat/{fbChatId}/chatmessages",
                 Data = null
             };
 
