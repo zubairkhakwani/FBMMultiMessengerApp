@@ -1,7 +1,11 @@
-﻿using FBMMultiMessenger.Contracts.Shared;
+﻿using FBMMultiMessenger.Contracts.Response;
 
 namespace FBMMultiMessenger.Contracts.Contracts.Account
 {
+    public class GetMyAccountsHttpRequest : PageableRequest
+    {
+
+    }
     public class GetMyAccountsHttpResponse
     {
         public int Id { get; set; }

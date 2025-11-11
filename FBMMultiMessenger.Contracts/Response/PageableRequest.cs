@@ -1,4 +1,4 @@
-﻿namespace FBMMultiMessenger.Contracts.Shared
+﻿namespace FBMMultiMessenger.Contracts.Response
 {
     public class PageableRequest
     {

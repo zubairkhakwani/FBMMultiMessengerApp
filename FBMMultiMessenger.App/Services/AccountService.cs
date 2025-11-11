@@ -1,4 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
+using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
@@ -36,27 +37,33 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<UpsertAccountHttpRequest, T>(request);
         }
 
-        public async Task<BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>> GetMyAccountsAsync(int pageNo, int pageSize)
+        public async Task<BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest)
         {
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url =$"account/me?pageNo={pageNo}&pageSize={pageSize}",
+                Url =$"account/me?pageNo={httpRequest.PageNo}&pageSize={httpRequest.PageSize}",
                 Data = null
             };
             return await _baseService.SendAsync<object, BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>>(request);
         }
 
-        public async Task<T> RemoveAccountAsync<T>(int accountId) where T : class, new()
+        public async Task<T> RemoveAccountAsync<T>(List<int> accountIds) where T : class, new()
         {
-            var request = new ApiRequest<RemoveAccountHttpRequest>()
+            var isMultipleDeleteRequest = accountIds.Count > 1;
+
+            var url = isMultipleDeleteRequest ? "account/bulk" : $"account/{accountIds.FirstOrDefault()}";
+
+            var data = isMultipleDeleteRequest ? accountIds : null;
+
+            var request = new ApiRequest<List<int>>()
             {
-                ApiType = SD.ApiType.PUT,
-                Url = $"account/{accountId}/status",
-                Data = null
+                ApiType = SD.ApiType.DELETE,
+                Url = url,
+                Data = data
             };
 
-            return await _baseService.SendAsync<RemoveAccountHttpRequest, T>(request);
+            return await _baseService.SendAsync<List<int>, T>(request);
         }
 
         public async Task<T> GetMyChatsAsync<T>() where T : class, new()

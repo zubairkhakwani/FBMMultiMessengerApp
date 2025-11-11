@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
+using System.Threading.Tasks;
 using Color = MudBlazor.Color;
 
 
@@ -29,6 +30,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         [Inject]
         private IJSRuntime JS { get; set; }
+
+        private GetMyAccountsHttpRequest RequestModel = new GetMyAccountsHttpRequest();
+
+        private HashSet<GetMyAccountsHttpResponse> _selectedAccounts = new();
+
 
         private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
@@ -54,12 +60,12 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private async Task<TableData<GetMyAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
         {
-            int pageNo = state.Page > 0 ? state.Page + 1 : 1;
-            int pageSize = state.PageSize;
-
-            var response = await AccountService.GetMyAccountsAsync(pageNo, pageSize);
-
             int totalItems = 0;
+            RequestModel.PageNo = state.Page > 0 ? state.Page + 1 : 1;
+            RequestModel.PageSize = state.PageSize;
+
+            var response = await AccountService.GetMyAccountsAsync(RequestModel);
+
             List<GetMyAccountsHttpResponse> data = new List<GetMyAccountsHttpResponse>();
             if (response.IsSuccess && response.Data is not null)
             {
@@ -194,10 +200,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public async Task RemoveAccountAsync(int accountId)
+        public async Task RemoveAccountAsync(List<int> accountId, bool mutlipleDelete = false)
         {
             var parameters = new DialogParameters();
-            parameters.Add("ContentText", $"Do you want to delete this account?");
+            var message = mutlipleDelete ? "Do you want to delete all the selected accounts?" : "Do you want to delete this account?";
+            parameters.Add("ContentText", message);
             parameters.Add("ButtonText", $"Delete it");
             parameters.Add("Color", Color.Primary);
 
@@ -223,12 +230,24 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
+        public async Task HandleMultipleRemoval()
+        {
+            if (_selectedAccounts.Any())
+            {
+                var selectedAccountIds = _selectedAccounts.Select(x => x.Id).ToList();
+                await RemoveAccountAsync(selectedAccountIds, true);
+                _selectedAccounts = new HashSet<GetMyAccountsHttpResponse>();
+                return;
+            }
+
+            Snackbar.Add("Please select any account to delete", Severity.Info);
+        }
+
         public void OpenBrowser(int accountId)
         {
             AccountService.OpenInBrowserAsync<object>(accountId);
             Snackbar.Add("The account has been opened in your browser.", Severity.Success);
         }
-
 
 
         #region Helper Methods

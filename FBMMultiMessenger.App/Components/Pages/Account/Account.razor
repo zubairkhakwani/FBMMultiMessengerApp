@@ -14,7 +14,10 @@
         </div>
     </div>
 
-    <MudTable  ServerData="ServerReload" Dense="true" Hover="true" @ref="table">
+    <button @onclick="HandleMultipleRemoval" class="btn-delete">
+        🗑️ Delete Selected
+    </button>
+    <MudTable ServerData="ServerReload" Dense="true" Hover="true" @ref="table" MultiSelection=true SelectedItems="_selectedAccounts">
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Cookie</MudTh>
@@ -53,7 +56,7 @@
                                 <span style="margin-left: 8px;">Edit</span>
                             </MudButton>
 
-                            <MudButton OnClick="@(e => RemoveAccountAsync(context.Id))"
+                            <MudButton OnClick="@(e => RemoveAccountAsync(new List<int> { context.Id }))"
                                        Size="Size.Small"
                                        StartIcon="@Icons.Material.Filled.PersonRemove"
                                        Color="Color.Error"

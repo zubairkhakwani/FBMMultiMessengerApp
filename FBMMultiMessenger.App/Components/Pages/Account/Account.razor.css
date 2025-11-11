@@ -58,6 +58,29 @@
         background: linear-gradient(135deg, #0A74FF 0%, #053464 100%);
     }
 
+.btn-delete {
+    display:flex;
+    align-self:flex-end;
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+    margin-bottom:0.5rem;
+}
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    .btn-delete:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
 @media (max-width:560px) {
     .add-new-account-container {
         display: block;
