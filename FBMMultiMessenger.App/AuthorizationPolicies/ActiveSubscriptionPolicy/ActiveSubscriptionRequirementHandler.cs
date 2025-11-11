@@ -1,5 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Subscription;
-using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;

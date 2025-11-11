@@ -1,4 +1,4 @@
-﻿using FBMMultiMessenger.Contracts.Response;
+﻿using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;

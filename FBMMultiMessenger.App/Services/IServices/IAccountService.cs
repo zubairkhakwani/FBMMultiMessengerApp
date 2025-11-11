@@ -1,5 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
-using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace FBMMultiMessenger.Services.IServices
         Task<T> RemoveAccountAsync<T>(int accountId) where T : class, new();
         Task<T> OpenInBrowserAsync<T>(int accountId) where T : class, new();
 
-        Task<T> GetMyAccountsAsync<T>() where T : class, new();
+        Task<BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>> GetMyAccountsAsync(int pageNo, int pageSize);
 
         Task<T> GetMyChatsAsync<T>() where T : class, new();
     }

@@ -1,5 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
-using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
@@ -36,15 +36,15 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<UpsertAccountHttpRequest, T>(request);
         }
 
-        public async Task<T> GetMyAccountsAsync<T>() where T : class, new()
+        public async Task<BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>> GetMyAccountsAsync(int pageNo, int pageSize)
         {
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url ="account/me",
+                Url =$"account/me?pageNo={pageNo}&pageSize={pageSize}",
                 Data = null
             };
-            return await _baseService.SendAsync<object, T>(request);
+            return await _baseService.SendAsync<object, BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>>(request);
         }
 
         public async Task<T> RemoveAccountAsync<T>(int accountId) where T : class, new()

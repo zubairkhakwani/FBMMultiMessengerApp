@@ -1,13 +1,11 @@
 ﻿using FBMMultiMessenger.Components.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
-using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
-using OneSignalSDK.DotNet.Core.Internal.Utilities;
-using System.Text.Json;
 using Color = MudBlazor.Color;
 
 
@@ -31,7 +29,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         [Inject]
         private IJSRuntime JS { get; set; }
-
 
         private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
@@ -57,13 +54,17 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private async Task<TableData<GetMyAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
         {
-            var response = await AccountService.GetMyAccountsAsync<BaseResponse<List<GetMyAccountsHttpResponse>>>();
+            int pageNo = state.Page > 0 ? state.Page + 1 : 1;
+            int pageSize = state.PageSize;
+
+            var response = await AccountService.GetMyAccountsAsync(pageNo, pageSize);
+
             int totalItems = 0;
             List<GetMyAccountsHttpResponse> data = new List<GetMyAccountsHttpResponse>();
             if (response.IsSuccess && response.Data is not null)
             {
-                data = response.Data;
-                totalItems = response.Data.Count;
+                data = response.Data.Records;
+                totalItems = response.Data.TotalCount;
             }
             else
             {
@@ -249,7 +250,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 await JS.InvokeVoidAsync(
                    "myInterop.showSweetAlert",
                    "Invalid File",
-                   "Please select a .csv file",
+                   "Please select an excel/.csv file",
                    false,
                    string.Empty,
                    string.Empty,

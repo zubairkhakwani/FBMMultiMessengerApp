@@ -1,5 +1,4 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts;
-using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Request;
 using MediatR;
 using System;
