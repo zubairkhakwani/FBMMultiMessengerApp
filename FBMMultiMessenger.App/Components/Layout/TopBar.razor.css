@@ -1,0 +1,57 @@
+﻿.topbar {
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    padding: 7px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.minimal-welcome {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+    .minimal-welcome .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 18px;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .minimal-welcome h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin:0;
+    }
+
+.subscription-cards {
+    display: flex;
+    gap: 12px;
+}
+
+.sub-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 3px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+    .sub-card .info-label {
+        font-size: 10px;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .sub-card .info-value {
+        font-size: 13px;
+        color: white;
+        font-weight: 500;
+    }

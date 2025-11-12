@@ -9,7 +9,7 @@
 @{
     var mobileView = isAndriodPlatform ? "" : "messenger-container";
     var mobileClass = isAndriodPlatform ? "mobile" : "";
-    var sideBarHeight = isAndriodPlatform ? "auto" : "650px";
+    var sideBarHeight = isAndriodPlatform ? "auto" : "calc(100vh - 125px)";
     var messageContainerHeight = SelectedFbChatId is null ? "100vh" : "calc(100vh - 135px)"; // 135 px is the height of selected message header and the message input so in result we end up in a perfect scroll if needed
     var avatarMargin = isAndriodPlatform ? "0px" : "12px";
 }

@@ -7,8 +7,6 @@ namespace FBMMultiMessenger.Components.Layout
 {
     public partial class NavMenu
     {
-        public bool isMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
-
         [Inject]
         public IAuthService AuthService { get; set; }
 

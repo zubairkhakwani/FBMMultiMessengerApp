@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace FBMMultiMessenger.Components.Shared.CustomPopupform
+namespace FBMMultiMessenger.Components.Pages.Shared.CustomPopupform
 {
     public partial class CustomPopupFormActions
     {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace FBMMultiMessenger.Components.Shared.CustomPopupform
+namespace FBMMultiMessenger.Components.Pages.Shared.CustomPopupform
 {
     public partial class PopupForm
     {

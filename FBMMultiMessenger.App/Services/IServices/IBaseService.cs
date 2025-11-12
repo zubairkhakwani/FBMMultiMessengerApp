@@ -1,11 +1,4 @@
-﻿using FBMMultiMessenger.Contracts.Contracts;
-using FBMMultiMessenger.Request;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FBMMultiMessenger.Request;
 
 namespace FBMMultiMessenger.Services.IServices
 {

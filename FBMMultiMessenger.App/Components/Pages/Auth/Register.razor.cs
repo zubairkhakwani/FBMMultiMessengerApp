@@ -24,8 +24,17 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
         [Inject]
         public ITokenProvider TokenProvider { get; set; }
+
+
         private bool ShowLoader = false;
 
+        private string Password = string.Empty;
+
+        private bool ShowPassword = false;
+        private bool ShowConfirmPassword = false;
+
+        private string PasswordType = "password";
+        private string PasswordConfirmType = "password";
 
         public async Task OnValidSubmit()
         {
@@ -55,6 +64,24 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
             ShowLoader = false;
             ResponseError =  registerResponse.Message;
+        }
+
+        private void IsStrongPassword(ChangeEventArgs input)
+        {
+            Password = input?.Value?.ToString() ?? "";
+        }
+
+        public void HandlePasswordToggle(bool passwordToggle)
+        {
+            if (passwordToggle)
+            {
+                ShowPassword = !ShowPassword;
+                PasswordType =  ShowPassword ? "text" : "password";
+                return;
+            }
+
+            ShowConfirmPassword = !ShowConfirmPassword;
+            PasswordConfirmType =  ShowConfirmPassword ? "text" : "password";
         }
     }
 }

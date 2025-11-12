@@ -64,26 +64,48 @@
                     </div>
                 </div>
 
+                <PasswordRequirement Password="@Password"/>
+                
+
                 <!-- Password Field -->
                 <div class="form-group">
                     <div class="input-wrapper password-container">
-                        <InputText type="password"
+                        <InputText type="@PasswordType"
                                    class="input"
                                    id="password"
                                    placeholder="Password"
-                                   @bind-Value="RequestModel.Password" />
+                                   @bind-Value="RequestModel.Password"
+                                   @oninput="(e) => IsStrongPassword(e)" />
+
                         <i class="fa-solid fa-lock input-icon"></i>
+
+                        @if (ShowPassword)
+                        {
+                            <i @onclick="()=>HandlePasswordToggle(true)" class="fa-solid fa-eye-slash password-eye-icon"></i>
+                        }
+                        else
+                        {
+                            <i @onclick="()=>HandlePasswordToggle(true)" class="fa-solid fa-eye password-eye-icon"></i>
+                        }
                         <ValidationMessage For="@(() => RequestModel.Password)"
                                            class="validation-message" />
                     </div>
 
                     <div class="input-wrapper password-container">
-                        <InputText type="password"
+                        <InputText type="@PasswordConfirmType"
                                    class="input"
                                    id="confirm-password"
                                    placeholder="Confirm Password"
                                    @bind-Value="RequestModel.ConfirmPassword" />
                         <i class="fa-solid fa-lock input-icon"></i>
+                        @if (ShowConfirmPassword)
+                        {
+                            <i @onclick="()=>HandlePasswordToggle(false)" class="fa-solid fa-eye-slash password-eye-icon"></i>
+                        }
+                        else
+                        {
+                            <i @onclick="() => HandlePasswordToggle(false)" class="fa-solid fa-eye password-eye-icon"></i>
+                        }
                         <ValidationMessage For="@(() => RequestModel.ConfirmPassword)"
                                            class="validation-message" />
                     </div>

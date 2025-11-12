@@ -1,9 +1,10 @@
-﻿using FBMMultiMessenger.Components.Shared.CustomPopupform;
+﻿using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System.Threading.Tasks;
@@ -33,7 +34,13 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private GetMyAccountsHttpRequest RequestModel = new GetMyAccountsHttpRequest();
 
-        private HashSet<GetMyAccountsHttpResponse> _selectedAccounts = new();
+        private HashSet<GetMyAccountsHttpResponse> selectedAccounts
+        {
+            get;
+            set;
+
+        } = new();
+        private string? Keyword { get; set; }
 
 
         private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
@@ -63,6 +70,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             int totalItems = 0;
             RequestModel.PageNo = state.Page > 0 ? state.Page + 1 : 1;
             RequestModel.PageSize = state.PageSize;
+            RequestModel.Keyword = Keyword;
 
             var response = await AccountService.GetMyAccountsAsync(RequestModel);
 
@@ -79,6 +87,31 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             table.Items = data;
             return new TableData<GetMyAccountsHttpResponse>() { TotalItems = totalItems, Items = data };
+        }
+
+        private async Task HandleFilter()
+        {
+            await table.ReloadServerData();
+        }
+
+        private async Task HandleReset()
+        {
+            Keyword = null;
+            await table.ReloadServerData();
+        }
+
+        private async Task HandleKeyPress(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                await HandleFilter();
+            }
+        }
+
+
+        private void HandleItemSelected(GetMyAccountsHttpResponse response)
+        {
+
         }
         public async Task AddNewAccountAsync()
         {
@@ -232,11 +265,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         public async Task HandleMultipleRemoval()
         {
-            if (_selectedAccounts.Any())
+            if (selectedAccounts.Any())
             {
-                var selectedAccountIds = _selectedAccounts.Select(x => x.Id).ToList();
+                var selectedAccountIds = selectedAccounts.Select(x => x.Id).ToList();
                 await RemoveAccountAsync(selectedAccountIds, true);
-                _selectedAccounts = new HashSet<GetMyAccountsHttpResponse>();
+                selectedAccounts = new HashSet<GetMyAccountsHttpResponse>();
                 return;
             }
 
