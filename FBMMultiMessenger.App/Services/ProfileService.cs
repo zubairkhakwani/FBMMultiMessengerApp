@@ -20,7 +20,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<ChangePasswordHttpRequest>()
             {
                 ApiType = SD.ApiType.PUT,
-                Url = "api/profile/me/changepassword",
+                Url = "profile/me/changepassword",
                 Data = httpRequest
             };
             return await _baseService.SendAsync<ChangePasswordHttpRequest, BaseResponse<object>>(request);
@@ -31,7 +31,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<EditProfileHttpRequest>()
             {
                 ApiType = SD.ApiType.PUT,
-                Url = "api/profile/me/edit",
+                Url = "profile/me/edit",
                 Data = httpRequest
 
             };
@@ -44,7 +44,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url = "api/profile/me",
+                Url = "profile/me",
                 Data = null
             };
 

@@ -1,6 +1,6 @@
 ﻿using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
-using FBMMultiMessenger.Contracts.Shared;
+using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;

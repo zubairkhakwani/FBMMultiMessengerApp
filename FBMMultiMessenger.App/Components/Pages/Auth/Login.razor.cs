@@ -6,7 +6,7 @@ using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using OneSignalSDK.DotNet;
-using FBMMultiMessenger.Contracts.Shared;
+using FBMMultiMessenger.Contracts.Response;
 
 namespace FBMMultiMessenger.Components.Pages.Auth
 {

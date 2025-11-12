@@ -83,11 +83,21 @@ namespace FBMMultiMessenger.Components.Pages.Profile
 
         private async Task OnValidPasswordSubmit()
         {
+            var currentPassword = PasswordModel.CurrentPassword;
+            var newPassword = PasswordModel.NewPassword;
+
+            if (currentPassword == newPassword)
+            {
+                Snackbar.Add("New password cannot be the same as your current password.", Severity.Info);
+                return;
+            }
+
+
             ShowPasswordLoader = true;
             var response = await ProfileService.ChangePasswordAsync(PasswordModel);
             var responseMessage = string.IsNullOrWhiteSpace(response.Message) ? "Something went wrong while updating your pasword." : response.Message;
             Snackbar.Add(responseMessage, response.IsSuccess ? Severity.Success : Severity.Error);
-            ShowPasswordLoader = true;
+            ShowPasswordLoader = false;
 
         }
 

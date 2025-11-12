@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 
-namespace FBMMultiMessenger.Contracts.Shared
+namespace FBMMultiMessenger.Contracts.Response
 {
     public class BaseResponse<T> where T : class
     {
