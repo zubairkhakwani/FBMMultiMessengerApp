@@ -1,12 +1,12 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Auth;
 using FBMMultiMessenger.Contracts.Contracts.Subscription;
-using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Notification;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using OneSignalSDK.DotNet;
+using FBMMultiMessenger.Contracts.Shared;
 
 namespace FBMMultiMessenger.Components.Pages.Auth
 {

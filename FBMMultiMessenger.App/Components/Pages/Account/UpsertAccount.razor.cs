@@ -1,15 +1,10 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
-using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.Components.Pages.Account
 {

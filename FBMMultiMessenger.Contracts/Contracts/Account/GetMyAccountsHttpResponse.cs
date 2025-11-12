@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FBMMultiMessenger.Contracts.Response;
 
 namespace FBMMultiMessenger.Contracts.Contracts.Account
 {
+    public class GetMyAccountsHttpRequest : PageableRequest
+    {
+
+    }
     public class GetMyAccountsHttpResponse
     {
         public int Id { get; set; }

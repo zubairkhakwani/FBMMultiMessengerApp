@@ -25,7 +25,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<NotifyExtensionRequest>()
             {
                 ApiType = SD.ApiType.POST,
-                Url ="api/extension/notify",
+                Url ="extension/notify",
                 Data = httpRequest,
                 ContentType = ContentType.MultipartFormData
             };

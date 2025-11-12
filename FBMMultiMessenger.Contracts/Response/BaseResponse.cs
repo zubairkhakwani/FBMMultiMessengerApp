@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FBMMultiMessenger.Contracts.Response
+namespace FBMMultiMessenger.Contracts.Shared
 {
     public class BaseResponse<T> where T : class
     {
@@ -14,6 +14,8 @@ namespace FBMMultiMessenger.Contracts.Response
         public bool IsSuccess { get; set; } = true;
         public bool RedirectToPackages { get; set; }
         public string Message { get; set; } = string.Empty;
+        public bool APIRequestFailed { get; set; }
+
 
         public T? Data { get; set; }
 

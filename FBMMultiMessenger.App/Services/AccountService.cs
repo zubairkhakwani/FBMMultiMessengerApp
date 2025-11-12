@@ -1,13 +1,9 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
+using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.Services
 {
@@ -23,12 +19,12 @@ namespace FBMMultiMessenger.Services
         public async Task<T> UpsertAccountAsync<T>(UpsertAccountHttpRequest httpRequest, int? accountId) where T : class, new()
         {
             var apiType = SD.ApiType.POST;
-            var url = "api/account";
+            var url = "account";
 
             if (accountId is not null)
             {
                 apiType = SD.ApiType.PUT;
-                url = $"api/account/{accountId}";
+                url = $"account/{accountId}";
             }
 
             var request = new ApiRequest<UpsertAccountHttpRequest>()
@@ -41,7 +37,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<UpsertAccountHttpRequest, T>(request);
         }
 
-        public async Task<T> GetMyAccountsAsync<T>() where T : class, new()
+        public async Task<BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest)
         {
             var request = new ApiRequest<object>()
             {
@@ -49,19 +45,25 @@ namespace FBMMultiMessenger.Services
                 Url =$"account/me?pageNo={httpRequest.PageNo}&pageSize={httpRequest.PageSize}&keyword={httpRequest.Keyword}",
                 Data = null
             };
-            return await _baseService.SendAsync<object, T>(request);
+            return await _baseService.SendAsync<object, BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>>(request);
         }
 
-        public async Task<T> RemoveAccountAsync<T>(int accountId) where T : class, new()
+        public async Task<T> RemoveAccountAsync<T>(List<int> accountIds) where T : class, new()
         {
-            var request = new ApiRequest<RemoveAccountHttpRequest>()
+            var isMultipleDeleteRequest = accountIds.Count > 1;
+
+            var url = isMultipleDeleteRequest ? "account/bulk" : $"account/{accountIds.FirstOrDefault()}";
+
+            var data = isMultipleDeleteRequest ? accountIds : null;
+
+            var request = new ApiRequest<List<int>>()
             {
-                ApiType = SD.ApiType.PUT,
-                Url = $"api/account/{accountId}/status",
-                Data = null
+                ApiType = SD.ApiType.DELETE,
+                Url = url,
+                Data = data
             };
 
-            return await _baseService.SendAsync<RemoveAccountHttpRequest, T>(request);
+            return await _baseService.SendAsync<List<int>, T>(request);
         }
 
         public async Task<T> GetMyChatsAsync<T>() where T : class, new()
@@ -69,7 +71,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url = "api/account/me/chats",
+                Url = "account/me/chats",
                 Data = null
             };
 
@@ -81,11 +83,23 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.POST,
-                Url = $"api/account/{accountId}/open-in-browser",
+                Url = $"account/{accountId}/open-in-browser",
                 Data = null
             };
 
             return await _baseService.SendAsync<object, T>(request);
+        }
+
+        public async Task<BaseResponse<object>> Import(List<UpsertAccountHttpRequest> httpRequest)
+        {
+            var request = new ApiRequest<List<UpsertAccountHttpRequest>>()
+            {
+                ApiType = SD.ApiType.POST,
+                Url = $"account/import",
+                Data = httpRequest
+            };
+
+            return await _baseService.SendAsync<List<UpsertAccountHttpRequest>, BaseResponse<object>>(request);
         }
     }
 }

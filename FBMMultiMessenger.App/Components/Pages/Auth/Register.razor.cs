@@ -1,5 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Auth;
-using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;

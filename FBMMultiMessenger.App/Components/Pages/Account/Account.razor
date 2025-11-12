@@ -90,7 +90,7 @@
                                 <span style="margin-left: 8px;">Edit</span>
                             </MudButton>
 
-                            <MudButton OnClick="@(e => RemoveAccountAsync(context.Id))"
+                            <MudButton OnClick="@(e => RemoveAccountAsync(new List<int> { context.Id }))"
                                        Size="Size.Small"
                                        StartIcon="@Icons.Material.Filled.PersonRemove"
                                        Color="Color.Error"
@@ -114,7 +114,7 @@
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
-            <MudText>No matching records found</MudText>
+            <MudText>No account found.</MudText>
         </NoRecordsContent>
         <LoadingContent>
             <MudText>Loading...</MudText>

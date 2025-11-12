@@ -8,12 +8,10 @@ namespace FBMMultiMessenger.Contracts.Contracts.Account
 {
     public class RemoveAccountHttpRequest
     {
-        public int AccountId { get; set; }
+        public List<int> AccountIds { get; set; } = new List<int>();
     }
 
     public class RemoveAccountHttpResponse
     {
-
-
     }
 }

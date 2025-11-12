@@ -1,12 +1,13 @@
 ﻿using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
-using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Contracts.Shared;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
+using System.Threading.Tasks;
 using Color = MudBlazor.Color;
 
 
@@ -23,7 +24,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
         private ITokenProvider TokenProvider { get; set; }
 
         [Inject]
-        public IDialogService DialogService { get; set; }
+        private IDialogService DialogService { get; set; }
 
         [Inject]
         private ISnackbar Snackbar { get; set; }
@@ -66,7 +67,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private async Task<TableData<GetMyAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
         {
-            var response = await AccountService.GetMyAccountsAsync<BaseResponse<List<GetMyAccountsHttpResponse>>>();
             int totalItems = 0;
             RequestModel.PageNo = state.Page > 0 ? state.Page + 1 : 1;
             RequestModel.PageSize = state.PageSize;
@@ -77,8 +77,8 @@ namespace FBMMultiMessenger.Components.Pages.Account
             List<GetMyAccountsHttpResponse> data = new List<GetMyAccountsHttpResponse>();
             if (response.IsSuccess && response.Data is not null)
             {
-                data = response.Data;
-                totalItems = response.Data.Count;
+                data = response.Data.Records;
+                totalItems = response.Data.TotalCount;
             }
             else
             {
@@ -131,6 +131,88 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
+        public async Task HandleImportFile(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
+
+            var isValid = await ValidateImportFile(file);
+
+            if (!isValid)
+                return;
+
+            bool isConfirmed = await JS.InvokeAsync<bool>(
+                             "myInterop.showSweetAlert",
+                             "Confirm Import",
+                             "Do you want to import this file?",
+                             false,
+                             string.Empty,
+                             string.Empty,
+                             "info",
+                             "Yes, import it!",
+                             true,
+                             "Cancel"
+                         );
+
+            if (!isConfirmed)
+                return;
+
+
+            using var stream = file.OpenReadStream();
+            using var reader = new StreamReader(stream);
+            var content = await reader.ReadToEndAsync();
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                Snackbar.Add("The selected file is empty. Please upload a file that contains accounts data.", Severity.Warning);
+                return;
+            }
+
+            List<UpsertAccountHttpRequest> accounts = new List<UpsertAccountHttpRequest>();
+
+            try
+            {
+                accounts = ParseCsv(content);
+                var totalCount = accounts.Count;
+                var isInValidCookie = false;
+                for (int i = 0; i < accounts.Count; i++)
+                {
+                    var account = accounts[i];
+                    var (isValidCookie, userId) = ValidateCookie(account.Cookie);
+
+                    if (!isValidCookie)
+                    {
+                        accounts.RemoveAt(i);
+                        isInValidCookie = true;
+                        i--;
+                    }
+                }
+
+                if (isInValidCookie &&  accounts.Count == 0)
+                {
+                    Snackbar.Add("No valid accounts to import. All provided accounts had invalid cookies.", Severity.Info);
+                    return;
+                }
+
+                //Call Api
+                var response = await AccountService.Import(accounts);
+
+                if (response.IsSuccess)
+                {
+                    Snackbar.Add(response.Message, Severity.Success);
+                    table?.ReloadServerData();
+                    return;
+                }
+
+                Snackbar.Add(string.IsNullOrWhiteSpace(response.Message) ? "Something went wrong when importing accounts, please try later." : response.Message, Severity.Error);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Unable to import the file. Please check that the file is not empty and has a valid format.", Severity.Error);
+            }
+
+
+        }
+
         public async Task EditAccountAsync(int accountId, string Name, string Cookie)
         {
             if (IsMobilePlatform)
@@ -151,10 +233,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public async Task RemoveAccountAsync(int accountId)
+        public async Task RemoveAccountAsync(List<int> accountId, bool mutlipleDelete = false)
         {
             var parameters = new DialogParameters();
-            parameters.Add("ContentText", $"Do you want to delete this account?");
+            var message = mutlipleDelete ? "Do you want to delete all the selected accounts?" : "Do you want to delete this account?";
+            parameters.Add("ContentText", message);
             parameters.Add("ButtonText", $"Delete it");
             parameters.Add("Color", Color.Primary);
 
@@ -198,5 +281,101 @@ namespace FBMMultiMessenger.Components.Pages.Account
             AccountService.OpenInBrowserAsync<object>(accountId);
             Snackbar.Add("The account has been opened in your browser.", Severity.Success);
         }
+
+
+        #region Helper Methods
+
+        public async Task<bool> ValidateImportFile(IBrowserFile file)
+        {
+            var maxAllowedFile = 5 * 1024 * 1024; //5mb
+
+            var fileExtension = Path.GetExtension(file?.Name)?.ToLowerInvariant();
+            var contentType = file?.ContentType.ToLowerInvariant();
+
+            if (file is null ||
+                (
+                    //fileExtension != ".txt" && contentType != "text/plain" &&
+                    fileExtension != ".csv" && contentType != "text/csv"
+
+                ))
+            {
+                await JS.InvokeVoidAsync(
+                   "myInterop.showSweetAlert",
+                   "Invalid File",
+                   "Please select an excel/.csv file",
+                   false,
+                   string.Empty,
+                   string.Empty,
+                   "error",
+                   "OK",
+                   false,
+                   string.Empty
+                );
+                return false;
+            }
+            if (file.Size > maxAllowedFile)
+            {
+                await JS.InvokeVoidAsync(
+                    "myInterop.showSweetAlert",
+                    "File Too Large",
+                    $"The selected file exceeds the maximum allowed size of {maxAllowedFile / (1024 * 1024)} MB.",
+                    false,
+                    string.Empty,
+                    string.Empty,
+                    "error",
+                    "OK",
+                    false,
+                    string.Empty
+                );
+                return false;
+            }
+
+            return true;
+        }
+        private List<UpsertAccountHttpRequest> ParseCsv(string content)
+        {
+            var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            var accounts = new List<UpsertAccountHttpRequest>();
+
+            // Skip header row (first line)
+            for (int i = 1; i < lines.Length; i++)
+            {
+                var parts = lines[i].Split(',');
+                if (parts.Length >= 2)
+                {
+                    accounts.Add(new UpsertAccountHttpRequest
+                    {
+                        Name = parts[0].Trim(),
+                        Cookie = parts[1].Trim()
+                    });
+                }
+            }
+
+            return accounts;
+        }
+
+        private (bool isValid, string? userId) ValidateCookie(string cookieString)
+        {
+            try
+            {
+                // Parse cookies into dictionary
+                var cookies = cookieString
+                    .Split(';')
+                    .Select(x => x.Trim().Split('=', 2))
+                    .Where(x => x.Length == 2)
+                    .ToDictionary(x => x[0], x => x[1]);
+
+
+                if (!cookies.ContainsKey("c_user") || !cookies.ContainsKey("xs"))
+                    return (false, null);
+
+                return (true, cookies["c_user"]);
+            }
+            catch
+            {
+                return (false, null);
+            }
+        }
+        #endregion
     }
 }
