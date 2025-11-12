@@ -3,6 +3,9 @@ using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using MudBlazor;
 using Color = MudBlazor.Color;
 
@@ -24,6 +27,20 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         [Inject]
         private ISnackbar Snackbar { get; set; }
+
+        [Inject]
+        private IJSRuntime JS { get; set; }
+
+        private GetMyAccountsHttpRequest RequestModel = new GetMyAccountsHttpRequest();
+
+        private HashSet<GetMyAccountsHttpResponse> selectedAccounts
+        {
+            get;
+            set;
+
+        } = new();
+        private string? Keyword { get; set; }
+
 
         private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
@@ -51,6 +68,12 @@ namespace FBMMultiMessenger.Components.Pages.Account
         {
             var response = await AccountService.GetMyAccountsAsync<BaseResponse<List<GetMyAccountsHttpResponse>>>();
             int totalItems = 0;
+            RequestModel.PageNo = state.Page > 0 ? state.Page + 1 : 1;
+            RequestModel.PageSize = state.PageSize;
+            RequestModel.Keyword = Keyword;
+
+            var response = await AccountService.GetMyAccountsAsync(RequestModel);
+
             List<GetMyAccountsHttpResponse> data = new List<GetMyAccountsHttpResponse>();
             if (response.IsSuccess && response.Data is not null)
             {
@@ -64,6 +87,31 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             table.Items = data;
             return new TableData<GetMyAccountsHttpResponse>() { TotalItems = totalItems, Items = data };
+        }
+
+        private async Task HandleFilter()
+        {
+            await table.ReloadServerData();
+        }
+
+        private async Task HandleReset()
+        {
+            Keyword = null;
+            await table.ReloadServerData();
+        }
+
+        private async Task HandleKeyPress(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                await HandleFilter();
+            }
+        }
+
+
+        private void HandleItemSelected(GetMyAccountsHttpResponse response)
+        {
+
         }
         public async Task AddNewAccountAsync()
         {
@@ -130,6 +178,19 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 Snackbar.Add(resposne?.Message ?? "Something went wrong, please try later", Severity.Error);
             }
+        }
+
+        public async Task HandleMultipleRemoval()
+        {
+            if (selectedAccounts.Any())
+            {
+                var selectedAccountIds = selectedAccounts.Select(x => x.Id).ToList();
+                await RemoveAccountAsync(selectedAccountIds, true);
+                selectedAccounts = new HashSet<GetMyAccountsHttpResponse>();
+                return;
+            }
+
+            Snackbar.Add("Please select any account to delete", Severity.Info);
         }
 
         public void OpenBrowser(int accountId)
