@@ -1,4 +1,6 @@
-﻿using FBMMultiMessenger.Contracts.Contracts.Auth;
+﻿using FBMMultiMessenger.Components.Pages.Auth;
+using FBMMultiMessenger.Contracts.Contracts.Auth;
+using FBMMultiMessenger.Contracts.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,10 @@ namespace FBMMultiMessenger.Services.IServices
     {
         Task<T> LoginAsync<T>(LoginHttpRequest httpRequest) where T : class, new();
         Task<T> RegisterAsync<T>(RegisterHttpRequest httpRequest) where T : class, new();
+        Task<BaseResponse<object>> ForgotPasswordAsync(ForgotPasswordHttpRequest httpRequest);
+
+        Task<BaseResponse<object>> VerifyOtpAsync(string otp);
+        Task<BaseResponse<object>> ResetPasswordAsync(ResetPasswordHttpRequest httpRequest);
 
         Task Logout();
 

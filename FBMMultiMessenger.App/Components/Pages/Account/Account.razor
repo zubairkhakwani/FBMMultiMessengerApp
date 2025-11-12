@@ -21,12 +21,12 @@
         <div class="filter-left">
             <div class="search-group">
                 <input type="text"
-                       @onkeydown="HandleKeyPress"
+                       @onkeypress="HandleFilterKeyPressAsync"
                        @bind-value="Keyword"
                        class="search-input"
                        id="searchInput"
                        placeholder="Search accounts...">
-                <button @onclick="HandleFilter" class="btn btn-primary">
+                <button @onclick="HandleFilterClickAsync" class="btn btn-primary">
                     🔍 Filter
                 </button>
               @*   <button @onclick="HandleReset" class="btn btn-outline">

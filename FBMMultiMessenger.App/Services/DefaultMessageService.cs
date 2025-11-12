@@ -20,7 +20,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<UpsertDefaultMessageHttpRequest>()
             {
                 ApiType =  defaultMessageId is null ? SD.ApiType.POST : SD.ApiType.PUT,
-                Url =  defaultMessageId is null ? "api/defaultmessage" : $"api/defaultmessage/{defaultMessageId}",
+                Url =  defaultMessageId is null ? "defaultmessage" : $"defaultmessage/{defaultMessageId}",
                 Data = httpRequest
             };
             return await _baseService.SendAsync<UpsertDefaultMessageHttpRequest, BaseResponse<UpsertDefaultMessageHttpResponse>>(request);
@@ -31,7 +31,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url ="api/defaultmessage/me",
+                Url ="defaultmessage/me",
                 Data = null
             };
             return await _baseService.SendAsync<object, BaseResponse<GetMyDefaultMessagesHttpResponse>>(request);

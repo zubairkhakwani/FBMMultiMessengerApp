@@ -1,15 +1,10 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Auth;
+using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.Services
 {
@@ -26,6 +21,19 @@ namespace FBMMultiMessenger.Services
             this.TokenProvider =tokenProvider;
 
         }
+
+        public async Task<BaseResponse<object>> ForgotPasswordAsync(ForgotPasswordHttpRequest httpRequest)
+        {
+            var apiRequest = new ApiRequest<ForgotPasswordHttpRequest>()
+            {
+                ApiType = SD.ApiType.POST,
+                Url ="auth/forgot-password",
+                Data = httpRequest
+            };
+
+            return await _baseService.SendAsync<ForgotPasswordHttpRequest, BaseResponse<object>>(apiRequest);
+        }
+
         public async Task<T> LoginAsync<T>(LoginHttpRequest httpRequest) where T : class, new()
         {
             var apiRequest = new ApiRequest<LoginHttpRequest>()
@@ -54,6 +62,30 @@ namespace FBMMultiMessenger.Services
             };
 
             return await _baseService.SendAsync<RegisterHttpRequest, T>(apiRequest);
+        }
+
+        public async Task<BaseResponse<object>> ResetPasswordAsync(ResetPasswordHttpRequest httpRequest)
+        {
+            var apiRequest = new ApiRequest<ResetPasswordHttpRequest>()
+            {
+                ApiType  = SD.ApiType.POST,
+                Url = "auth/reset-password",
+                Data  = httpRequest
+            };
+
+            return await _baseService.SendAsync<ResetPasswordHttpRequest, BaseResponse<object>>(apiRequest);
+        }
+
+        public async Task<BaseResponse<object>> VerifyOtpAsync(string otp)
+        {
+            var apiRequest = new ApiRequest<string>()
+            {
+                ApiType  = SD.ApiType.POST,
+                Url = "auth/verify-otp",
+                Data  = otp
+            };
+
+            return await _baseService.SendAsync<string, BaseResponse<object>>(apiRequest);
         }
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
-using System.Threading.Tasks;
 using Color = MudBlazor.Color;
 
 
@@ -43,7 +42,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
         private string? Keyword { get; set; }
 
 
-        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
+        private readonly bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
         [SupplyParameterFromQuery]
         public string? Message { get; set; }
@@ -89,29 +88,17 @@ namespace FBMMultiMessenger.Components.Pages.Account
             return new TableData<GetMyAccountsHttpResponse>() { TotalItems = totalItems, Items = data };
         }
 
-        private async Task HandleFilter()
+        private async Task HandleFilterClickAsync()
         {
             await table.ReloadServerData();
         }
 
-        private async Task HandleReset()
-        {
-            Keyword = null;
-            await table.ReloadServerData();
-        }
-
-        private async Task HandleKeyPress(KeyboardEventArgs e)
+        private async Task HandleFilterKeyPressAsync(KeyboardEventArgs e)
         {
             if (e.Key == "Enter")
             {
-                await HandleFilter();
+                await table.ReloadServerData();
             }
-        }
-
-
-        private void HandleItemSelected(GetMyAccountsHttpResponse response)
-        {
-
         }
         public async Task AddNewAccountAsync()
         {
@@ -302,7 +289,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 await JS.InvokeVoidAsync(
                    "myInterop.showSweetAlert",
                    "Invalid File",
-                   "Please select an excel/.csv file",
+                   "Please select an excel\\.csv file",
                    false,
                    string.Empty,
                    string.Empty,
