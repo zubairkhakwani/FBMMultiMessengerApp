@@ -89,7 +89,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<object, T>(request);
         }
 
-        public async Task<BaseResponse<object>> Import(List<UpsertAccountHttpRequest> httpRequest)
+        public async Task<BaseResponse<UpsertAccountHttpResponse>> Import(List<UpsertAccountHttpRequest> httpRequest)
         {
             var request = new ApiRequest<List<UpsertAccountHttpRequest>>()
             {
@@ -98,7 +98,7 @@ namespace FBMMultiMessenger.Services
                 Data = httpRequest
             };
 
-            return await _baseService.SendAsync<List<UpsertAccountHttpRequest>, BaseResponse<object>>(request);
+            return await _baseService.SendAsync<List<UpsertAccountHttpRequest>, BaseResponse<UpsertAccountHttpResponse>>(request);
         }
     }
 }

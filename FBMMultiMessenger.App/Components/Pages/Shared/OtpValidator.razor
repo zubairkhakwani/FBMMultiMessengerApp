@@ -1,0 +1,166 @@
+﻿@page "/Verify-Otp"
+@layout EmptyLayout
+
+<div class="page-container">
+
+    @if (!IsOtpVerified)
+    {
+        <!-- STEP 2: Verify OTP -->
+        <div class="verify-container">
+
+            <div class="verify-header">
+                <div class="verify-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+
+                <h1>Verify Your Code</h1>
+                <p>Enter the 6-digit code we sent to your email</p>
+
+                @if (!string.IsNullOrWhiteSpace(TotalSteps) && !string.IsNullOrWhiteSpace(CurrentStep))
+                {
+                    <div class="step-indicator">Step @CurrentStep of @TotalSteps</div>
+                }
+            </div>
+
+            <div class="verify-content">
+                <div class="email-display">
+                    We sent a code to <strong id="userEmail">@EmailSentTo</strong>
+                </div>
+
+                @{
+                    var showErrorClass = !string.IsNullOrWhiteSpace(OtpErrorMessage) ? "show" : "";
+                }
+                <div id="errorMessage" class="error-message @showErrorClass">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText">@OtpErrorMessage</span>
+                </div>
+
+                @{
+                    var showSuccessClass = !string.IsNullOrWhiteSpace(OtpSuccessMessage) ? "show" : "";
+                }
+                <div id="successMessage" class="success-message @showSuccessClass">
+                    <i class="fas fa-check-circle"></i>
+                    @OtpSuccessMessage
+                </div>
+
+                <EditForm Model="VerifyOtpModel" OnValidSubmit="OnValidOtpSubmit" id="verificationForm" Enhance="true">
+                    <DataAnnotationsValidator />
+
+                    <div class="code-input-container">
+                        <InputText @bind-Value="VerifyOtpModel.Digit1" type="text" maxlength="1" class="code-digit" id="digit1" data-index="0" autocomplete="off" />
+                        <InputText @bind-Value="VerifyOtpModel.Digit2" type="text" maxlength="1" class="code-digit" id="digit2" data-index="1" autocomplete="off" />
+                        <InputText @bind-Value="VerifyOtpModel.Digit3" type="text" maxlength="1" class="code-digit" id="digit3" data-index="2" autocomplete="off" />
+                        <InputText @bind-Value="VerifyOtpModel.Digit4" type="text" maxlength="1" class="code-digit" id="digit4" data-index="3" autocomplete="off" />
+                        <InputText @bind-Value="VerifyOtpModel.Digit5" type="text" maxlength="1" class="code-digit" id="digit5" data-index="4" autocomplete="off" />
+                        <InputText @bind-Value="VerifyOtpModel.Digit6" type="text" maxlength="1" class="code-digit" id="digit6" data-index="5" autocomplete="off" />
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        The verification code expires in <strong>30 minutes</strong>
+                    </div>
+
+                    @if (IsOtpVerifying)
+                    {
+                        <button type="submit" class="verify-button" id="verifyButton" disabled>
+                            <div class="loader"></div>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="verify-button" id="verifyButton">
+                            <i class="fas fa-check"></i>
+                            Verify Code
+                        </button>
+                    }
+                </EditForm>
+
+                <div class="resend-section">
+                    Didn't receive the code?
+                    <button @onclick="HandleResendOtp" id="resendButton">Resend Code</button>
+                    <span id="timerText" class="timer" style="display: none;"></span>
+                </div>
+
+                <div class="back-to-login">
+                    <a href="@ReturnUrl">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to @ReturnTo
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- STEP 3: Reset Password -->
+        <div class="step-container">
+
+            <div class="step-header">
+                <div class="step-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+
+                <h1>Set New Password</h1>
+                <p>Create a strong password for your account</p>
+                <div class="step-indicator">Step 3 of 3</div>
+            </div>
+
+            <div class="step-content">
+                <EditForm Model="ResetPasswordModel" OnValidSubmit="HandleResetPassword" Enhance="true">
+                    <DataAnnotationsValidator />
+
+                    <div class="form-group">
+                        <div class="password-container">
+                            <InputText type="password"
+                                       @oninput="(e) => IsStrongPassword(e)"
+                                       @bind-Value="ResetPasswordModel.NewPassword"
+                                       id="newPassword"
+                                       placeholder="New Password"
+                                       class="input"
+                                       required />
+                            <i class="fas fa-eye password-eye-icon"></i>
+                            <ValidationMessage For="@(() => ResetPasswordModel.NewPassword)" class="validation-message" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="password-container">
+                            <InputText type="password"
+                                       @bind-Value="ResetPasswordModel.ConfirmPassword"
+                                       id="confirmPassword"
+                                       class="input"
+                                       placeholder="Confirm New Password"
+                                       required />
+                            <i class="fas fa-eye password-eye-icon"></i>
+                            <ValidationMessage For="@(() => ResetPasswordModel.ConfirmPassword)" class="validation-message" />
+                        </div>
+                    </div>
+
+                    <PasswordRequirement Password="@Password" />
+
+                    @if (IsRessetingNewPassword)
+                    {
+                        <button type="submit" class="submit-button">
+                            <div class="loader"></div>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="submit-button">
+                            <i class="fas fa-check-circle"></i>
+                            Reset Password
+                        </button>
+                    }
+                </EditForm>
+
+                <div class="back-to-login">
+                    <a href="@ReturnUrl">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to @ReturnTo
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

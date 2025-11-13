@@ -64,6 +64,18 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<RegisterHttpRequest, T>(apiRequest);
         }
 
+        public async Task<BaseResponse<object>> ResendOtpAsync(string email, bool isEmailVerification = false)
+        {
+            var apiRequest = new ApiRequest<string>()
+            {
+                ApiType  = SD.ApiType.POST,
+                Url = $"auth/resend-otp?isEmailVerification={isEmailVerification}",
+                Data  = email
+            };
+
+            return await _baseService.SendAsync<string, BaseResponse<object>>(apiRequest);
+        }
+
         public async Task<BaseResponse<object>> ResetPasswordAsync(ResetPasswordHttpRequest httpRequest)
         {
             var apiRequest = new ApiRequest<ResetPasswordHttpRequest>()
@@ -76,12 +88,12 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<ResetPasswordHttpRequest, BaseResponse<object>>(apiRequest);
         }
 
-        public async Task<BaseResponse<object>> VerifyOtpAsync(string otp)
+        public async Task<BaseResponse<object>> VerifyOtpAsync(string otp, bool isEmailVerification = false)
         {
             var apiRequest = new ApiRequest<string>()
             {
                 ApiType  = SD.ApiType.POST,
-                Url = "auth/verify-otp",
+                Url = $"auth/verify-otp?isEmailVerification={isEmailVerification}",
                 Data  = otp
             };
 

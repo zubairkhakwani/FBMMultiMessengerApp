@@ -15,7 +15,9 @@ namespace FBMMultiMessenger.Services.IServices
         Task<T> RegisterAsync<T>(RegisterHttpRequest httpRequest) where T : class, new();
         Task<BaseResponse<object>> ForgotPasswordAsync(ForgotPasswordHttpRequest httpRequest);
 
-        Task<BaseResponse<object>> VerifyOtpAsync(string otp);
+        Task<BaseResponse<object>> VerifyOtpAsync(string otp, bool isEmailVerification = false);
+        Task<BaseResponse<object>> ResendOtpAsync(string email, bool isEmailVerification = false);
+
         Task<BaseResponse<object>> ResetPasswordAsync(ResetPasswordHttpRequest httpRequest);
 
         Task Logout();

@@ -91,6 +91,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 await JS.InvokeVoidAsync("myInterop.showSweetAlert", "Limit Exceeded", response.Message, true, "Click here to upgrade from the available packages", "/packages");
             }
 
+            else if (response.Data is not null &&  !response.Data.IsEmailVerified)
+            {
+                Navigation.NavigateTo($"/verify-otp?ReturnUrl=/Account&ReturnTo=Account&OtpSuccessMessage={response.Message}&EmailSentTo={response.Data.EmailSendTo}&IsEmailVerification=true");
+            }
+
             else if (!response.IsSuccess && response.RedirectToPackages)
             {
                 var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;

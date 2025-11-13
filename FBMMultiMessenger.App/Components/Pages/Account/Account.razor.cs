@@ -183,6 +183,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 //Call Api
                 var response = await AccountService.Import(accounts);
 
+                if (response.Data is not null && !response.Data.IsEmailVerified)
+                {
+                    Navigation.NavigateTo($"/verify-otp?ReturnUrl=/Account&ReturnTo=Account&OtpSuccessMessage={response.Message}&EmailSendTo={response.Data.EmailSendTo}");
+                }
+
                 if (response.IsSuccess)
                 {
                     Snackbar.Add(response.Message, Severity.Success);
