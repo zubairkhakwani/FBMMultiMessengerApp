@@ -1,21 +1,25 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Subscription;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
 namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
 {
     internal class ActiveSubscriptionRequirementHandler : AuthorizationHandler<ActiveSubscriptionRequirement>
     {
-        public ActiveSubscriptionRequirementHandler(ISubscriptionSerivce subscriptionSerivce)
+        public ActiveSubscriptionRequirementHandler(ISubscriptionSerivce subscriptionSerivce, IAuthService authService)
         {
             SubscriptionSerivce = subscriptionSerivce;
+            this.authService=authService;
         }
 
         private static DateTime _lastChecked = DateTime.MinValue;
         private static bool _lastResult = false;
         private static readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(60);
+        private readonly IAuthService authService;
 
         public ISubscriptionSerivce SubscriptionSerivce { get; }
 
@@ -26,6 +30,7 @@ namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
                 return;
             }
 
+            //await authService.Logout();
             if (DateTime.Now - _lastChecked < _cacheDuration && _lastResult)
             {
                 context.Succeed(requirement);

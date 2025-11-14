@@ -73,6 +73,11 @@
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
+    ::deep .input::-ms-reveal,
+    ::deep .input::-ms-clear {
+        display: none;
+    }
+
     ::deep .input::placeholder {
         color: #9ca3af;
     }

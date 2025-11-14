@@ -185,7 +185,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
                 if (response.Data is not null && !response.Data.IsEmailVerified)
                 {
-                    Navigation.NavigateTo($"/verify-otp?ReturnUrl=/Account&ReturnTo=Account&OtpSuccessMessage={response.Message}&EmailSendTo={response.Data.EmailSendTo}");
+                    Navigation.NavigateTo($"/verify-otp?ReturnUrl=/Account&ReturnTo=Account&OtpSuccessMessage={response.Message}&EmailSentTo={response.Data.EmailSendTo}&IsEmailVerification=true");
                 }
 
                 if (response.IsSuccess)

@@ -17,7 +17,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height:100vh;
+    height: 100vh;
 }
 
 .register-container {
@@ -71,7 +71,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
-    margin-bottom:1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .input-wrapper {
@@ -107,6 +107,11 @@ body {
         ::deep .input:focus + ::deep .input-icon {
             color: #667eea;
         }
+
+    ::deep .input::-ms-reveal,
+    ::deep .input::-ms-clear {
+        display: none;
+    }
 
     ::deep .input::placeholder {
         color: #9ca3af;
@@ -261,7 +266,7 @@ body {
 }
 
 @media (max-width: 560px) {
-    
+
     .register-header {
         display: flex;
         border-radius: 0;
@@ -270,6 +275,7 @@ body {
         flex-direction: column;
         justify-content: center;
     }
+
     .register-container {
         display: flex;
         gap: 2rem;
@@ -281,7 +287,7 @@ body {
     }
 
     .register-form {
-        padding:28px 20px;
+        padding: 28px 20px;
     }
 
     .register-header h1 {
