@@ -97,7 +97,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
         {
             if (e.Key == "Enter")
             {
-                await table.ReloadServerData();
+                await HandleFilterClickAsync();
             }
         }
         public async Task AddNewAccountAsync()
@@ -294,7 +294,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 await JS.InvokeVoidAsync(
                    "myInterop.showSweetAlert",
                    "Invalid File",
-                   "Please select an excel\\.csv file",
+                   "Please select an excel(.csv) file",
                    false,
                    string.Empty,
                    string.Empty,

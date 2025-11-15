@@ -1,12 +1,13 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Profile;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
 
 namespace FBMMultiMessenger.Services
 {
-    internal class ProfileService : IProfileService
+    public class ProfileService : IProfileService
     {
         private readonly IBaseService _baseService;
 
@@ -14,6 +15,7 @@ namespace FBMMultiMessenger.Services
         {
             this._baseService=baseService;
         }
+
 
         public async Task<BaseResponse<object>> ChangePasswordAsync(ChangePasswordHttpRequest httpRequest)
         {
@@ -39,7 +41,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<EditProfileHttpRequest, BaseResponse<object>>(request);
         }
 
-        public async Task<BaseResponse<GetMyProfileHttpResponse>> GetMyProfileAsync()
+        public async Task<BaseResponse<GetMyProfleHttpResponse>> GetMyProfileAsync()
         {
             var request = new ApiRequest<object>()
             {
@@ -48,7 +50,7 @@ namespace FBMMultiMessenger.Services
                 Data = null
             };
 
-            return await _baseService.SendAsync<object, BaseResponse<GetMyProfileHttpResponse>>(request);
+            return await _baseService.SendAsync<object, BaseResponse<GetMyProfleHttpResponse>>(request);
         }
     }
 }

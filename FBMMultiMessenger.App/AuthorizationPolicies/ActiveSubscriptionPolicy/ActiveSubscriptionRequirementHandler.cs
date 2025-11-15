@@ -13,7 +13,7 @@ namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
         public ActiveSubscriptionRequirementHandler(ISubscriptionSerivce subscriptionSerivce, IAuthService authService)
         {
             SubscriptionSerivce = subscriptionSerivce;
-            this.authService=authService;
+            this.authService = authService;
         }
 
         private static DateTime _lastChecked = DateTime.MinValue;
@@ -30,7 +30,8 @@ namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
                 return;
             }
 
-            //await authService.Logout();
+           // await authService.Logout();
+
             if (DateTime.Now - _lastChecked < _cacheDuration && _lastResult)
             {
                 context.Succeed(requirement);

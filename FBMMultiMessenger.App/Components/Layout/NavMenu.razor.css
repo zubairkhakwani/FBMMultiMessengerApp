@@ -75,7 +75,7 @@
     transition: all 0.2s ease 0.2s;
     overflow-y: auto;
     background: var( --primary-bg-clr);
-    height: calc(100vh - 65px);
+    height: calc(100vh - 56px);
 }
 
     .custom-nav.hide, .slideable.hide {

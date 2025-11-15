@@ -99,7 +99,7 @@ namespace FBMMultiMessenger.Components.Pages.Shared
 
             OtpErrorMessage = string.Empty;
 
-            VerifyOtpModel = new VerifyOtp();
+            VerifyOtpModel.Digit1 = VerifyOtpModel.Digit2 =VerifyOtpModel.Digit3 =VerifyOtpModel.Digit4 = VerifyOtpModel.Digit5 =VerifyOtpModel.Digit6 ="";
 
             var isParsed = bool.TryParse(IsEmailVerification, out bool isEmailVerification);
 

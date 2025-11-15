@@ -1,4 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Profile;
+using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -38,7 +39,7 @@ namespace FBMMultiMessenger.Components.Pages.Profile
             var response = await ProfileService.GetMyProfileAsync();
             if (response.IsSuccess)
             {
-                var userData = response.Data ?? new GetMyProfileHttpResponse();
+                var userData = response.Data ?? new GetMyProfleHttpResponse();
                 var userName = userData.Name.Trim();
                 var userEmail = userData.Email.Trim();
                 var userPhoneNumber = userData.ContactNumber.Trim();
@@ -68,6 +69,7 @@ namespace FBMMultiMessenger.Components.Pages.Profile
             }
 
             ShowProfileLoader = true;
+
             var response = await ProfileService.EditProfileAsync(ProfileModel);
 
             if (response.IsSuccess)

@@ -1,13 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Maui.Controls;
 using OneSignalSDK.DotNet;
 using OneSignalSDK.DotNet.Core.Notifications;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.Notification
 {
@@ -59,7 +52,7 @@ namespace FBMMultiMessenger.Notification
                     }
                     else
                     {
-                        Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={message!.ToString()}");
+                        Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={message}");
                     }
                 });
             }

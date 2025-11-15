@@ -26,10 +26,10 @@
                        class="search-input"
                        id="searchInput"
                        placeholder="Search accounts...">
-                <button @onclick="HandleFilterClickAsync" class="btn btn-primary">
+                <button @onclick="HandleFilterClickAsync" class="btn btn-primary btn-fullwidth" >
                     🔍 Filter
                 </button>
-              @*   <button @onclick="HandleReset" class="btn btn-outline">
+                @* <button class="btn btn-outline">
                     🔄 Reset
                 </button> *@
             </div>
@@ -44,7 +44,7 @@
                 </span>
             }
 
-            <button @onclick="HandleMultipleRemoval" class="btn btn-danger" id="deleteBtn">
+            <button @onclick="HandleMultipleRemoval" class="btn btn-danger btn-fullwidth">
                 🗑️ Delete Selected
             </button>
 

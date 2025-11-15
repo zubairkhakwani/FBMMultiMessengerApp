@@ -82,7 +82,7 @@ namespace FBMMultiMessenger
             builder.Logging.AddDebug();
 #endif
 
-            if (DeviceInfo.Platform == DevicePlatform.Android)
+            if (DeviceInfo.Platform != DevicePlatform.WinUI)
             {
                 var appId = builder.Configuration.GetValue<string>("OneSignal:AppId")!;
                 OneSignal.Initialize(appId);
