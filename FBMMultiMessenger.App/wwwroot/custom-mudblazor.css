@@ -1,9 +1,8 @@
 ﻿
 /*AutoSelect*/
 
-.mud-select.mud-autocomplete
-{
-    display : flex !important;
+.mud-select.mud-autocomplete {
+    display: flex !important;
 }
 
 /*Table*/
@@ -17,19 +16,18 @@
     justify-content: flex-end;
 }
 
-.table-search-filters > div {
-    display: flex;
-    flex : 1 1 auto;
-}
+    .table-search-filters > div {
+        display: flex;
+        flex: 1 1 auto;
+    }
 
-.table-search-filters .search-button {
-    margin-bottom: 10px;
-    flex: 1 1 auto;
-}
+    .table-search-filters .search-button {
+        margin-bottom: 10px;
+        flex: 1 1 auto;
+    }
 
-.mud-toolbar.mud-toolbar-gutters.mud-table-toolbar
-{
-    height : auto;
+.mud-toolbar.mud-toolbar-gutters.mud-table-toolbar {
+    height: auto;
 }
 
 .mud-table-root .mud-table-head .mud-table-cell {
@@ -46,8 +44,7 @@
     white-space: nowrap
 }
 
-@media (max-width: 960px) 
-{
+@media (max-width: 960px) {
     .mud-sm-table .mud-table-cell:before {
         font-weight: 550 !important;
     }
@@ -57,10 +54,9 @@
     }
 }
 
-@media (max-width: 600px) 
-{
+@media (max-width: 600px) {
     .mud-table-cell .neeleez-table-column {
-        max-width: 250px !important; 
+        max-width: 250px !important;
     }
 }
 
@@ -72,11 +68,10 @@
     margin-bottom: 10px !important;
 }
 
-.neeleez-field.mud-picker .mud-input-control .mud-icon-button-edge-start /* Added this because there is no option in mud picker to set Edge property of its icon button  */
-{
-    margin-left: 0;
-    margin-inline-start: 0;
-}
+    .neeleez-field.mud-picker .mud-input-control .mud-icon-button-edge-start /* Added this because there is no option in mud picker to set Edge property of its icon button  */ {
+        margin-left: 0;
+        margin-inline-start: 0;
+    }
 
 .neeleez-field.mud-input-control {
     margin: 0 !important;
@@ -150,30 +145,27 @@
     border-radius: 20px !important;
     max-height: 85% !important;
     margin-top: 5% !important;
-
     overflow: visible !important;
 }
 
-.custom-form-popup.single-view {
-    width: fit-content !important;
-    max-width: fit-content !important;
-    max-width: 95% !important;
-}
+    .custom-form-popup.single-view {
+        width: fit-content !important;
+        max-width: fit-content !important;
+        max-width: 95% !important;
+    }
 
-.custom-form-popup.double-view 
-{
-    max-width: 820px !important;
-    width: 820px !important;
-}
+    .custom-form-popup.double-view {
+        max-width: 820px !important;
+        width: 820px !important;
+    }
 
-.custom-form-popup .mud-dialog-title {
-    padding-bottom: 7px !important;
-}
+    .custom-form-popup .mud-dialog-title {
+        padding-bottom: 7px !important;
+    }
 
-    .custom-form-popup .popup-grid
-    {
-        display : grid;
-        padding : 0px 20px;
+    .custom-form-popup .popup-grid {
+        display: grid;
+        padding: 0px 20px;
     }
 
     .custom-form-popup.single-view .popup-grid {
@@ -202,11 +194,10 @@
     }
 
 
-@media screen and (max-width: 600px) 
-{
+@media screen and (max-width: 600px) {
     .custom-form-popup.double-view .popup-grid {
         grid-template-columns: 1fr;
-        grid-gap : 10px;
+        grid-gap: 10px;
     }
 
     .custom-form-popup.double-view {
@@ -214,13 +205,12 @@
         width: 500px !important;
     }
 
-    .custom-form-popup.double-view .popup-grid .custom-form-popup-actions {
-        grid-column: span 1;
-    }
+        .custom-form-popup.double-view .popup-grid .custom-form-popup-actions {
+            grid-column: span 1;
+        }
 
-    .job-slider
-    {
-        grid-column : span 1 !important;
+    .job-slider {
+        grid-column: span 1 !important;
     }
 }
 
@@ -234,43 +224,43 @@
     margin-bottom: 40px;
 }
 
-.job-slider .mud-slider {
-    width: 50% !important;
-}
+    .job-slider .mud-slider {
+        width: 50% !important;
+    }
 
-.job-slider .mud-slider .mud-slider-track-tick-label {
-    min-width: 140px;
-}
+        .job-slider .mud-slider .mud-slider-track-tick-label {
+            min-width: 140px;
+        }
 
-.total-figures-table{
+.total-figures-table {
     box-shadow: none !important;
 }
 
-.total-figures-table td{
-    padding:6px 16px !important;
-    border-bottom:none !important;
-    min-width:140px;
-}
+    .total-figures-table td {
+        padding: 6px 16px !important;
+        border-bottom: none !important;
+        min-width: 140px;
+    }
 
-.total-figures-table tr:nth-child(3) td h5, .total-figures-table tr:nth-child(3) td{
-    font-weight:bold !important;
-}
+    .total-figures-table tr:nth-child(3) td h5, .total-figures-table tr:nth-child(3) td {
+        font-weight: bold !important;
+    }
 
-.total-figures-table tr:nth-child(5) td h5, .total-figures-table tr:nth-child(5) td{
-    font-weight:bold !important;
-}
+    .total-figures-table tr:nth-child(5) td h5, .total-figures-table tr:nth-child(5) td {
+        font-weight: bold !important;
+    }
 
-.total-figures-table tr:nth-child(5), .total-figures-table tr:nth-child(3) {
-    background-color: #f0f0f0 !important;
-}
+    .total-figures-table tr:nth-child(5), .total-figures-table tr:nth-child(3) {
+        background-color: #f0f0f0 !important;
+    }
 
-.total-figures-table tr:nth-child(6) td p {
-    font-size:12px !important;
-}
+    .total-figures-table tr:nth-child(6) td p {
+        font-size: 12px !important;
+    }
 
-.total-figures-table tr:nth-child(6) td {
-    padding:12px !important;
-}
+    .total-figures-table tr:nth-child(6) td {
+        padding: 12px !important;
+    }
 
 
 /*Side drawer*/
@@ -290,14 +280,13 @@
     background-position-y: top;
 }
 
-.side-drawer .mud-drawer-content {
-    overflow-y: auto;
-}
+    .side-drawer .mud-drawer-content {
+        overflow-y: auto;
+    }
 
-.side-drawer .mud-drawer-content .mud-tooltip-root.mud-tooltip-inline
-{
-    margin-top : 5px;
-}
+        .side-drawer .mud-drawer-content .mud-tooltip-root.mud-tooltip-inline {
+            margin-top: 5px;
+        }
 
 .MenuTooltip:not(.mud-popover-open) {
     display: none !important;
@@ -316,6 +305,99 @@
     border-color: #970303 !important;
 }
 
-.custom-mud-auto-complete{
-    margin:0 !important;
+.custom-mud-auto-complete {
+    margin: 0 !important;
 }
+
+
+
+
+/* Base Snackbar Styling */
+
+.mud-snackbar {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(8, 102, 255, 0.2) !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    backdrop-filter: blur(10px) !important;
+    animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Success Toast */
+.mud-snackbar.mud-alert-filled-success {
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%) !important;
+    border-left: 5px solid #10b981 !important;
+}
+
+/* Error Toast */
+.mud-snackbar.mud-alert-filled-error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border-left: 5px solid #ef4444 !important;
+}
+
+/* Info Toast  */
+.mud-snackbar.mud-alert-filled-info {
+    background: linear-gradient(135deg, #0866FF 0%, #1e3a8a 100%) !important;
+    border-left: 5px solid #3b82f6 !important;
+}
+
+/* Warning Toast */
+.mud-snackbar.mud-alert-filled-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    border-left: 5px solid #f59e0b !important;
+}
+
+/* Text Styling */
+.mud-snackbar .mud-snackbar-content-message {
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    letter-spacing: 0.3px !important;
+    color: #ffffff !important;
+}
+
+/* Icon Styling */
+.mud-snackbar .mud-snackbar-icon {
+    font-size: 24px !important;
+    margin-right: 12px !important;
+    animation: scaleIn 0.3s ease-out !important;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Close Button */
+.mud-snackbar .mud-snackbar-close-button {
+    color: rgba(255, 255, 255, 0.8) !important;
+    transition: all 0.2s ease !important;
+}
+
+    .mud-snackbar .mud-snackbar-close-button:hover {
+        color: #ffffff !important;
+        transform: scale(1.1) rotate(90deg) !important;
+    }

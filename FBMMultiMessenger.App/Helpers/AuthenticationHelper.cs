@@ -19,7 +19,9 @@ namespace FBMMultiMessenger.Helpers
 
             if (!hasActiveSubscription)
             {
-                navigationManager.NavigateTo($"/packages?isExpired={isSubscriptionExpired}");
+                navigationManager.NavigateTo($"/pricing");
+
+                // navigationManager.NavigateTo($"/packages?isExpired={isSubscriptionExpired}");
                 return;
             }
 

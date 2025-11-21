@@ -1,7 +1,7 @@
-﻿using FBMMultiMessenger.Notification;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy;
 using FBMMultiMessenger.Helpers;
+using FBMMultiMessenger.Notification;
 using FBMMultiMessenger.Services;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.SignalR;
@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
+using MudBlazor;
 using MudBlazor.Services;
 using OneSignalSDK.DotNet;
 using System.Reflection;
@@ -45,7 +46,6 @@ namespace FBMMultiMessenger
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<IBaseService, BaseService>();
 
-            //builder.Services.AddHttpClient<IAuthService, AuthService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             builder.Services.AddScoped<IAccountService, AccountService>();
@@ -58,12 +58,25 @@ namespace FBMMultiMessenger
             builder.Services.AddScoped<OneSignalService>();
             builder.Services.AddScoped<IDefaultMessageService, DefaultMessageService>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IPricingService, PricingService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+
 
             builder.Services.AddSingleton<BackButtonService>();
             builder.Services.AddSingleton<SignalRChatService>();
 
             builder.Services.AddHttpClient();
-            builder.Services.AddMudServices();
+            builder.Services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+                config.SnackbarConfiguration.PreventDuplicates = false;
+                config.SnackbarConfiguration.ShowCloseIcon = true;
+                config.SnackbarConfiguration.VisibleStateDuration = 4000;
+                config.SnackbarConfiguration.HideTransitionDuration = 500;
+                config.SnackbarConfiguration.ShowTransitionDuration = 500;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+                config.SnackbarConfiguration.MaxDisplayedSnackbars = 5;
+            });
             builder.Services.AddBlazoredLocalStorage();
 
             builder.Services.AddAuthorizationCore(options =>

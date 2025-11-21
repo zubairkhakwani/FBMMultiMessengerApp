@@ -494,14 +494,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
                 foreach (var file in files)
                 {
-                    //if base64 is needed you can uncomment.
                     using var ms = new MemoryStream();
                     await file.OpenReadStream(MaxMediaSize).CopyToAsync(ms);
                     var buffer = ms.ToArray();
                     var bas64 = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
 
-                    // get a blob URL 
-                    // var objectUrl = await JS.InvokeAsync<string>("myInterop.createObjectURL", file);
                     var newFile = new FileData()
                     {
                         Id = $"File-{Guid.NewGuid()}",

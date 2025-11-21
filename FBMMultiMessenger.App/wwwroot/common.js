@@ -32,7 +32,14 @@
             return null;
         }
     },
-
+    copyToClipboard: async function (text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            return false;
+        }
+    },
     showSweetAlert: function (title, message, showFooter = false, footerText = "Help", footerLink = "#", icon = "error", confirmBtnText = "Yes", showCancelBtn = false, cancelBtnText = "No") {
         const config = {
             icon: icon,
@@ -44,7 +51,7 @@
         };
 
         if (showFooter) {
-            config.footer = `<a href="${footerLink}">${footerText}</a>`;
+            config.footer = `<a >${footerText}</a>`;
         }
 
         return Swal.fire(config).then((result) => {
@@ -52,3 +59,6 @@
         });
     }
 };
+
+
+

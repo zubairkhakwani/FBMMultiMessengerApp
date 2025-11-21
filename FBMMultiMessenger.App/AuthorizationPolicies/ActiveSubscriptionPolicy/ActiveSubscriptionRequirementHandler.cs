@@ -30,7 +30,7 @@ namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
                 return;
             }
 
-           // await authService.Logout();
+            //await authService.Logout();
 
             if (DateTime.Now - _lastChecked < _cacheDuration && _lastResult)
             {

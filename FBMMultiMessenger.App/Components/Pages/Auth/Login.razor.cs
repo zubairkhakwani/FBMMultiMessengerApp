@@ -72,7 +72,8 @@ namespace FBMMultiMessenger.Components.Pages.Auth
             {
                 var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;
 
-                Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
+                Navigation.NavigateTo("/pricing");
+                //Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
                 return;
             }
 

@@ -134,7 +134,10 @@ namespace FBMMultiMessenger.Services
                 // CASE 3: Regular property (string, int)
                 else
                 {
-                    content.Add(new StringContent(value.ToString()), prop.Name);
+                    if (value != null)
+                    {
+                        content.Add(new StringContent(value?.ToString() ?? string.Empty), prop.Name);
+                    }
                 }
             }
 
