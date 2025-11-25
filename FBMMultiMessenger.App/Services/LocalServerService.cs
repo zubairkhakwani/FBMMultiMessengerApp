@@ -2,35 +2,29 @@
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static FBMMultiMessenger.Utility.SD;
 
 namespace FBMMultiMessenger.Services
 {
-    internal class ExtensionService : IExtensionService
+    public class LocalServerService : ILocalServerService
     {
         private readonly IBaseService _baseService;
 
-        public ExtensionService(IBaseService baseService)
+        public LocalServerService(IBaseService baseService)
         {
             this._baseService=baseService;
         }
-        public async Task<T> Notify<T>(NotifyExtensionRequest httpRequest) where T : class, new()
+        public async Task<T> Notify<T>(NotifyLocalServerHttpRequest httpRequest) where T : class, new()
         {
-            var request = new ApiRequest<NotifyExtensionRequest>()
+            var request = new ApiRequest<NotifyLocalServerHttpRequest>()
             {
                 ApiType = SD.ApiType.POST,
-                Url ="extension/notify",
+                Url ="localserver/notify",
                 Data = httpRequest,
                 ContentType = ContentType.MultipartFormData
             };
 
-            return await _baseService.SendAsync<NotifyExtensionRequest, T>(request);
+            return await _baseService.SendAsync<NotifyLocalServerHttpRequest, T>(request);
 
         }
     }

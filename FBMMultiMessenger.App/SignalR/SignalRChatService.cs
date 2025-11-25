@@ -31,7 +31,7 @@ namespace FBMMultiMessenger.SignalR
         public async Task ConnectAsync(string userId)
         {
             this.userId = userId;
-            _shouldReconnect = true; // ← Add this line
+            _shouldReconnect = true;
 
             try
             {
@@ -52,7 +52,7 @@ namespace FBMMultiMessenger.SignalR
 
                 _hubConnection.Closed += async (error) =>
                 {
-                    if(_shouldReconnect)
+                    if (_shouldReconnect)
                     {
                         Console.WriteLine("SignalR disconnected, attempting to reconnect...");
                         await AttemptReconnect();

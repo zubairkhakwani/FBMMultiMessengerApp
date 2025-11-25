@@ -27,7 +27,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public IChatMessagesService ChatMessagesService { get; set; }
 
         [Inject]
-        public IExtensionService ExtensionService { get; set; }
+        public ILocalServerService LocalServerService { get; set; }
 
         [Inject]
         public SignalRChatService SignalRChatService { get; set; }
@@ -111,8 +111,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public bool _autocycle { get; set; } = false;
         public List<FileData> _carouselItems { get; set; } = new List<FileData>();
         public bool _showCarousel;
-
-
 
         public List<GetMyChatsHttpResponse> FilteredAccountChats = new List<GetMyChatsHttpResponse>();
         public List<GetMyChatsHttpResponse> AccountChats = new List<GetMyChatsHttpResponse>();
@@ -231,7 +229,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                         IsVideoMessage = receivedChat.IsVideoMessage,
                         IsAudioMessage = receivedChat.IsAudioMessage,
                         IsSent = true,
-                        CreatedAt = receivedChat.StartedAt
+                        CreatedAt = receivedChat.StartedAt,
                     };
 
                     if (receivedChat.IsImageMessage || receivedChat.IsVideoMessage)
@@ -257,8 +255,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     UserProfileImage = receivedChat.UserProfileImage,
                     FbListingLocation = receivedChat.FbListingLocation,
                     FbListingPrice = receivedChat.FbListingPrice,
-                    LastMessage = receivedChat.Message,
-                    LastMessageFrom = receivedChat.FbListingTitle?.Split(" ")[0],
+                    MessagePreview = receivedChat.MessagPreview,
+                    SenderName = receivedChat.MessagePreviewFrom,
                     FbChatId = receivedChat.FbChatId,
                     StartedAt = receivedChat.StartedAt,
                     IsRead = false,
@@ -272,10 +270,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 await JS.InvokeVoidAsync("myInterop.playNotificationSound", 1);
             }
 
-            var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId);
+            var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId) ?? new GetMyChatsHttpResponse();
 
-            chat.LastMessage = receivedChat.Message;
-            chat.LastMessageFrom = receivedChat.FbListingTitle?.Split(" ")[0];
+            chat.MessagePreview = receivedChat.MessagPreview;
+            chat.SenderName = receivedChat.MessagePreviewFrom;
+            chat.FbListingImage = receivedChat.FbListingImage;
+            chat.FbListingTitle = receivedChat.FbListingTitle;
             chat.IsRead = receivedChat.FbChatId == SelectedFbChatId;
 
             FilteredAccountChats.Remove(chat);
@@ -284,6 +284,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             await InvokeAsync(StateHasChanged);
         }
+
 
         private async Task FocusTextArea()
         {
@@ -368,7 +369,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
-        public async Task NotifyExtension(string msg)
+        public async Task NotifyLocalServer(string msg)
         {
             await FocusTextArea();
 
@@ -431,11 +432,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             foreach (var chat in messages)
             {
-                var ms = $"message: {Message}, UniqueId: {chat.UniqueId}";
-                _ = JS.InvokeVoidAsync("console.log", ms);
 
                 //This is to call API 
-                var request = new NotifyExtensionRequest()
+                var request = new NotifyLocalServerHttpRequest()
                 {
                     FbChatId = SelectedFbChatId!,
                     Message = chat.Message,
@@ -443,12 +442,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     OfflineUniqueId = chat.UniqueId
                 };
 
-                var response = await ExtensionService.Notify<BaseResponse<NotifyExtensionHttpResponse>>(request);
+                var response = await LocalServerService.Notify<BaseResponse<NotifyLocalServerHttpResponse>>(request);
 
                 if (!response.IsSuccess && response.RedirectToPackages)
                 {
                     var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;
-                    Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
+                    Navigation.NavigateTo("/pricing");
+                    //Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
                     return;
                 }
 
@@ -531,7 +531,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [JSInvokable]
         public async Task HandleEnterKey(string message)
         {
-            await NotifyExtension(message);
+            await NotifyLocalServer(message);
             await InvokeAsync(StateHasChanged);
         }
 
@@ -583,7 +583,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task ConnectToSignalR()
         {
-            var currentUserId = $"User_{CurrentUser.Id}";
+            var currentUserId = $"App_{CurrentUser.Id}";
 
             if (!SignalRChatService.IsConnected)
             {

@@ -48,8 +48,8 @@
                     var fbListingImage = chat.FbListingImage;
                     var fbListingTitle = chat.FbListingTitle;
                     var fbListingLocation = chat.FbListingLocation;
-                    var lastMesasge = chat.LastMessage;
-                    var lastMessageFrom = chat.LastMessageFrom;
+                    var messagePreview = chat.MessagePreview;
+                    var senderName = chat.SenderName;
                     var isRead = chat.IsRead ? "read" : "unread";
                     var fbListingPrice = chat.FbListingPrice;
                     var unreadCount = chat.UnReadCount;
@@ -73,9 +73,9 @@
                         <div class="chat-info">
                             <div class="chat-name">@fbListingTitle</div>
                             <div class="chat-listing-info @isRead">
-                                @if (lastMesasge is not null)
+                                @if (messagePreview is not null)
                                 {
-                                    <div class="preview">@lastMessageFrom: @lastMesasge</div>
+                                    <div class="preview">@senderName: @messagePreview</div>
                                 }
                                 else if (fbListingLocation is not null)
                                 {
@@ -345,7 +345,7 @@
                     <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
                     <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
                     <textarea @bind="Message" @ref="textArea" @onfocusout="FocusTextArea" class="message-input" placeholder="Type a message..." rows="1"></textarea>
-                    <button @onclick="() => NotifyExtension(Message)" class="send-button">➤</button>
+                    <button @onclick="() => NotifyLocalServer(Message)" class="send-button">➤</button>
                 </div>
             }
 
@@ -361,7 +361,7 @@
                      Color="@Color.Error"
                      Size="@Size.Large" />
         </div>
-        <MudCarousel  ItemsSource="@_carouselItems"  NavigationButtonsClass="navigation-btns" Class="mud-width-full" Style="height:100vh;" AutoCycle="false">
+        <MudCarousel ItemsSource="@_carouselItems" NavigationButtonsClass="navigation-btns" Class="mud-width-full" Style="height:100vh;" AutoCycle="false">
             <BulletTemplate Context="selected">
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
                     <span class="mud-icon-button-label">
@@ -383,19 +383,19 @@
                     </span>
                 </div>
             </NextButtonTemplate>
-            <ItemTemplate >
+            <ItemTemplate>
 
                 <div style="display:flex; justify-content:center;align-items:center;">
-                    @if(context.IsVideo)
+                    @if (context.IsVideo)
                     {
                         <video width="450" height="340" controls>
-                                <source src="@context.FileUrl" type="video/mp4">
+                            <source src="@context.FileUrl" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                     }
                     else
                     {
-                    <img  src="@context.FileUrl" alt="Image"/>
+                        <img src="@context.FileUrl" alt="Image" />
                     }
                 </div>
             </ItemTemplate>

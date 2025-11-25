@@ -1,9 +1,7 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Subscription;
 using FBMMultiMessenger.Contracts.Response;
-using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
 namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy

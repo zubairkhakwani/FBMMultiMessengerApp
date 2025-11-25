@@ -1,171 +1,177 @@
 ﻿@page "/Pricing"
+<div class="parent-container">
+    <div class="container">
+        <a class="back-button" href="/account">
+            ← Back to Dashboard
+        </a>
+        <div class="header">
 
-<div class="container">
-    <div class="header">
-        <h1>📦 Our Packages</h1>
-        <p>Choose your plan and get started today</p>
-        <p class="punchline">"Growth isn't expensive, staying small is"</p>
-    </div>
+            <h1>📦 Our Packages</h1>
+            <p>Choose your plan and get started today</p>
+            <p class="punchline">"Growth isn't expensive, staying small is"</p>
+        </div>
 
-    <!-- Calculator Section -->
-    <div class="card">
-        <h2><span class="icon">🧮</span> Pricing Calculator</h2>
-        <div class="calculator-section">
-            <!-- Pricing Tiers Info -->
-            <div class="pricing-tiers">
-                <h3>💡 Volume Discounts Available</h3>
-                <div class="tier-list">
-                    @for (int i = 0; i < Pricings.Count; i++)
+        <!-- Calculator Section -->
+        <div class="card">
+            <h2><span class="icon">🧮</span> Pricing Calculator</h2>
+            <div class="calculator-section">
+                <!-- Pricing Tiers Info -->
+                <div class="pricing-tiers">
+                    <h3>💡 Volume Discounts Available</h3>
+                    <div class="tier-list">
+                        @for (int i = 0; i < Pricings.Count; i++)
+                        {
+                            var pricing = Pricings[i];
+                            var minAccounts = pricing.MinAccounts;
+                            var maxAccounts = pricing.MaxAccounts;
+                            var pricePerAccount = pricing.PricePerAccount;
+                            var activeTier = pricing.IsActive ? "active" : "";
+
+
+                            <div class="tier-item @activeTier">
+                                @if (minAccounts > 100 || maxAccounts > 100)
+                                {
+                                    <span class="tier-range">100+ accounts</span>
+                                }
+                                else
+                                {
+                                    <span class="tier-range">@minAccounts-@maxAccounts accounts</span>
+                                }
+                                <span class="tier-price">PKR @pricePerAccount / account</span>
+                                <span class="tier-badge">Save @GetDiscount(pricePerAccount)%</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="accounts">Number of Accounts</label>
+                    <input @bind-value="AccountsInput" @bind-value:event="oninput" type="number" id="accounts" placeholder="Enter number of accounts" min="1">
+                </div>
+
+                <div class="pricing-display">
+                    <div class="price-item">
+                        <div class="label">Price Per Account</div>
+                        <div class="value" id="pricePerAccount">PKR @PricePerAccount</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="label">Total Accounts</div>
+                        <div class="value" id="totalAccounts">@AccountsInput</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="label">Total Cost</div>
+                        <div class="value" id="totalCost">PKR @TotalCost</div>
+                    </div>
+                </div>
+
+                <button class="purchase-btn" id="purchaseBtn">
+                    💳 Proceed to Purchase
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Banking Details Section -->
+        <div class="card  hidden scroll-to-section" id="bankingSection">
+            <h2><span class="icon">🏦</span> Banking Details</h2>
+            <p style="margin-bottom: 20px; color: #666;">Please use the following details to complete your payment</p>
+            <div class="banking-details">
+                <div class="bank-info">
+                    <div class="info-row">
+                        <span class="info-label">Bank Name:</span>
+                        <span class="info-value">ABC Bank</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Account Title:</span>
+                        <span class="info-value">Your Company Name</span>
+                    </div>
+                    <div @onclick="() => HandleCopyToClipboardAsync()" class="info-row">
+                        <span class="info-label">Account Number:</span>
+                        <span class="info-value">
+                            @AccountNo
+                            <span class="copy-icon" title="Copy to clipboard">📋</span>
+                        </span>
+                    </div>
+                    <div @onclick="() => HandleCopyToClipboardAsync(isCopyIBAN: true)" class="info-row">
+                        <span class="info-label">IBAN:</span>
+                        <span class="info-value">
+                            @IBAN
+                            <span class="copy-icon" title="Copy to clipboard">📋</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Payment Proof Section -->
+        <div class="card hidden scroll-to-section" id="uploadSection">
+            <h2><span class="icon">📤</span> Submit Payment Proof</h2>
+            <p style="margin-bottom: 20px; color: #666;">Upload your payment receipt for verification</p>
+            <EditForm Model="@RequestModel" class="upload-form" id="uploadForm" OnValidSubmit="HandlePaymentProofSubmitAsync">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label for="paymentProof">Upload Payment Receipt *</label>
+                    <div class="file-input-wrapper">
+                        <label for="paymentProof" class="file-input-label">
+                            <span>Click to upload receipt (JPG, PNG, PDF)</span>
+                        </label>
+                        <InputFile multiple type="file" style="display: none;" id="paymentProof" onchange="HandlePaymentProofChangeAsync" />
+                        <ValidationMessage For="@(() => RequestModel.PaymentImages)" class="validation-message" />
+                    </div>
+
+                    @if (PreviewSelectedImages.Any())
                     {
-                        var pricing = Pricings[i];
-                        var minAccounts = pricing.MinAccounts;
-                        var maxAccounts = pricing.MaxAccounts;
-                        var pricePerAccount = pricing.PricePerAccount;
-                        var activeTier = pricing.IsActive ? "active" : "";
-
-
-                        <div class="tier-item @activeTier">
-                            @if (minAccounts > 100 || maxAccounts > 100)
-                            {
-                                <span class="tier-range">100+ accounts</span>
-                            }
-                            else
-                            {
-                                <span class="tier-range">@minAccounts-@maxAccounts accounts</span>
-                            }
-                            <span class="tier-price">PKR @pricePerAccount / account</span>
-                            <span class="tier-badge">Save @GetDiscount(pricePerAccount)%</span>
+                        <div class="preview-container" id="previewContainer">
+                            <span class="preview-label">Payment Receipt Preview:</span>
+                            <div class="preview-image-container">
+                                @foreach (var url in PreviewSelectedImages)
+                                {
+                                    <img class="preview-media" id="previewImage" src="@url" alt="Payment receipt preview">
+                                }
+                            </div>
                         </div>
                     }
                 </div>
-            </div>
 
-            <div class="input-group">
-                <label for="accounts">Number of Accounts</label>
-                <input @bind-value="AccountsInput" @bind-value:event="oninput" type="number" id="accounts" placeholder="Enter number of accounts" min="1">
-            </div>
-
-            <div class="pricing-display">
-                <div class="price-item">
-                    <div class="label">Price Per Account</div>
-                    <div class="value" id="pricePerAccount">PKR @PricePerAccount</div>
+                <div class="form-group">
+                    <label for="accountsPurchased">Number of Accounts Purchased</label>
+                    <input type="number" id="accountsPurchased" @bind-value="AccountsInput" disabled>
                 </div>
-                <div class="price-item">
-                    <div class="label">Total Accounts</div>
-                    <div class="value" id="totalAccounts">@AccountsInput</div>
-                </div>
-                <div class="price-item">
-                    <div class="label">Total Cost</div>
-                    <div class="value" id="totalCost">PKR @TotalCost</div>
-                </div>
-            </div>
-
-            <button class="purchase-btn" id="purchaseBtn">
-                💳 Proceed to Purchase
-            </button>
-        </div>
-    </div>
-
-
-    <!-- Banking Details Section -->
-    <div class="card  hidden scroll-to-section" id="bankingSection">
-        <h2><span class="icon">🏦</span> Banking Details</h2>
-        <p style="margin-bottom: 20px; color: #666;">Please use the following details to complete your payment</p>
-        <div class="banking-details">
-            <div class="bank-info">
-                <div class="info-row">
-                    <span class="info-label">Bank Name:</span>
-                    <span class="info-value">ABC Bank</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Account Title:</span>
-                    <span class="info-value">Your Company Name</span>
-                </div>
-                <div @onclick="() => HandleCopyToClipboardAsync()" class="info-row">
-                    <span class="info-label">Account Number:</span>
-                    <span class="info-value">
-                        @AccountNo
-                        <span class="copy-icon" title="Copy to clipboard">📋</span>
-                    </span>
-                </div>
-                <div @onclick="() => HandleCopyToClipboardAsync(isCopyIBAN: true)" class="info-row">
-                    <span class="info-label">IBAN:</span>
-                    <span class="info-value">
-                        @IBAN
-                        <span class="copy-icon" title="Copy to clipboard">📋</span>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upload Payment Proof Section -->
-    <div class="card hidden scroll-to-section" id="uploadSection">
-        <h2><span class="icon">📤</span> Submit Payment Proof</h2>
-        <p style="margin-bottom: 20px; color: #666;">Upload your payment receipt for verification</p>
-        <EditForm Model="@RequestModel" class="upload-form" id="uploadForm" OnValidSubmit="HandlePaymentProofSubmitAsync">
-            <DataAnnotationsValidator />
-            <div class="form-group">
-                <label for="paymentProof">Upload Payment Receipt *</label>
-                <div class="file-input-wrapper">
-                    <label for="paymentProof" class="file-input-label">
-                        <span>Click to upload receipt (JPG, PNG, PDF)</span>
-                    </label>
-                    <InputFile multiple type="file" style="display: none;" id="paymentProof" onchange="HandlePaymentProofChangeAsync" />
-                    <ValidationMessage For="@(() => RequestModel.PaymentImages)" class="validation-message" />
+                <div class="form-group">
+                    <label for="accountsPurchased">Purchased Price</label>
+                    <input type="number" id="purchasedPrice" @bind-value="TotalCost" disabled>
                 </div>
 
-                @if (PreviewSelectedImages.Any())
+                <div class="form-group">
+                    <label for="notes">Additional Notes (Optional)</label>
+                    <textarea @bind="RequestModel.Note" id="notes" rows="4" placeholder="Any additional information..."></textarea>
+                </div>
+
+                @if (IsSubmitting)
                 {
-                    <div class="preview-container" id="previewContainer">
-                        <span class="preview-label">Payment Receipt Preview:</span>
-                        <div class="preview-image-container">
-                            @foreach (var url in PreviewSelectedImages)
-                            {
-                                <img class="preview-media" id="previewImage" src="@url" alt="Payment receipt preview">
-                            }
-                        </div>
+                    <button type="submit" class="submit-btn" disabled>
+                        <div class="loader"></div>
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="submit-btn">
+                        Submit for Approval 🚀
+                    </button>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(ResponseMessage))
+                {
+                    var responseClass = IsSuccess ? "success-message" : "error-message";
+                    <div class="@responseClass">
+                        @ResponseMessage
                     </div>
                 }
-            </div>
-
-            <div class="form-group">
-                <label for="accountsPurchased">Number of Accounts Purchased</label>
-                <input type="number" id="accountsPurchased" @bind-value="AccountsInput" disabled>
-            </div>
-            <div class="form-group">
-                <label for="accountsPurchased">Purchased Price</label>
-                <input type="number" id="purchasedPrice" @bind-value="TotalCost" disabled>
-            </div>
-
-            <div class="form-group">
-                <label for="notes">Additional Notes (Optional)</label>
-                <textarea @bind="RequestModel.Note" id="notes" rows="4" placeholder="Any additional information..."></textarea>
-            </div>
-
-            @if (IsSubmitting)
-            {
-                <button type="submit" class="submit-btn" disabled>
-                    <div class="loader"></div>
-                </button>
-            }
-            else
-            {
-                <button type="submit" class="submit-btn">
-                    Submit for Approval 🚀
-                </button>
-            }
-
-            @if (!string.IsNullOrWhiteSpace(ResponseMessage))
-            {
-                var responseClass = IsSuccess ? "success-message" : "error-message";
-                <div class="@responseClass">
-                    @ResponseMessage
-                </div>
-            }
-        </EditForm>
+            </EditForm>
+        </div>
     </div>
 </div>
+
 
 <script src="/Components/Pages/Pricing/Pricing.razor.js"></script>
 

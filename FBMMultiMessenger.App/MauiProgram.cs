@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.LifecycleEvents;
 using MudBlazor;
 using MudBlazor.Services;
 using OneSignalSDK.DotNet;
@@ -51,7 +50,7 @@ namespace FBMMultiMessenger
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ITokenProvider, TokenProvider>();
             builder.Services.AddScoped<IChatMessagesService, ChatMessageService>();
-            builder.Services.AddScoped<IExtensionService, ExtensionService>();
+            builder.Services.AddScoped<ILocalServerService, LocalServerService>();
             builder.Services.AddScoped<ISubscriptionSerivce, SubscriptionService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();

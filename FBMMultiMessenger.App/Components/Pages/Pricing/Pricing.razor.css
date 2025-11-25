@@ -1,12 +1,7 @@
-﻿* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
+﻿
+.parent-container {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%) !important;
     min-height: 100vh;
     padding: 20px;
     color: #333;
@@ -17,11 +12,33 @@ body {
     margin: 0 auto;
 }
 
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: #0866FF;
+    border: 2px solid #0866FF;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+    .back-button:hover {
+        background: #f8f9fa;
+        transform: translateX(-3px);
+    }
+
+
 .header {
     text-align: center;
     color: white;
-    margin-bottom: 50px;
-    padding: 30px 0;
+    padding-top: 15px;
+    padding-bottom: 30px;
 }
 
     .header h1 {

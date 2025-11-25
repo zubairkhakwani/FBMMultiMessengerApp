@@ -41,9 +41,11 @@
         public string FbListingId { get; set; } = null!;
         public string FbAccountId { get; set; } = null!;
         public string? FbListingTitle { get; set; }
-        public string? FbListingLocation { get; set; } 
+        public string? FbListingLocation { get; set; }
         public decimal? FbListingPrice { get; set; }
         public string? FbListingImage { get; set; }
+        public string MessagPreview { get; set; } = string.Empty;
+        public string MessagePreviewFrom { get; set; } = string.Empty;
         public string? UserProfileImage { get; set; }
         public string Message { get; set; } = null!;
         public string? OfflineUniqueId { get; set; }
@@ -57,6 +59,5 @@
         public bool IsReceived { get; set; }
 
         public DateTime StartedAt { get; set; }
-
     }
 }
