@@ -83,12 +83,25 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             var response = await AccountService.UpsertAccountAsync<BaseResponse<UpsertAccountHttpResponse>>(model, accountId);
 
-
             mudDialog?.Close(DialogResult.Ok(true));
 
-            if (!response.IsSuccess && response.Data is not null && response.Data.IsLimitExceeded)
+            if (response.Data is not null && response.Data.IsLimitExceeded)
             {
-                await JS.InvokeVoidAsync("myInterop.showSweetAlert", "Limit Exceeded", response.Message, true, "Click here to upgrade from the available packages", "/packages");
+                var sweetAlertOptions = new SweetAlertOptions()
+                {
+                    Title =  "Limit Exceeded",
+                    Message = response.Message,
+                    ConfirmButtonText = "Upgrade now",
+                    ShowCancelButton = true,
+                    CancelButtonText = "Later"
+                };
+
+                var upgradeNow = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", sweetAlertOptions);
+
+                if (upgradeNow)
+                {
+                    Navigation.NavigateTo("/Pricing");
+                }
             }
 
             else if (response.Data is not null &&  !response.Data.IsEmailVerified)
@@ -96,11 +109,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 Navigation.NavigateTo($"/verify-otp?ReturnUrl=/Account&ReturnTo=Account&OtpSuccessMessage={response.Message}&EmailSentTo={response.Data.EmailSendTo}&IsEmailVerification=true");
             }
 
-            else if (!response.IsSuccess && response.RedirectToPackages)
+            else if (response.RedirectToPackages)
             {
-                var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;
-
-                Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
+                Navigation.NavigateTo($"/Pricing?redirectReason={response.Message}");
             }
 
             else

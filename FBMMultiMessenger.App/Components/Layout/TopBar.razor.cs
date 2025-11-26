@@ -13,7 +13,7 @@ namespace FBMMultiMessenger.Components.Layout
         public IProfileService ProfileService { get; set; }
 
         public string FullName = string.Empty;
-        public string ShortName { get; set; } = string.Empty;
+        public string Avatar { get; set; } = string.Empty;
         protected override async Task OnInitializedAsync()
         {
             var response = await ProfileService.GetMyProfileAsync();
@@ -22,10 +22,21 @@ namespace FBMMultiMessenger.Components.Layout
             {
                 var profile = response.Data;
 
-                FullName = profile.Name;
-                ShortName = String.Join("", FullName.Split(" ")
-                                                 .Select(x => x[0])
-                                                 .ToList());
+                var name = profile?.Name ?? "Jhon Doe";
+                var splitedName = name.Trim().Split(" ");
+
+                var avatar = name[0].ToString();
+
+                if (splitedName.Length > 1)
+                {
+                    var firstLetter = splitedName[0][0];
+                    var secondLetter = splitedName[1][0];
+
+                    avatar = $"{firstLetter}{secondLetter}";
+                }
+
+                FullName = name;
+                Avatar = avatar;
             }
         }
 
@@ -38,8 +49,8 @@ namespace FBMMultiMessenger.Components.Layout
 
         private string GetShortName()
         {
-            if (!string.IsNullOrWhiteSpace(ShortName))
-                return ShortName;
+            if (!string.IsNullOrWhiteSpace(Avatar))
+                return Avatar;
 
             return "?";
         }

@@ -47,7 +47,10 @@ namespace FBMMultiMessenger.Components.Pages.Auth
         public async Task OnValidPost()
         {
             ShowLoader = true;
+
             var response = await AuthService.LoginAsync<BaseResponse<LoginHttpResponse>>(RequestModel);
+
+            ShowLoader = false;
 
             if (response.Data is not null &&  !string.IsNullOrWhiteSpace(response.Data.Token))
             {
@@ -62,22 +65,18 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                 }
             }
 
+            if (!response.IsSuccess && response.RedirectToPackages)
+            {
+                Navigation.NavigateTo($"/pricing?redirectReason={Uri.EscapeDataString(response.Message)}");
+                return;
+            }
+
             if (response.IsSuccess)
             {
                 navManager.NavigateTo("/Chat");
                 return;
             }
 
-            if (!response.IsSuccess && response.RedirectToPackages)
-            {
-                var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;
-
-                Navigation.NavigateTo("/pricing");
-                //Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
-                return;
-            }
-
-            ShowLoader = false;
             ResponseError = response.Message;
         }
 

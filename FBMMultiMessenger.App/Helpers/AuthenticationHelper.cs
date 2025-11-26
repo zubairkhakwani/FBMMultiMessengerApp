@@ -17,14 +17,23 @@ namespace FBMMultiMessenger.Helpers
             var hasActiveSubscription = context.User.FindFirst("hasActiveSubscription")?.Value != null;
             var isSubscriptionExpired = context.User.FindFirst("isSubscriptionExpired")?.Value != null;
 
-            if (!hasActiveSubscription)
+            if (!hasActiveSubscription || isSubscriptionExpired)
             {
-                navigationManager.NavigateTo($"/pricing");
+                var redirectReason = string.Empty;
 
-                // navigationManager.NavigateTo($"/packages?isExpired={isSubscriptionExpired}");
+                if (isSubscriptionExpired && !hasActiveSubscription)
+                {
+                    redirectReason = "Oops! Your subscription has expired. Renew today to pick up right where you left off!";
+                }
+                else
+                {
+                    redirectReason = "Ready to unlock the full experience? Subscribe now to unlock powerful features and take your experience to the next level!";
+                }
+
+                navigationManager.NavigateTo($"/pricing?redirectReason={Uri.EscapeDataString(redirectReason)}");
+
                 return;
             }
-
         }
     }
 }

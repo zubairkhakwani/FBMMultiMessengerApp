@@ -1,6 +1,7 @@
 ﻿using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -127,18 +128,17 @@ namespace FBMMultiMessenger.Components.Pages.Account
             if (!isValid)
                 return;
 
-            bool isConfirmed = await JS.InvokeAsync<bool>(
-                             "myInterop.showSweetAlert",
-                             "Confirm Import",
-                             "Do you want to import this file?",
-                             false,
-                             string.Empty,
-                             string.Empty,
-                             "info",
-                             "Yes, import it!",
-                             true,
-                             "Cancel"
-                         );
+            var options = new SweetAlertOptions
+            {
+                Title = "Confirm Import",
+                Message = "Do you want to import this file?",
+                Icon = "info",
+                ConfirmButtonText = "Yes, import it!",
+                ShowCancelButton = true,
+                CancelButtonText = "Cancel"
+            };
+
+            bool isConfirmed = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
 
             if (!isConfirmed)
                 return;
@@ -183,7 +183,31 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 //Call Api
                 var response = await AccountService.Import(accounts);
 
-                if (response.Data is not null && !response.Data.IsEmailVerified)
+                if (response.Data is not null && response.Data.IsLimitExceeded)
+                {
+                    var sweetAlertOptions = new SweetAlertOptions()
+                    {
+                        Title =  "Limit Exceeded",
+                        Message = response.Message,
+                        ConfirmButtonText = "Upgrade now",
+                        ShowCancelButton = true,
+                        CancelButtonText = "Later"
+                    };
+
+                    var upgradeNow = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", sweetAlertOptions);
+
+                    if (upgradeNow)
+                    {
+                        Navigation.NavigateTo("/Pricing");
+                    }
+                    return;
+                }
+                else if (response.RedirectToPackages)
+                {
+                    Navigation.NavigateTo($"/Pricing?redirectReason={response.Message}");
+                }
+
+                else if (response.Data is not null && !response.Data.IsEmailVerified)
                 {
                     Navigation.NavigateTo($"/verify-otp?ReturnUrl=/Account&ReturnTo=Account&OtpSuccessMessage={response.Message}&EmailSentTo={response.Data.EmailSendTo}&IsEmailVerification=true");
                 }
@@ -201,8 +225,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 Snackbar.Add("Unable to import the file. Please check that the file is not empty and has a valid format.", Severity.Error);
             }
-
-
         }
 
         public async Task EditAccountAsync(int accountId, string Name, string Cookie)

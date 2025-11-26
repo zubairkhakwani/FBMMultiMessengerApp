@@ -3,6 +3,7 @@
     public static class UserHelper
     {
 
+        //TODO: Refactor
         public static string GetShortName(string fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName))

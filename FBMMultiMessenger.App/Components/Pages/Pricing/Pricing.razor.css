@@ -406,8 +406,8 @@
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(8, 102, 255, 0.3);
     width: auto;
-    min-width: 300px;
-    display: block;
+    min-width: 250px;
+    display: flex;
     margin-left: auto;
     margin-right: auto;
 }
@@ -419,6 +419,10 @@
 
     .submit-btn:active {
         transform: translateY(0);
+    }
+    .submit-btn:disabled {
+        cursor: not-allowed;
+        transform: none;
     }
 
 .icon {

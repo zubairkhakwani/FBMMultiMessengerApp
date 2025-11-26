@@ -50,12 +50,10 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                 };
 
                 var loginResponse = await AuthService.LoginAsync<BaseResponse<LoginHttpResponse>>(loginRequest);
-                if (loginResponse.IsSuccess && loginResponse.Data is not null && loginResponse.Data.Token is not null)
+                if (!loginResponse.IsSuccess && loginResponse.RedirectToPackages && loginResponse.Data is not null && loginResponse.Data.Token is not null)
                 {
                     await TokenProvider.SetTokenAsync(loginResponse.Data.Token);
-
-                    var message = Uri.EscapeDataString("Registration complete — welcome aboard!");
-                    navManager.NavigateTo($"/Account?message={message}");
+                    navManager.NavigateTo($"/Pricing?isNewUser=true&newUserName={RequestModel.Name}");
                     return;
                 }
 

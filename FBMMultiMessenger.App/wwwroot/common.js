@@ -40,23 +40,35 @@
             return false;
         }
     },
-    showSweetAlert: function (title, message, showFooter = false, footerText = "Help", footerLink = "#", icon = "error", confirmBtnText = "Yes", showCancelBtn = false, cancelBtnText = "No") {
+    showSweetAlert: function (options = {}) {
+        const {
+            title = "Error",
+            message = "Something went wrong.",
+            icon = "error",
+            confirmButtonText = "Yes",
+            showCancelButton = false,
+            cancelButtonText = "No",
+            footer = null
+        } = options;
+
         const config = {
-            icon: icon,
-            title: title || "Error",
-            text: message || "Something went wrong.",
-            showCancelButton: showCancelBtn,
-            confirmButtonText: confirmBtnText,
-            cancelButtonText: cancelBtnText,
+            icon,
+            title,
+            text: message,
+            showCancelButton: showCancelButton,
+            confirmButtonText: confirmButtonText,
+            cancelButtonText: cancelButtonText,
         };
 
-        if (showFooter) {
-            config.footer = `<a >${footerText}</a>`;
+        if (footer) {
+            if (footer.link) {
+                config.footer = `<a href="${footer.link}">${footer.text || 'Help'}</a>`;
+            } else {
+                config.footer = footer.text;
+            }
         }
 
-        return Swal.fire(config).then((result) => {
-            return result.isConfirmed;
-        });
+        return Swal.fire(config).then((result) => result.isConfirmed);
     }
 };
 

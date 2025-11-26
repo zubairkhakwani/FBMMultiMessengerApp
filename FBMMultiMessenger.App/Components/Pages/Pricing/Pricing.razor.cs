@@ -1,6 +1,7 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Payment;
 using FBMMultiMessenger.Contracts.Contracts.Pricing;
 using FBMMultiMessenger.Contracts.Enums;
+using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -24,6 +25,15 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
         [Inject]
         public ISnackbar Snackbar { get; set; }
+
+        [SupplyParameterFromQuery]
+        public bool IsNewUser { get; set; }
+
+        [SupplyParameterFromQuery]
+        public string NewUserName { get; set; } = string.Empty;
+
+        [SupplyParameterFromQuery]
+        public string RedirectReason { get; set; } = string.Empty;
 
         public List<GetAllPricingHttpResponse> Pricings { get; set; } = new List<GetAllPricingHttpResponse>();
 
@@ -54,6 +64,8 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         public bool IsSubmitting { get; set; }
         protected override async Task OnInitializedAsync()
         {
+            await ShowNotificationFromQueryAsync();
+
             var response = await PaymentService.GetMyStatus();
 
             if (response.IsSuccess && response.Data is not null && response.Data.Status == PaymentStatus.Rejected)
@@ -66,6 +78,32 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             Pricings = pricingResponse.Data ?? new List<GetAllPricingHttpResponse>();
             BasePrice = Pricings.FirstOrDefault()?.PricePerAccount ?? 0;
             CalculatePricing();
+        }
+
+        private async Task ShowNotificationFromQueryAsync()
+        {
+            if (IsNewUser)
+            {
+                var options = new SweetAlertOptions
+                {
+                    Title = $"Welcome {NewUserName}!",
+                    Message = "Your account has been successfully created. To unlock all features and start your journey, please choose a subscription plan.",
+                    Icon = "success",
+                    ConfirmButtonText = "Get started"
+                };
+                await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
+            }
+            else if (!string.IsNullOrWhiteSpace(RedirectReason))
+            {
+                var options = new SweetAlertOptions
+                {
+                    Title = "Attention!",
+                    Message = RedirectReason,
+                    Icon = "info",
+                    ConfirmButtonText = "Get started"
+                };
+                await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
+            }
         }
 
         public async Task HandlePaymentProofSubmitAsync()
