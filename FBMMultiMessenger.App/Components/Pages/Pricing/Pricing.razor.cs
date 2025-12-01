@@ -70,7 +70,19 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
             if (response.IsSuccess && response.Data is not null && response.Data.Status == PaymentStatus.Rejected)
             {
-                await JS.InvokeVoidAsync("myInterop.showSweetAlert", "Attention", response.Data.Description, true, "check your email for detail information or contact support", "#", "error", "Okay");
+                var options = new SweetAlertOptions
+                {
+                    Title = "Attention",
+                    Message = response.Data.Description,
+                    Icon = "error",
+                    ConfirmButtonText = "Okay",
+                    Footer = new SweetAlertFooter()
+                    {
+                        Text = "Check your email further assistance.",
+                    }
+                };
+
+                await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
             }
 
 
@@ -209,35 +221,37 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
                 if (!isValidFile || file is null)
                 {
-                    await JS.InvokeVoidAsync(
-                      "myInterop.showSweetAlert",
-                      "Invalid File",
-                      "Invalid file format. Only JPG, PNG, and PDF files are allowed.",
-                      false,
-                      string.Empty,
-                      string.Empty,
-                      "error",
-                      "OK",
-                      false,
-                      string.Empty
-                   );
+                    var sweetAlertOptions = new SweetAlertOptions
+                    {
+                        Title = "Invalid File",
+                        Message = "Invalid file format. Only JPG, PNG, and PDF files are allowed.",
+                        ConfirmButtonText = "OK",
+                        ShowCancelButton = false,
+                        CancelButtonText = string.Empty,
+                        Icon = "error"
+                    };
+
+                    await JS.InvokeVoidAsync("myInterop.showSweetAlert", sweetAlertOptions);
+
+
+
                     return false;
                 }
 
                 if (file.Size > MaxMediaSize)
                 {
-                    await JS.InvokeVoidAsync(
-                        "myInterop.showSweetAlert",
-                        "File Too Large",
-                        $"The selected file exceeds the maximum allowed size of {MaxMediaSize / (1024 * 1024)} MB.",
-                        false,
-                        string.Empty,
-                        string.Empty,
-                        "error",
-                        "OK",
-                        false,
-                        string.Empty
-                    );
+                    var sweetAlertOptions = new SweetAlertOptions
+                    {
+                        Title = "File Too Large",
+                        Message = $"The selected file exceeds the maximum allowed size of {MaxMediaSize / (1024 * 1024)} MB.",
+                        ConfirmButtonText = "OK",
+                        ShowCancelButton = false,
+                        CancelButtonText = string.Empty,
+                        Icon = "error"
+                    };
+
+                    await JS.InvokeVoidAsync("myInterop.showSweetAlert", sweetAlertOptions);
+
                     return false;
                 }
             }

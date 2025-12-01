@@ -306,41 +306,34 @@ namespace FBMMultiMessenger.Components.Pages.Account
             var fileExtension = Path.GetExtension(file?.Name)?.ToLowerInvariant();
             var contentType = file?.ContentType.ToLowerInvariant();
 
-            if (file is null ||
-                (
-                    //fileExtension != ".txt" && contentType != "text/plain" &&
-                    fileExtension != ".csv" && contentType != "text/csv"
-
-                ))
+            if (file is null || (fileExtension != ".csv" && contentType != "text/csv"))
             {
-                await JS.InvokeVoidAsync(
-                   "myInterop.showSweetAlert",
-                   "Invalid File",
-                   "Please select an excel(.csv) file",
-                   false,
-                   string.Empty,
-                   string.Empty,
-                   "error",
-                   "OK",
-                   false,
-                   string.Empty
-                );
+                var sweetAlertOptions = new SweetAlertOptions
+                {
+                    Title = "Invalid File",
+                    Message = "Please select an excel(.csv) file",
+                    ShowCancelButton = false,
+                    CancelButtonText = string.Empty,
+                    ConfirmButtonText = "OK",
+                    Icon = "error",
+                };
+
+                await JS.InvokeVoidAsync("myInterop.showSweetAlert", sweetAlertOptions);
                 return false;
             }
             if (file.Size > maxAllowedFile)
             {
-                await JS.InvokeVoidAsync(
-                    "myInterop.showSweetAlert",
-                    "File Too Large",
-                    $"The selected file exceeds the maximum allowed size of {maxAllowedFile / (1024 * 1024)} MB.",
-                    false,
-                    string.Empty,
-                    string.Empty,
-                    "error",
-                    "OK",
-                    false,
-                    string.Empty
-                );
+                var sweetAlertOptions = new SweetAlertOptions
+                {
+                    Title = "File Too Large",
+                    Message = $"The selected file exceeds the maximum allowed size of {maxAllowedFile / (1024 * 1024)} MB.",
+                    ConfirmButtonText = "OK",
+                    ShowCancelButton = false,
+                    CancelButtonText = string.Empty,
+                    Icon = "error"
+                };
+
+                await JS.InvokeVoidAsync("myInterop.showSweetAlert", sweetAlertOptions);
                 return false;
             }
 
