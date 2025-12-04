@@ -186,7 +186,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         {
             var discountedPrice = ((BasePrice - price) / BasePrice) * 100;
 
-            return discountedPrice;
+            return Math.Round(discountedPrice, 0); // Rounds to nearest whole number
         }
 
         private async Task HandleCopyToClipboardAsync(bool isCopyIBAN = false)
