@@ -181,17 +181,17 @@
                     </div>
                     <div class="sub-item">
                         <div class="sub-item-label">Start Date</div>
-                        <div class="sub-item-value">Jan 15, 2025</div>
+                        <div class="sub-item-value">@SubscriptionStartedAt</div>
                     </div>
                     <div class="sub-item">
                         <div class="sub-item-label">End Date</div>
-                        <div class="sub-item-value">Jan 15, 2026</div>
+                        <div class="sub-item-value">@SubscriptionExpiredAt</div>
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill"></div>
+                    <div class="progress-fill @GetProgressClass()"></div>
                 </div>
-                <div class="progress-text">83 days remaining (77% of subscription period left)</div>
+                <div class="progress-text">@RemainingTimeText</div>
             </div>
         </div>
     </div>

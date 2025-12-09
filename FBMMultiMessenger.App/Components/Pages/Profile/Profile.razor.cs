@@ -22,6 +22,12 @@ namespace FBMMultiMessenger.Components.Pages.Profile
         private string OriginalName = string.Empty;
         private string OriginalEmail = string.Empty;
         private string OriginalPhoneNumber = string.Empty;
+        private string SubscriptionStartedAt = string.Empty;
+        private string SubscriptionExpiredAt = string.Empty;
+        private string RemainingTimeText = string.Empty;
+        private int RemainingDaysCount;
+
+
 
         private string JoinedAt = string.Empty;
         private bool ShowProfileLoader = false;
@@ -44,9 +50,16 @@ namespace FBMMultiMessenger.Components.Pages.Profile
                 var userEmail = userData.Email.Trim();
                 var userPhoneNumber = userData.ContactNumber.Trim();
 
+                //Profile related data
                 ProfileModel.Name = userName;
                 ProfileModel.Email = userEmail;
                 ProfileModel.PhoneNumber = userPhoneNumber;
+
+                //Subscription related data
+                SubscriptionStartedAt = userData.StartedAt;
+                SubscriptionExpiredAt = userData.ExpiredAt;
+                RemainingTimeText = userData.RemainingTimeText;
+                RemainingDaysCount = userData.RemainingDaysCount;
 
                 CaptureProfileSnapshot(userName, userEmail, userPhoneNumber);
 
@@ -116,6 +129,19 @@ namespace FBMMultiMessenger.Components.Pages.Profile
             OriginalName = name;
             OriginalEmail = email;
             OriginalPhoneNumber = phoneNumber;
+        }
+
+
+        private string GetProgressClass()
+        {
+            if (RemainingDaysCount < 0) return "Expired";
+            if (RemainingDaysCount == 0) return "VeryCritical";
+            if (RemainingDaysCount <= 3) return "Critical";
+            if (RemainingDaysCount <= 7) return "VeryLow";
+            if (RemainingDaysCount <= 14) return "Low";
+            if (RemainingDaysCount <= 21) return "Medium";
+            if (RemainingDaysCount < 30) return "Good";
+            return "Excellent";
         }
     }
 }

@@ -62,7 +62,7 @@ namespace FBMMultiMessenger
 
 
             builder.Services.AddSingleton<BackButtonService>();
-            builder.Services.AddSingleton<SignalRChatService>();
+            builder.Services.AddSingleton<SignalRService>();
 
             builder.Services.AddHttpClient();
             builder.Services.AddMudServices(config =>

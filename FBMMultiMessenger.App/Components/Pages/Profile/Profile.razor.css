@@ -372,3 +372,44 @@ body {
         width: 100%;
         background: #2ed573;
     }
+
+.progress-fill.Expired {
+    width: 0%;
+    background: #95a5a6; /* Gray */
+}
+
+.progress-fill.VeryCritical {
+    width: 1%;
+    background: #a93226; /* Darker Red */
+}
+
+.progress-fill.Critical {
+    width: 15%;
+    background: #e74c3c; /* Bright Red */
+}
+
+.progress-fill.VeryLow {
+    width: 30%;
+    background: #e67e22; /* Dark Orange */
+}
+
+.progress-fill.Low {
+    width: 45%;
+    background: #f39c12; /* Orange */
+}
+
+.progress-fill.Medium {
+    width: 60%;
+    background: #f1c40f; /* Yellow */
+}
+
+.progress-fill.Good {
+    width: 85%;
+    background: #27ae60; /* Green */
+}
+
+.progress-fill.Excellent {
+    width: 100%;
+    background: #2ed573; /* Bright Green */
+}
+

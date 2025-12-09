@@ -30,7 +30,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public ILocalServerService LocalServerService { get; set; }
 
         [Inject]
-        public SignalRChatService SignalRChatService { get; set; }
+        public SignalRService SignalRService { get; set; }
 
         [Inject]
         public ISnackbar Snackbar { get; set; }
@@ -365,7 +365,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             if (isAndriodPlatform)
             {
                 var deviceId = OneSignal.User.PushSubscription.Id;
-                await SignalRChatService.HandleNotification(deviceId, fbChatId);
+                await SignalRService.HandleNotification(deviceId, fbChatId);
             }
         }
 
@@ -585,11 +585,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             var currentUserId = $"App_{CurrentUser.Id}";
 
-            if (!SignalRChatService.IsConnected)
+            if (!SignalRService.IsConnected)
             {
-                await SignalRChatService.ConnectAsync(currentUserId);
+                await SignalRService.ConnectAsync(currentUserId);
 
-                SignalRChatService.OnHandleMessage += HandleMessageReceivedAsync;
+                SignalRService.OnHandleMessage += HandleMessageReceivedAsync;
             }
         }
 
@@ -654,8 +654,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public void Dispose()
         {
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
-            SignalRChatService.OnHandleMessage -= HandleMessageReceivedAsync;
-            SignalRChatService?.DisconnectAsync();
+            SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
         }
     }
 }

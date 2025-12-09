@@ -15,6 +15,76 @@
     margin-bottom: 2rem;
 }
 
+
+::deep .account-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: capitalize;
+    transition: all 0.2s ease;
+}
+
+/* Active status - Green */
+::deep .account-status-active {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+/* Inactive status - Gray */
+::deep .account-status-inactive {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+/* In Progress status - Blue */
+::deep .account-status-inprogress {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+/* Optional: Add pulse animation for In Progress */
+::deep .account-status-inprogress {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Optional: Add dot indicator */
+::deep .account-status-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+::deep .account-status-active::before {
+    background-color: #10b981;
+}
+
+::deep .account-status-inactive::before {
+    background-color: #6b7280;
+}
+
+::deep .account-status-inprogress::before {
+    background-color: #3b82f6;
+}
+
 .add-new-account-container {
     display: none;
     position: fixed;

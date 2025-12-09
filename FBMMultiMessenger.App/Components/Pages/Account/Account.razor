@@ -26,7 +26,7 @@
                        class="search-input"
                        id="searchInput"
                        placeholder="Search accounts...">
-                <button @onclick="HandleFilterClickAsync" class="btn btn-primary btn-fullwidth" >
+                <button @onclick="HandleFilterClickAsync" class="btn btn-primary btn-fullwidth">
                     🔍 Filter
                 </button>
                 @* <button class="btn btn-outline">
@@ -55,6 +55,7 @@
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Cookie</MudTh>
+            <MudTh>Status</MudTh>
             <MudTh>Created At</MudTh>
             <MudTh>Actions</MudTh>
 
@@ -62,6 +63,7 @@
         <RowTemplate>
             <MudTd DataLabel="Account Name">@context.Name</MudTd>
             <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Cookie">@context.Cookie</MudTd>
+            <MudTd Class="@GetBadgeClass(context.Status)" DataLabel="Status">@context.Status</MudTd>
             <MudTd DataLabel="Account Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">
 

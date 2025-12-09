@@ -1,21 +1,15 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Chat;
-using FBMMultiMessenger.Contracts.Contracts.Extension;
+using FBMMultiMessenger.Models.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.SignalR
 {
-    public class SignalRChatService
+    public class SignalRService
     {
         private HubConnection _hubConnection;
         public event Func<HandleChatHttpResponse, Task> OnHandleMessage;
-
+        public event Func<AccountsStatusSignalRModel, Task> OnAccountStatusChange;
         public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
 
         private readonly string _baseURL;
@@ -23,7 +17,7 @@ namespace FBMMultiMessenger.SignalR
         private bool _shouldReconnect = true;
         private string userId;
 
-        public SignalRChatService(IConfiguration configuration)
+        public SignalRService(IConfiguration configuration)
         {
             _baseURL = configuration.GetValue<string>("Urls:BaseUrl")!;
         }
@@ -47,11 +41,20 @@ namespace FBMMultiMessenger.SignalR
                     }
                 });
 
+                _hubConnection.On<AccountsStatusSignalRModel>("HandleAccountStatus", async (accountsStatus) =>
+                {
+                    if (OnAccountStatusChange != null)
+                    {
+                        await OnAccountStatusChange.Invoke(accountsStatus);
+                    }
+                });
+
                 await _hubConnection.StartAsync();
-                await _hubConnection.SendAsync("RegisterUser", $"{userId}");
+                await _hubConnection.SendAsync("RegisterApp", $"{userId}");
 
                 _hubConnection.Closed += async (error) =>
                 {
+
                     if (_shouldReconnect)
                     {
                         Console.WriteLine("SignalR disconnected, attempting to reconnect...");
@@ -80,7 +83,7 @@ namespace FBMMultiMessenger.SignalR
                     await Task.Delay(5000); // Wait 5 seconds
 
                     await _hubConnection.StartAsync();
-                    await _hubConnection.SendAsync("RegisterUser", userId);
+                    await _hubConnection.SendAsync("RegisterApp", userId);
 
                     Console.WriteLine("Reconnected successfully!");
                     _isReconnecting = false;

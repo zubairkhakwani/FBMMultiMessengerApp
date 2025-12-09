@@ -2,7 +2,9 @@
 using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Models;
+using FBMMultiMessenger.Models.SignalR;
 using FBMMultiMessenger.Services.IServices;
+using FBMMultiMessenger.SignalR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
@@ -27,6 +29,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
         private IDialogService DialogService { get; set; }
 
         [Inject]
+        public SignalRService SignalRService { get; set; }
+
+        [Inject]
         private ISnackbar Snackbar { get; set; }
 
         [Inject]
@@ -40,6 +45,8 @@ namespace FBMMultiMessenger.Components.Pages.Account
             set;
 
         } = new();
+
+        private List<GetMyAccountsHttpResponse> AccountsData = new List<GetMyAccountsHttpResponse>();
         private string? Keyword { get; set; }
 
 
@@ -63,6 +70,8 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 Snackbar.Add(Message, Severity.Success);
             }
+
+            SignalRService.OnAccountStatusChange += HandleAccountStatusChanged;
         }
 
         private async Task<TableData<GetMyAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
@@ -74,10 +83,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             var response = await AccountService.GetMyAccountsAsync(RequestModel);
 
-            List<GetMyAccountsHttpResponse> data = new List<GetMyAccountsHttpResponse>();
             if (response.IsSuccess && response.Data is not null)
             {
-                data = response.Data.Records;
+                AccountsData = response.Data.Records;
                 totalItems = response.Data.TotalCount;
             }
             else
@@ -85,8 +93,8 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 Snackbar.Add(response?.Message ?? "Something went wrong when wrong while fetching your accounts details", Severity.Error);
             }
 
-            table.Items = data;
-            return new TableData<GetMyAccountsHttpResponse>() { TotalItems = totalItems, Items = data };
+            table.Items = AccountsData;
+            return new TableData<GetMyAccountsHttpResponse>() { TotalItems = totalItems, Items = AccountsData };
         }
 
         private async Task HandleFilterClickAsync()
@@ -100,6 +108,24 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 await HandleFilterClickAsync();
             }
+        }
+
+        private async Task HandleAccountStatusChanged(AccountsStatusSignalRModel request)
+        {
+            var accountStatus = request.AccountStatus;
+
+            if (accountStatus is null || !accountStatus.Any())
+                return;
+
+            var accountsToUpdate = AccountsData.Where(a => accountStatus.Keys.Any(id => id == a.Id))
+                                               .ToList();
+
+            foreach (var account in accountsToUpdate)
+            {
+                account.Status = accountStatus[account.Id];
+            }
+
+            await InvokeAsync(StateHasChanged);
         }
         public async Task AddNewAccountAsync()
         {
@@ -290,10 +316,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
             Snackbar.Add("Please select any account to delete", Severity.Info);
         }
 
-        public void OpenBrowser(int accountId)
+        public async Task OpenBrowser(int accountId)
         {
-            AccountService.OpenInBrowserAsync<object>(accountId);
-            Snackbar.Add("The account has been opened in your browser.", Severity.Success);
+            var response = await AccountService.OpenInBrowserAsync<BaseResponse<object>>(accountId);
+            Snackbar.Add($"{response.Message}", response.IsSuccess ? Severity.Success : Severity.Error);
         }
 
 
@@ -339,6 +365,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             return true;
         }
+
         private List<UpsertAccountHttpRequest> ParseCsv(string content)
         {
             var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -361,6 +388,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             return accounts;
         }
 
+
         private (bool isValid, string? userId) ValidateCookie(string cookieString)
         {
             try
@@ -382,6 +410,17 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 return (false, null);
             }
+        }
+
+        public static string GetBadgeClass(string status)
+        {
+            return status switch
+            {
+                "Active" => "account-status-badge account-status-active",
+                "Inactive" => "account-status-badge account-status-inactive",
+                "In Progress" => "account-status-badge account-status-inprogress",
+                _ => "account-status-badge"
+            };
         }
         #endregion
     }
