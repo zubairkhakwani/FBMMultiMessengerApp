@@ -252,7 +252,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public async Task EditAccountAsync(int accountId, string Name, string Cookie, int proxyId)
+        public async Task EditAccountAsync(int accountId, string Name, string Cookie, int? proxyId)
         {
             if (PlatformHelper.IsMobilePlatform)
             {
@@ -264,7 +264,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             parameters.Add("AccountId", accountId.ToString());
             parameters.Add("Name", Name);
             parameters.Add("Cookie", Cookie);
-            parameters.Add("ProxyId", proxyId.ToString());
+            parameters.Add("ProxyId", proxyId?.ToString());
 
             var result = await DialogService.Show<UpsertAccount>("", parameters).Result;
             if (!result.Canceled)

@@ -2,6 +2,7 @@
 using FBMMultiMessenger.Contracts.Contracts.Chat;
 using FBMMultiMessenger.Contracts.Contracts.Extension;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Notification;
 using FBMMultiMessenger.Services;
@@ -74,7 +75,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private string? SelectedFbChatId = null;
         private CurrentUser CurrentUser = new();
-        private bool isAndriodPlatform;
 
         private string _filterKeyword = string.Empty;
         private string FilterKeyword
@@ -119,7 +119,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         protected override async Task OnInitializedAsync()
         {
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
-            isAndriodPlatform =  DeviceInfo.Platform != DevicePlatform.WinUI;
 
             BackButtonService.BackButtonPressed+= OnBackButtonPressed;
 
@@ -321,7 +320,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             HandleSelectedChat(fbChatId);
 
-            if (isAndriodPlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 HandleMobileSideBar();
                 await HandlePushNotification(fbChatId);
@@ -362,7 +361,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task HandlePushNotification(string fbChatId)
         {
-            if (isAndriodPlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 var deviceId = OneSignal.User.PushSubscription.Id;
                 await SignalRService.HandleNotification(deviceId, fbChatId);
@@ -570,15 +569,18 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task ConfigurePushNotificationsAsync()
         {
-            if (isAndriodPlatform)
-            {
-                await OneSignalService.AskNotificationPermissionAsync();
-                OneSignalService.OnNotificationClicked();
 
-                // Optional
-                var playerId = OneSignal.User.PushSubscription.Id;
-                Console.WriteLine("Player Id :", playerId);
-            }
+            //TODO : Uncomment just commented for testing
+
+            //if (PlatformHelper.IsMobilePlatform)
+            //{
+            //    await OneSignalService.AskNotificationPermissionAsync();
+            //    OneSignalService.OnNotificationClicked();
+
+            //    // Optional
+            //    var playerId = OneSignal.User.PushSubscription.Id;
+            //    Console.WriteLine("Player Id :", playerId);
+            //}
         }
 
         public async Task ConnectToSignalR()

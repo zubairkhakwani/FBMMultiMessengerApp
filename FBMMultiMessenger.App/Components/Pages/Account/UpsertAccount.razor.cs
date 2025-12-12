@@ -71,7 +71,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 model.Name = Name!;
                 model.Cookie = Cookie!;
-                model.ProxyId = ProxyId!;
+                model.ProxyId = ProxyId;
 
                 Title = "Edit Account";
                 SubTitle = "Update your account details";

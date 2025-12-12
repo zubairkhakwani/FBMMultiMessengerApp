@@ -1,8 +1,8 @@
 ﻿@page "/create/proxy"
-@* @page "/edit/{AccountId}/account/{name}/{cookie}" *@
+@page "/edit/{proxyId}/proxy/{IpPort}/{Name}/{Password}"
 
 
-@if (IsMobilePlatform)
+@if (PlatformHelper.IsMobilePlatform)
 {
     <div class="mobile-container">
         <div class="header">
@@ -25,17 +25,21 @@
                 <DataAnnotationsValidator />
 
                 <div class="form-group">
-                    <label for="name" class="form-label">Full Name</label>
-                    <InputText id="name" class="form-input" @bind-Value="model.Name" placeholder="Enter your name" />
-                    <ValidationMessage For="@(() => model.Name)" class="validation-message" />
+                    <label for="name" class="form-label">Ip Port</label>
+                    <InputText id="name" class="form-input" @bind-Value="model.Ip_Port" placeholder="Enter Ip with port" />
+                    <ValidationMessage For="@(() => model.Ip_Port)" class="validation-message" />
                 </div>
 
-                @* <div class="form-group">
-                    <label for="cookies" class="form-label">Cookies</label>
-                    <InputText id="cookies" class="form-input" @bind-Value="model.Cookie" placeholder="Enter cookies value" />
-                    <ValidationMessage For="@(() => model.Cookie)" class="validation-message" />
-                </div> *@
-
+                <div class="form-group">
+                    <label for="name" class="form-label">Name</label>
+                    <InputText id="name" class="form-input" @bind-Value="model.Name" placeholder="Enter proxy name" />
+                    <ValidationMessage For="@(() => model.Name)" class="validation-message" />
+                </div>
+                <div class="form-group">
+                    <label for="name" class="form-label">Password</label>
+                    <InputText id="name" class="form-input" @bind-Value="model.Password" placeholder="Enter proxy password" />
+                    <ValidationMessage For="@(() => model.Password)" class="validation-message" />
+                </div>
                 <button type="submit" class="submit-btn">
                     <span>@ButtonText</span>
                     <svg viewBox="0 0 24 24" fill="white" width="18" height="18">

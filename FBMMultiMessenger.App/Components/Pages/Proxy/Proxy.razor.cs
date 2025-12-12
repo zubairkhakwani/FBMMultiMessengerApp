@@ -1,5 +1,5 @@
-﻿using FBMMultiMessenger.Components.Pages.Account;
-using FBMMultiMessenger.Contracts.Contracts.Proxy;
+﻿using FBMMultiMessenger.Contracts.Contracts.Proxy;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -26,8 +26,6 @@ namespace FBMMultiMessenger.Components.Pages.Proxy
         private List<GetMyProxiesHttpResponse> ProxiesData = new List<GetMyProxiesHttpResponse>();
         private string? Keyword { get; set; }
 
-
-        private readonly bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
         private MudTable<GetMyProxiesHttpResponse> table;
 
         private async Task<TableData<GetMyProxiesHttpResponse>> ServerReload(TableState state, CancellationToken token)
@@ -55,9 +53,9 @@ namespace FBMMultiMessenger.Components.Pages.Proxy
 
         public async Task AddNewProxyAsync()
         {
-            if (IsMobilePlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
-                //Navigation.NavigateTo("/create/account");
+                Navigation.NavigateTo("/create/proxy");
                 return;
             }
 
@@ -73,7 +71,7 @@ namespace FBMMultiMessenger.Components.Pages.Proxy
 
         public async Task EditProxyAsync(int proxyId, string IpPort, string Name, string Password)
         {
-            if (IsMobilePlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 Navigation.NavigateTo($"/edit/{proxyId}/proxy/{IpPort}/{Name}/{Password}");
                 return;

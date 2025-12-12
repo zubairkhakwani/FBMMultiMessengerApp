@@ -29,9 +29,6 @@
                 <button @onclick="HandleFilterClickAsync" class="btn btn-primary btn-fullwidth">
                     🔍 Filter
                 </button>
-                @* <button class="btn btn-outline">
-                    🔄 Reset
-                </button> *@
             </div>
 
         </div>
@@ -65,7 +62,8 @@
             <MudTd DataLabel="Account Name">@context.Name</MudTd>
             <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Cookie">@context.Cookie</MudTd>
             @{
-                var ipPort = context.Proxy is null ? "-" : context.Proxy.Name;
+                string ipPort = context.Proxy is null ? "-" : context.Proxy.Name;
+                int? proxyId = context.Proxy is null ? null : context.Proxy.Id;
             }
 
             <MudTd title="@ipPort" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Ip Port">@ipPort</MudTd>
@@ -88,7 +86,7 @@
                                        Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
                                 <span style="margin-left: 8px;">Open Browser</span>
                             </MudButton>
-                            <MudButton OnClick="@(e => EditAccountAsync(context.Id, context.Name, context.Cookie,context.Proxy.Id))"
+                            <MudButton OnClick="@(e => EditAccountAsync(context.Id, context.Name, context.Cookie, proxyId))"
                                        Size="Size.Small"
                                        StartIcon="@Icons.Material.Filled.ReceiptLong"
                                        Color="Color.Success"
@@ -109,17 +107,9 @@
                                        Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
                                 <span style="margin-left: 8px;">Delete</span>
                             </MudButton>
-
-
-
-
                         </MudPaper>
                     </MudMenu>
                 </MudButtonGroup>
-
-
-
-
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>

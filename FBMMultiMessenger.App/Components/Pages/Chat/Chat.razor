@@ -7,11 +7,11 @@
 @attribute [Authorize(Policy = "ValidSubscription")]
 
 @{
-    var mobileView = isAndriodPlatform ? "" : "messenger-container";
-    var mobileClass = isAndriodPlatform ? "mobile" : "";
-    var sideBarHeight = isAndriodPlatform ? "auto" : "calc(100vh - 125px)";
+    var mobileView = PlatformHelper.IsMobilePlatform ? "" : "messenger-container";
+    var mobileClass = PlatformHelper.IsMobilePlatform ? "mobile" : "";
+    var sideBarHeight = PlatformHelper.IsMobilePlatform ? "auto" : "calc(100vh - 125px)";
     var messageContainerHeight = SelectedFbChatId is null ? "100vh" : "calc(100vh - 135px)"; // 135 px is the height of selected message header and the message input so in result we end up in a perfect scroll if needed
-    var avatarMargin = isAndriodPlatform ? "0px" : "12px";
+    var avatarMargin = PlatformHelper.IsMobilePlatform ? "0px" : "12px";
 }
 
 
@@ -127,7 +127,7 @@
         @if (SelectedFbChatId is not null)
         {
             <div class="chat-header">
-                @if (isAndriodPlatform)
+                @if (PlatformHelper.IsMobilePlatform)
                 {
                     <div style="cursor:pointer; padding: 33px 12px 32px 20px;" @onclick="HandleMobileMainChat">
                         <i class="fa-sharp fa-solid fa-arrow-left"></i>
@@ -165,7 +165,7 @@
 
         <div class="messages-container" id="messagesContainer" style="height:@messageContainerHeight">
 
-            @if (SelectedFbChatId is null && !isAndriodPlatform)
+            @if (SelectedFbChatId is null && !PlatformHelper.IsMobilePlatform)
             {
                 <div class="empty-state" id="emptyState">
                     <div class="empty-state-icon">
@@ -403,7 +403,7 @@
     </div>
 }
 
-@if (isAndriodPlatform && SidebarZIndex > MainChatZIndex)
+@if (PlatformHelper.IsMobilePlatform && SidebarZIndex > MainChatZIndex)
 {
     <MobileNav></MobileNav>
 }

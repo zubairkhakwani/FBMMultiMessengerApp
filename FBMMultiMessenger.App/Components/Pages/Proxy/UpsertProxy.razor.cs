@@ -1,4 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Proxy;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
@@ -16,13 +17,13 @@ namespace FBMMultiMessenger.Components.Pages.Proxy
         public string? ProxyId { get; set; }
 
         [Parameter]
-        public string IpPort { get; set; }
+        public string? IpPort { get; set; }
 
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Parameter]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
 
         [Inject]
@@ -40,17 +41,17 @@ namespace FBMMultiMessenger.Components.Pages.Proxy
         [Inject]
         private IJSRuntime JS { get; set; }
 
-        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
         private string Title = "Create Proxy";
-        private string SubTitle = "Join our comunity today";
-        private string Heading = "Get Started";
-        private string Description = "Fill in your details to create your account";
-        private string ButtonText = "Create Account";
+        private string SubTitle = "Add a new proxy to your account";
+        private string Heading = "Create Proxy";
+        private string Description = "Enter the required details to register a new proxy.";
+        private string ButtonText = "Create Proxy";
+
 
         protected override void OnInitialized()
         {
-            if (!IsMobilePlatform)
+            if (!PlatformHelper.IsMobilePlatform)
             {
                 popupFormSettings = new PopupFormSettings()
                 {
@@ -66,11 +67,11 @@ namespace FBMMultiMessenger.Components.Pages.Proxy
                 model.Ip_Port = IpPort;
                 model.Password =  Password;
 
-                Title = "Edit Account";
-                SubTitle = "Update your account details";
+                Title = "Update Proxy";
+                SubTitle = "Update your existing proxy details";
                 Heading = "Update Information";
-                Description = "Modify your account information below";
-                ButtonText = "Update Account";
+                Description = "Update the fields below to apply changes to this proxy.";
+                ButtonText = "Save Changes";
             }
         }
 
@@ -87,7 +88,7 @@ namespace FBMMultiMessenger.Components.Pages.Proxy
 
             Snackbar.Add(response.Message, response.IsSuccess ? Severity.Success : Severity.Error);
 
-            if (IsMobilePlatform && response.IsSuccess)
+            if (PlatformHelper.IsMobilePlatform && response.IsSuccess)
             {
                 Navigation.NavigateTo("/Proxy");
             }
