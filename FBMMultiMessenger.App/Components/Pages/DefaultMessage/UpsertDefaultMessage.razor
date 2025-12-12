@@ -40,7 +40,7 @@
 
                 <div class="form-group">
                     <label for="Accounts" class="form-label">Accounts</label>
-                    <MudSelect T="string" Dense=true Variant="Variant.Outlined" MultiSelection="true" SelectAll="true" SelectAllText="Select all accounts" HelperText="Select one or more accounts that will use this default message" @bind-SelectedValues="Options" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" Label="Account" AdornmentIcon="@Icons.Material.Filled.Search">
+                   <MudSelect T="string" Dense=true Variant="Variant.Outlined" MultiSelection="true" SelectAll="true" SelectAllText="Select all accounts" HelperText="Select one or more accounts that will use this default message" @bind-SelectedValues="Options" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" Label="Account" AdornmentIcon="@Icons.Material.Filled.Search">
                 @foreach (var account in DefaultMessagesAccounts)
                 {
                     var isTaken = account.IsTaken;

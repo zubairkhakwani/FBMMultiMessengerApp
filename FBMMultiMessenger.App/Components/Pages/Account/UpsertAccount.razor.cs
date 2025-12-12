@@ -1,4 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
+using FBMMultiMessenger.Contracts.Contracts.Proxy;
 using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
@@ -11,20 +12,28 @@ namespace FBMMultiMessenger.Components.Pages.Account
     public partial class UpsertAccount
     {
         public UpsertAccountHttpRequest model { get; set; } = new();
+        public List<GetMyProxiesHttpResponse> MyProxies { get; set; } = new List<GetMyProxiesHttpResponse>();
+        public string SelectedProxy { get; set; } = string.Empty;
         public PopupFormSettings popupFormSettings { get; set; }
 
         [Parameter]
         public string? AccountId { get; set; }
 
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Parameter]
-        public string Cookie { get; set; }
+        public string? Cookie { get; set; }
 
+        [Parameter]
+        public string? ProxyId { get; set; }
 
         [Inject]
         public IAccountService AccountService { get; set; }
+
+
+        [Inject]
+        public IProxyService ProxyService { get; set; }
 
         [Inject]
         public ISnackbar Snackbar { get; set; }
@@ -46,7 +55,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
         private string Description = "Fill in your details to create your account";
         private string ButtonText = "Create Account";
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             if (!IsMobilePlatform)
             {
@@ -60,13 +69,26 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
             if (AccountId is not null)
             {
-                model.Name = Name;
-                model.Cookie = Cookie;
+                model.Name = Name!;
+                model.Cookie = Cookie!;
+                model.ProxyId = ProxyId!;
+
                 Title = "Edit Account";
                 SubTitle = "Update your account details";
                 Heading = "Update Information";
                 Description = "Modify your account information below";
                 ButtonText = "Update Account";
+            }
+            await GetMyProxiesAsync();
+        }
+
+        private async Task GetMyProxiesAsync()
+        {
+            var response = await ProxyService.GetMyProxiesAsync(new GetMyProxiesHttpRequest());
+
+            if (response.IsSuccess)
+            {
+                MyProxies = response.Data?.Records ?? new List<GetMyProxiesHttpResponse>();
             }
         }
 
@@ -83,7 +105,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             var response = await AccountService.UpsertAccountAsync<BaseResponse<UpsertAccountHttpResponse>>(model, accountId);
 
-            mudDialog?.Close(DialogResult.Ok(true));
 
             if (response.Data is not null && response.Data.IsLimitExceeded)
             {
@@ -116,6 +137,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             else
             {
+                if (response.IsSuccess)
+                {
+                    mudDialog?.Close(DialogResult.Ok(true));
+                }
+
                 Snackbar.Add(response.Message, response.IsSuccess ? Severity.Success : Severity.Error);
 
                 if (IsMobilePlatform && response.IsSuccess)
@@ -134,6 +160,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(cookieString))
+                {
+                    return false;
+                }
+
                 // Parse cookies into dictionary
                 var cookies = cookieString
                     .Split(';')

@@ -127,6 +127,8 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             await InvokeAsync(StateHasChanged);
         }
+
+
         public async Task AddNewAccountAsync()
         {
             if (IsMobilePlatform)
@@ -180,16 +182,15 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 return;
             }
 
-            List<UpsertAccountHttpRequest> accounts = new List<UpsertAccountHttpRequest>();
-
             try
             {
-                accounts = ParseCsv(content);
+                List<UpsertAccountHttpRequest> accounts = ParseCsv(content);
                 var totalCount = accounts.Count;
                 var isInValidCookie = false;
                 for (int i = 0; i < accounts.Count; i++)
                 {
                     var account = accounts[i];
+
                     var (isValidCookie, userId) = ValidateCookie(account.Cookie);
 
                     if (!isValidCookie)
@@ -200,9 +201,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     }
                 }
 
-                if (isInValidCookie &&  accounts.Count == 0)
+                if (isInValidCookie && accounts.Count == 0)
                 {
-                    Snackbar.Add("No valid accounts to import. All provided accounts had invalid cookies.", Severity.Info);
+                    Snackbar.Add("No valid accounts to import", Severity.Info);
                     return;
                 }
 
@@ -253,7 +254,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public async Task EditAccountAsync(int accountId, string Name, string Cookie)
+        public async Task EditAccountAsync(int accountId, string Name, string Cookie, int proxyId)
         {
             if (IsMobilePlatform)
             {
@@ -265,6 +266,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             parameters.Add("AccountId", accountId.ToString());
             parameters.Add("Name", Name);
             parameters.Add("Cookie", Cookie);
+            parameters.Add("ProxyId", proxyId.ToString());
 
             var result = await DialogService.Show<UpsertAccount>("", parameters).Result;
             if (!result.Canceled)
@@ -380,7 +382,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     accounts.Add(new UpsertAccountHttpRequest
                     {
                         Name = parts[0].Trim(),
-                        Cookie = parts[1].Trim()
+                        Cookie = parts[1].Trim(),
+                        ProxyId = parts.Length > 2 && !string.IsNullOrWhiteSpace(parts[2])
+                                                    ? parts[2].Trim()
+                                                    : null
                     });
                 }
             }

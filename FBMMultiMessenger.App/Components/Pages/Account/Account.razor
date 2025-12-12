@@ -55,6 +55,7 @@
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Cookie</MudTh>
+            <MudTh>Ip Port</MudTh>
             <MudTh>Status</MudTh>
             <MudTh>Created At</MudTh>
             <MudTh>Actions</MudTh>
@@ -63,6 +64,12 @@
         <RowTemplate>
             <MudTd DataLabel="Account Name">@context.Name</MudTd>
             <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Cookie">@context.Cookie</MudTd>
+            @{
+                var ipPort = context.Proxy is null ? "-" : context.Proxy.Name;
+            }
+
+            <MudTd title="@ipPort" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Ip Port">@ipPort</MudTd>
+
             <MudTd Class="@GetBadgeClass(context.Status)" DataLabel="Status">@context.Status</MudTd>
             <MudTd DataLabel="Account Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">
@@ -81,7 +88,7 @@
                                        Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
                                 <span style="margin-left: 8px;">Open Browser</span>
                             </MudButton>
-                            <MudButton OnClick="@(e => EditAccountAsync(context.Id, context.Name, context.Cookie))"
+                            <MudButton OnClick="@(e => EditAccountAsync(context.Id, context.Name, context.Cookie,context.Proxy.Id))"
                                        Size="Size.Small"
                                        StartIcon="@Icons.Material.Filled.ReceiptLong"
                                        Color="Color.Success"

@@ -1,5 +1,5 @@
-﻿@page "/create/account"
-@page "/edit/{AccountId}/account/{name}/{cookie}"
+﻿@page "/create/proxy"
+@* @page "/edit/{AccountId}/account/{name}/{cookie}" *@
 
 
 @if (IsMobilePlatform)
@@ -7,9 +7,6 @@
     <div class="mobile-container">
         <div class="header">
             <div class="logo-circle">
-                @*  <div class="logo">
-                    FBM
-                </div> *@
                 <svg viewBox="0 0 24 24" fill="white" width="28" height="28">
                     <path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15h-2v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95 0-5.52-4.48-10-10-10z" />
                 </svg>
@@ -33,11 +30,11 @@
                     <ValidationMessage For="@(() => model.Name)" class="validation-message" />
                 </div>
 
-                <div class="form-group">
+                @* <div class="form-group">
                     <label for="cookies" class="form-label">Cookies</label>
                     <InputText id="cookies" class="form-input" @bind-Value="model.Cookie" placeholder="Enter cookies value" />
                     <ValidationMessage For="@(() => model.Cookie)" class="validation-message" />
-                </div>
+                </div> *@
 
                 <button type="submit" class="submit-btn">
                     <span>@ButtonText</span>
@@ -55,26 +52,23 @@ else
     <PopupForm Model="@model" OnValidSubmit="OnValidSubmit" Setting="popupFormSettings">
          <DataAnnotationsValidator />
         <div>
-            <MudTextField @bind-Value="model.Name" Label="Name *" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AccountCircle" />
+            <MudTextField @bind-Value="model.Ip_Port" Label="Ip Port" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AccountCircle" />
+            <ValidationMessage For="@(() => model.Ip_Port)" class="validation-message" />
+
+            <MudTextField @bind-Value="model.Name" Label="Name" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AccountCircle" />
             <ValidationMessage For="@(() => model.Name)" class="validation-message" />
 
-            <MudTextField @bind-Value="model.Cookie" Label="Cookie *" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Cookie" />
-            <ValidationMessage For="@(() => model.Cookie)" class="validation-message" />
 
-            <MudSelect @bind-Value="model.ProxyId" Label="Select a Proxy *"  FullWidth="true" FitContent="true" Variant="Variant.Outlined" Clearable Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.LocationOn">
-                @foreach (var proxy in MyProxies)
-                {
-                  <MudSelectItem Value="@proxy.Id.ToString()">@proxy.Name</MudSelectItem>
-                }
-            </MudSelect>
-              <ValidationMessage For="@(() => model.ProxyId)" class="validation-message" />
+            <MudTextField @bind-Value="model.Password" Label="Password" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Cookie" />
+              <ValidationMessage For="@(() => model.Password)" class="validation-message" />
+
         </div>
         <CustomPopupFormActions>
 
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
                 <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="me-2" />
                 @{
-                    var buttonText = AccountId is null ? "Add" : "Update";
+                    var buttonText = ProxyId is null ? "Add" : "Update";
                 }
                 @buttonText
             </MudButton>

@@ -9,11 +9,13 @@ namespace FBMMultiMessenger.Contracts.Contracts.Account
 {
     public class UpsertAccountHttpRequest
     {
-        [Required]
+        [Required(ErrorMessage = "Please enter name")]
         public string Name { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "Please enter cookie")]
         public string Cookie { get; set; } = null!;
+
+        public string? ProxyId { get; set; }
     }
 
     public class UpsertAccountHttpResponse

@@ -59,6 +59,7 @@ namespace FBMMultiMessenger
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<IPricingService, PricingService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IProxyService, ProxyService>();
 
 
             builder.Services.AddSingleton<BackButtonService>();
