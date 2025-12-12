@@ -1,6 +1,7 @@
 ﻿using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Models.SignalR;
 using FBMMultiMessenger.Services.IServices;
@@ -48,9 +49,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private List<GetMyAccountsHttpResponse> AccountsData = new List<GetMyAccountsHttpResponse>();
         private string? Keyword { get; set; }
-
-
-        private readonly bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
         [SupplyParameterFromQuery]
         public string? Message { get; set; }
@@ -131,7 +129,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         public async Task AddNewAccountAsync()
         {
-            if (IsMobilePlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 Navigation.NavigateTo("/create/account");
                 return;
@@ -256,7 +254,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         public async Task EditAccountAsync(int accountId, string Name, string Cookie, int proxyId)
         {
-            if (IsMobilePlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 Navigation.NavigateTo($"/edit/{accountId}/account/{Name}/{Cookie}");
                 return;

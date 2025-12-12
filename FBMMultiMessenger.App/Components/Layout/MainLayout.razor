@@ -5,7 +5,7 @@
 
     <div class="page">
 
-        @if (!isMobilePlatform)
+        @if (!PlatformHelper.IsMobilePlatform)
         {
             <div class="sidebar">
                 <NavMenu />
@@ -13,7 +13,7 @@
         }
         <main>
 
-            @if (isMobilePlatform)
+            @if (PlatformHelper.IsMobilePlatform)
             {
                 <MobileNav></MobileNav>
             }

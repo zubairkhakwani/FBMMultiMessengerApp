@@ -1,6 +1,7 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Contracts.Proxy;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
@@ -47,7 +48,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
         [Inject]
         private IJSRuntime JS { get; set; }
 
-        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
 
         private string Title = "Create Account";
         private string SubTitle = "Join our comunity today";
@@ -57,7 +57,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         protected override async Task OnInitializedAsync()
         {
-            if (!IsMobilePlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 popupFormSettings = new PopupFormSettings()
                 {
@@ -144,7 +144,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
                 Snackbar.Add(response.Message, response.IsSuccess ? Severity.Success : Severity.Error);
 
-                if (IsMobilePlatform && response.IsSuccess)
+                if (PlatformHelper.IsMobilePlatform && response.IsSuccess)
                 {
                     Navigation.NavigateTo("/Account");
                 }

@@ -1,8 +1,7 @@
 ﻿@page "/create/account"
 @page "/edit/{AccountId}/account/{name}/{cookie}"
 
-
-@if (IsMobilePlatform)
+@if (PlatformHelper.IsMobilePlatform)
 {
     <div class="mobile-container">
         <div class="header">
