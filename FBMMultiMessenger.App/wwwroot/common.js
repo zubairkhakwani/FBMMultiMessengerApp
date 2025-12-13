@@ -40,6 +40,22 @@
             return false;
         }
     },
+
+    downloadAccountsFormat: async function (text) {
+        try {
+            let url = '/templates/accounts-template.csv';
+            let fileName = 'accounts-template.csv';
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (err) {
+            return false;
+        }
+    },
     showSweetAlert: function (options = {}) {
         const {
             title = "Error",

@@ -9,7 +9,7 @@ namespace FBMMultiMessenger.SignalR
     {
         private HubConnection _hubConnection;
         public event Func<HandleChatHttpResponse, Task> OnHandleMessage;
-        public event Func<AccountsStatusSignalRModel, Task> OnAccountStatusChange;
+        public event Func<List<AccountStatusSignalRModel>, Task> OnAccountStatusChange;
         public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
 
         private readonly string _baseURL;
@@ -41,7 +41,7 @@ namespace FBMMultiMessenger.SignalR
                     }
                 });
 
-                _hubConnection.On<AccountsStatusSignalRModel>("HandleAccountStatus", async (accountsStatus) =>
+                _hubConnection.On<List<AccountStatusSignalRModel>>("HandleAccountStatus", async (accountsStatus) =>
                 {
                     if (OnAccountStatusChange != null)
                     {

@@ -1,4 +1,6 @@
-﻿using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
 using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Helpers;
@@ -11,6 +13,8 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
+using System.Globalization;
+using System.Text;
 using Color = MudBlazor.Color;
 
 
@@ -108,19 +112,22 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        private async Task HandleAccountStatusChanged(AccountsStatusSignalRModel request)
+        private async Task HandleAccountStatusChanged(List<AccountStatusSignalRModel> accountStatus)
         {
-            var accountStatus = request.AccountStatus;
-
             if (accountStatus is null || !accountStatus.Any())
                 return;
 
-            var accountsToUpdate = AccountsData.Where(a => accountStatus.Keys.Any(id => id == a.Id))
+            var accountsToUpdate = AccountsData.Where(a => accountStatus.Any(x => x.AccountId == a.Id))
                                                .ToList();
 
             foreach (var account in accountsToUpdate)
             {
-                account.Status = accountStatus[account.Id];
+                var status = accountStatus.FirstOrDefault(x => x.AccountId == account.Id)?.AccountStatus;
+
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    account.Status = status;
+                }
             }
 
             await InvokeAsync(StateHasChanged);
@@ -154,59 +161,65 @@ namespace FBMMultiMessenger.Components.Pages.Account
             if (!isValid)
                 return;
 
-            var options = new SweetAlertOptions
-            {
-                Title = "Confirm Import",
-                Message = "Do you want to import this file?",
-                Icon = "info",
-                ConfirmButtonText = "Yes, import it!",
-                ShowCancelButton = true,
-                CancelButtonText = "Cancel"
-            };
+            var options = new SweetAlertOptions();
+
+            options.Title = "Confirm Import";
+            options.Message = "Do you want to import this file?";
+            options.Icon = "info";
+            options.ConfirmButtonText = "Yes, import it!";
+            options.ShowCancelButton = true;
+            options.CancelButtonText = "Cancel";
 
             bool isConfirmed = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
 
             if (!isConfirmed)
                 return;
 
-
-            using var stream = file.OpenReadStream();
-            using var reader = new StreamReader(stream);
-            var content = await reader.ReadToEndAsync();
-
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                Snackbar.Add("The selected file is empty. Please upload a file that contains accounts data.", Severity.Warning);
-                return;
-            }
-
             try
             {
-                List<UpsertAccountHttpRequest> accounts = ParseCsv(content);
-                var totalCount = accounts.Count;
-                var isInValidCookie = false;
-                for (int i = 0; i < accounts.Count; i++)
+                CsvParseResult result = await ParseAndValidateCsvAsync(file);
+
+                if (!result.Success)
                 {
-                    var account = accounts[i];
+                    options.Title = "Invalid Request";
+                    options.Message = result.Message;
+                    options.Icon = "error";
+                    options.ConfirmButtonText = "Download Format";
+                    options.ShowCancelButton = true;
+                    options.CancelButtonText = "Close";
 
-                    var (isValidCookie, userId) = ValidateCookie(account.Cookie);
+                    bool isDownloadformatRequest = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
 
-                    if (!isValidCookie)
+                    if (isDownloadformatRequest)
                     {
-                        accounts.RemoveAt(i);
-                        isInValidCookie = true;
-                        i--;
+                        await JS.InvokeVoidAsync("myInterop.downloadAccountsFormat");
                     }
+
+                    return;
                 }
 
-                if (isInValidCookie && accounts.Count == 0)
+
+                List<UpsertAccountHttpRequest> parsedAccounts = result.Accounts;
+                List<UpsertAccountHttpRequest> validatedAccounts = new();
+
+                foreach (var account in parsedAccounts)
+                {
+                    var (isValidCookie, userId) = ValidateCookie(account.Cookie);
+
+                    if (!isValidCookie) continue;
+
+                    validatedAccounts.Add(account);
+                }
+
+                if (validatedAccounts.Count == 0)
                 {
                     Snackbar.Add("No valid accounts to import", Severity.Info);
                     return;
                 }
 
                 //Call Api
-                var response = await AccountService.Import(accounts);
+                var distinctAccounts = validatedAccounts.DistinctBy(a => a.Cookie).ToList();
+                var response = await AccountService.Import(distinctAccounts);
 
                 if (response.Data is not null && response.Data.IsLimitExceeded)
                 {
@@ -338,13 +351,17 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 {
                     Title = "Invalid File",
                     Message = "Please select an excel(.csv) file",
-                    ShowCancelButton = false,
-                    CancelButtonText = string.Empty,
-                    ConfirmButtonText = "OK",
+                    ConfirmButtonText = "Download Format",
+                    ShowCancelButton = true,
+                    CancelButtonText = "Okay",
                     Icon = "error",
                 };
 
-                await JS.InvokeVoidAsync("myInterop.showSweetAlert", sweetAlertOptions);
+                var isDowloadFormatRequest = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", sweetAlertOptions);
+                if (isDowloadFormatRequest)
+                {
+                    await JS.InvokeVoidAsync("myInterop.downloadAccountsFormat");
+                }
                 return false;
             }
             if (file.Size > maxAllowedFile)
@@ -366,31 +383,105 @@ namespace FBMMultiMessenger.Components.Pages.Account
             return true;
         }
 
-        private List<UpsertAccountHttpRequest> ParseCsv(string content)
+        private async Task<CsvParseResult> ParseAndValidateCsvAsync(IBrowserFile file)
         {
-            var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            var accounts = new List<UpsertAccountHttpRequest>();
+            var result = new CsvParseResult();
 
-            // Skip header row (first line)
-            for (int i = 1; i < lines.Length; i++)
+            try
             {
-                var parts = lines[i].Split(',');
-                if (parts.Length >= 2)
+                using var stream = file.OpenReadStream();
+                using var reader = new StreamReader(stream, Encoding.UTF8, true);
+
+                var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    accounts.Add(new UpsertAccountHttpRequest
+                    HasHeaderRecord = true,
+                    MissingFieldFound = null,
+                    HeaderValidated = null,
+                    PrepareHeaderForMatch = args => args.Header.ToLower().Trim()
+                };
+
+                using var csv = new CsvReader(reader, csvConfig);
+                await csv.ReadAsync();
+                csv.ReadHeader();
+
+                var headers = csv?.HeaderRecord?.Select(h => h.ToLower().Trim()).ToList();
+
+                if (headers == null || headers.Count == 0)
+                {
+                    result.Success = false;
+                    result.Message = "CSV file has no headers. Expected headers: Name, Cookie, ProxyId (optional).";
+                    return result;
+                }
+
+                if (!headers.Contains("name") && !headers.Contains("cookie"))
+                {
+                    result.Success = false;
+                    result.Message = "CSV file has no headers. Expected headers: Name, Cookie, ProxyId (optional).";
+                    return result;
+                }
+
+                if (!headers.Contains("name"))
+                {
+                    result.Success = false;
+                    result.Message = "Missing required header: Name.";
+                    return result;
+                }
+
+                if (!headers.Contains("cookie"))
+                {
+                    result.Success = false;
+                    result.Message = "Missing required header: Cookie.";
+                    return result;
+                }
+
+                var rowNumber = 1;
+
+                await foreach (var record in csv.GetRecordsAsync<UpsertAccountHttpRequest>())
+                {
+                    rowNumber++;
+
+                    if (string.IsNullOrWhiteSpace(record.Name))
                     {
-                        Name = parts[0].Trim(),
-                        Cookie = parts[1].Trim(),
-                        ProxyId = parts.Length > 2 && !string.IsNullOrWhiteSpace(parts[2])
-                                                    ? parts[2].Trim()
-                                                    : null
+                        result.Success = false;
+                        result.Message = $"Row {rowNumber}: Name is required.";
+                        return result;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(record.Cookie))
+                    {
+                        result.Success = false;
+                        result.Message = $"Row {rowNumber}: Cookie is required.";
+                        return result;
+                    }
+
+                    result.Accounts.Add(new UpsertAccountHttpRequest
+                    {
+                        Name = record.Name.Trim(),
+                        Cookie = record.Cookie.Trim(),
+                        ProxyId = string.IsNullOrWhiteSpace(record.ProxyId)
+                            ? null
+                            : record.ProxyId.Trim()
                     });
                 }
+
+                if (result.Accounts.Count == 0)
+                {
+                    result.Success = false;
+                    result.Message = "No valid data found in the CSV file.";
+                    return result;
+                }
+
+                result.Success = true;
+                result.Message = $"Successfully imported {result.Accounts.Count} account(s).";
+                return result;
             }
-
-            return accounts;
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = "The CSV file is either empty or not in the expected format. Please check the file and try again.";
+                return result;
+            }
         }
-
 
         private (bool isValid, string? userId) ValidateCookie(string cookieString)
         {
@@ -425,6 +516,15 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 _ => "account-status-badge"
             };
         }
+
+        //Helper class for CSV 
+        public class CsvParseResult
+        {
+            public bool Success { get; set; }
+            public string Message { get; set; } = string.Empty;
+            public List<UpsertAccountHttpRequest> Accounts { get; set; } = new();
+        }
+
         #endregion
     }
 }

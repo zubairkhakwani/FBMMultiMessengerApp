@@ -75,6 +75,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="CsvHelper" Version="33.1.0" />
         <PackageReference Include="MediatR" Version="13.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.9" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.2" />
@@ -91,6 +92,10 @@
     <ItemGroup>
       <ProjectReference Include="..\FBMMultiMessenger.Contracts\FBMMultiMessenger.Contracts.csproj" />
       <ProjectReference Include="..\FBMMultiMessenger.Utility\FBMMultiMessenger.Utility.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\templates\" />
     </ItemGroup>
 
 </Project>

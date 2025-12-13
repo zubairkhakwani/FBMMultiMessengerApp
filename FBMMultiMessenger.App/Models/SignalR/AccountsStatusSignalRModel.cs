@@ -1,7 +1,9 @@
 ﻿namespace FBMMultiMessenger.Models.SignalR
 {
-    public class AccountsStatusSignalRModel
+    public class AccountStatusSignalRModel
     {
-        public Dictionary<int, string> AccountStatus { get; set; } = new Dictionary<int, string>();
+        public int AccountId { get; set; }
+
+        public string AccountStatus { get; set; } = string.Empty;
     }
 }
