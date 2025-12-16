@@ -11,7 +11,9 @@ namespace FBMMultiMessenger.Contracts.Contracts.Account
         public int Id { get; set; }
         public required string Name { get; set; }
         public required string Cookie { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public string AuthStatus { get; set; } = string.Empty;
+        public string ConnectionStatus { get; set; } = string.Empty;
+
         public DateTime CreatedAt { get; set; }
 
         public AccountProxyHttpResponse? Proxy { get; set; }

@@ -569,18 +569,15 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task ConfigurePushNotificationsAsync()
         {
+            if (PlatformHelper.IsMobilePlatform)
+            {
+                await OneSignalService.AskNotificationPermissionAsync();
+                OneSignalService.OnNotificationClicked();
 
-            //TODO : Uncomment just commented for testing
-
-            //if (PlatformHelper.IsMobilePlatform)
-            //{
-            //    await OneSignalService.AskNotificationPermissionAsync();
-            //    OneSignalService.OnNotificationClicked();
-
-            //    // Optional
-            //    var playerId = OneSignal.User.PushSubscription.Id;
-            //    Console.WriteLine("Player Id :", playerId);
-            //}
+                // Optional
+                var playerId = OneSignal.User.PushSubscription.Id;
+                Console.WriteLine("Player Id :", playerId);
+            }
         }
 
         public async Task ConnectToSignalR()

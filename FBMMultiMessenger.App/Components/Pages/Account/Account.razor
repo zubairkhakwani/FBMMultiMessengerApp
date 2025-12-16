@@ -53,7 +53,8 @@
             <MudTh>Name</MudTh>
             <MudTh>Cookie</MudTh>
             <MudTh>Ip Port</MudTh>
-            <MudTh>Status</MudTh>
+            <MudTh>Connection Status</MudTh>
+            <MudTh>Account Status</MudTh>
             <MudTh>Created At</MudTh>
             <MudTh>Actions</MudTh>
 
@@ -68,7 +69,9 @@
 
             <MudTd title="@ipPort" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Ip Port">@ipPort</MudTd>
 
-            <MudTd Class="@GetBadgeClass(context.Status)" DataLabel="Status">@context.Status</MudTd>
+            <MudTd Class="@GetBadgeClass(context.ConnectionStatus)" DataLabel="Status">@context.ConnectionStatus</MudTd>
+            <MudTd Class="@GetBadgeClass(context.AuthStatus)" DataLabel="Status">@context.AuthStatus</MudTd>
+
             <MudTd DataLabel="Account Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">
 

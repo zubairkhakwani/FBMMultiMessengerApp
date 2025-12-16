@@ -57,7 +57,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         protected override async Task OnInitializedAsync()
         {
-            if (PlatformHelper.IsMobilePlatform)
+            if (!PlatformHelper.IsMobilePlatform)
             {
                 popupFormSettings = new PopupFormSettings()
                 {

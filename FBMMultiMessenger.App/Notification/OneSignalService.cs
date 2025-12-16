@@ -20,18 +20,14 @@ namespace FBMMultiMessenger.Notification
 
         public async Task AskNotificationPermissionAsync()
         {
-            //TODO : Uncomment just commented for testing
-
-            //await OneSignal.Notifications.RequestPermissionAsync(true);
+            await OneSignal.Notifications.RequestPermissionAsync(true);
         }
 
         public void OnNotificationClicked()
         {
+            OneSignal.Notifications.Clicked -= HandleNotificationClicked;
 
-            //TODO : Uncomment just commented for testing
-            //OneSignal.Notifications.Clicked -= HandleNotificationClicked;
-
-            //OneSignal.Notifications.Clicked += HandleNotificationClicked;
+            OneSignal.Notifications.Clicked += HandleNotificationClicked;
         }
 
         public void HandleNotificationClicked(object sender, NotificationClickedEventArgs e)

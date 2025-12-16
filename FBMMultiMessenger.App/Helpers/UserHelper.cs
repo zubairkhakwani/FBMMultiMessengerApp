@@ -2,18 +2,21 @@
 {
     public static class UserHelper
     {
-
-        //TODO: Refactor
         public static string GetShortName(string fullName)
         {
-            if (string.IsNullOrWhiteSpace(fullName))
+            var splitedName = fullName.Split(" ");
+
+            var avatar = fullName[0].ToString();
+
+            if (splitedName.Length > 1)
             {
-                return string.Empty;
+                var firstLetter = splitedName[0][0];
+                var secondLetter = splitedName[1][0];
+
+                avatar = $"{firstLetter}{secondLetter}";
             }
 
-            var shortName = string.Join("", fullName.Split(" ").Select(x => x[0]).ToList());
-
-            return shortName;
+            return avatar;
         }
     }
 }

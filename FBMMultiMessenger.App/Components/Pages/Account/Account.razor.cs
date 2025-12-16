@@ -112,21 +112,29 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        private async Task HandleAccountStatusChanged(List<AccountStatusSignalRModel> accountStatus)
+        private async Task HandleAccountStatusChanged(List<AccountStatusSignalRModel> accountsStatusRequest)
         {
-            if (accountStatus is null || !accountStatus.Any())
+            if (accountsStatusRequest is null || !accountsStatusRequest.Any())
                 return;
 
-            var accountsToUpdate = AccountsData.Where(a => accountStatus.Any(x => x.AccountId == a.Id))
+            var accountsToUpdate = AccountsData.Where(a => accountsStatusRequest.Any(x => x.AccountId == a.Id))
                                                .ToList();
 
             foreach (var account in accountsToUpdate)
             {
-                var status = accountStatus.FirstOrDefault(x => x.AccountId == account.Id)?.AccountStatus;
+                var accountStatusRequest = accountsStatusRequest.FirstOrDefault(x => x.AccountId == account.Id);
 
-                if (!string.IsNullOrWhiteSpace(status))
+                if (accountStatusRequest is not null)
                 {
-                    account.Status = status;
+                    if (!string.IsNullOrWhiteSpace(accountStatusRequest.AuthStatus))
+                    {
+                        account.AuthStatus = accountStatusRequest.AuthStatus;
+
+                    }
+                    if (!string.IsNullOrWhiteSpace(accountStatusRequest.ConnectionStatus))
+                    {
+                        account.ConnectionStatus = accountStatusRequest.ConnectionStatus;
+                    }
                 }
             }
 
