@@ -431,7 +431,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             foreach (var chat in messages)
             {
-
                 //This is to call API 
                 var request = new NotifyLocalServerHttpRequest()
                 {
@@ -588,8 +587,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 await SignalRService.ConnectAsync(currentUserId);
 
-                SignalRService.OnHandleMessage += HandleMessageReceivedAsync;
             }
+            SignalRService.OnHandleMessage += HandleMessageReceivedAsync;
         }
 
         private void FilterChat()

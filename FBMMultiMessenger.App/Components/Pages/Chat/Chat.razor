@@ -19,11 +19,11 @@
     <!-- Sidebar -->
     <div class="sidebar @mobileClass" style="z-index:@SidebarZIndex;">
 
-        @if (FilteredAccountChats.Count == 0 && IsLoading)
+        @if (IsLoading && (FilteredAccountChats?.Count ?? 0) == 0)
         {
             <ChatLoadingSkelton></ChatLoadingSkelton>
         }
-        else if (FilteredAccountChats.Any() && !IsLoading)
+        else if (!IsLoading && FilteredAccountChats?.Any() == true)
         {
             <div class="sidebar-header">
                 <div style="display:flex;align-items:center;">
