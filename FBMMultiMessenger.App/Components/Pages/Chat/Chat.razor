@@ -10,7 +10,7 @@
     var mobileView = PlatformHelper.IsMobilePlatform ? "" : "messenger-container";
     var mobileClass = PlatformHelper.IsMobilePlatform ? "mobile" : "";
     var sideBarHeight = PlatformHelper.IsMobilePlatform ? "auto" : "calc(100vh - 125px)";
-    var messageContainerHeight = SelectedFbChatId is null ? "100vh" : "calc(100vh - 135px)"; // 135 px is the height of selected message header and the message input so in result we end up in a perfect scroll if needed
+    var messageContainerHeight = SelectedFbChatId is null ? "100vh" : "calc(100vh - 135px)";
     var avatarMargin = PlatformHelper.IsMobilePlatform ? "0px" : "12px";
 }
 
@@ -124,6 +124,9 @@
 
     <!-- Main Chat Area -->
     <div class="main-chat  @mobileClass" style="z-index:@MainChatZIndex" id="mainChat">
+
+
+        <!--  Chat header for the active conversation. Shows listing image, title, location/price,  and a back button on mobile for navigation.  -->
         @if (SelectedFbChatId is not null)
         {
             <div class="chat-header">
@@ -163,8 +166,9 @@
         }
 
 
-        <div class="messages-container" id="messagesContainer" style="height:@messageContainerHeight">
 
+        <div class="messages-container" id="messagesContainer" style="height:@messageContainerHeight">
+            <!-- Empty state shown on desktop when no conversation is selected -->
             @if (SelectedFbChatId is null && !PlatformHelper.IsMobilePlatform)
             {
                 <div class="empty-state" id="emptyState">
@@ -179,10 +183,12 @@
             }
 
 
+
             <div id="messagesList">
                 @for (int i = 0; i < ChatMessages.Count; i++)
                 {
                     var chatMessage = ChatMessages[i];
+
                     var isReceived = chatMessage.IsReceived;
                     var messageClass = isReceived ? "received" : "sent";
                     var isSent = !isReceived;
@@ -214,13 +220,6 @@
                                         @chatMessage.Message
                                     }
                                 </div>
-                                @* @if (!isReceived)
-                                {
-                                    <div class="profile-picture-container">
-                                        <span>Me</span>
-                                    </div>
-                                } *@
-
                             </div>
 
 
@@ -277,12 +276,6 @@
                                                 <img @onclick="() => ShowCarousal(chatMessage.FileData, file.FileUrl)" class="image-message" src="@file.FileUrl" style="@imageWidthStyle" />
                                             }
                                         </div>
-                                        @* @if (!isReceived &&  j==0 )
-                                        {
-                                            <div class="profile-picture-container">
-                                                <span>Me</span>
-                                            </div>
-                                        } *@
 
                                     </div>
                                     @if (j == (chatMessage.FileData.Count - 1))
@@ -316,6 +309,8 @@
         </div>
 
         <div class="input-wrapper">
+
+            <!--  Media attachment preview. Allows users to review and remove files before sending.  -->
             @if (PreviewMediaFiles.Any())
             {
                 <div class="file-preview-container" id="filePreview">
@@ -339,12 +334,15 @@
                 </div>
             }
 
+
+
+            <!--   Chat composer (text, attachments, send).  Rendered only when a conversation is selected. -->
             @if (SelectedFbChatId is not null)
             {
                 <div class="input-container">
                     <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
                     <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
-                    <textarea @bind="Message" @ref="textArea" @onfocusout="FocusTextArea" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1" onblur="this.focus()" autofocus>  </textarea>
                     <button @onclick="() => NotifyLocalServer(Message)" class="send-button">➤</button>
                 </div>
             }
@@ -353,6 +351,8 @@
     </div>
 </div>
 
+
+<!-- Carousal -->
 @if (_showCarousel)
 {
     <div class="carousel-overlay">
@@ -403,8 +403,28 @@
     </div>
 }
 
+
+
+@* Mobile Nav *@
+
+
+
+
+
+
+
+@* Mobile Nav *@
+
+
+
+
+
+<!-- Mobile NavBar -->
 @if (PlatformHelper.IsMobilePlatform && SidebarZIndex > MainChatZIndex)
 {
     <MobileNav></MobileNav>
 }
+
+
+
 <script src="/Components/Pages/Chat/Chat.razor.js"></script>

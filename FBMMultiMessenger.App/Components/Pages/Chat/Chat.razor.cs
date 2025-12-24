@@ -51,7 +51,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [Inject]
         private ICurrentUserService CurrentUserService { get; set; }
 
-        private ElementReference? textArea;
 
         [SupplyParameterFromQuery]
         public string IsNotification { get; set; } //this bit tells if the user opens the notification from his app and we have to show him the right chat.
@@ -172,7 +171,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         }
 
 
-
         private List<FileData> GetFileData(string message)
         {
             var mediaUrls = JsonSerializer.Deserialize<List<string>>(message);
@@ -284,28 +282,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             await InvokeAsync(StateHasChanged);
         }
 
-
-        private async Task FocusTextArea()
-        {
-            try
-            {
-                while (true)
-                {
-                    if (textArea != null)
-                    {
-                        await textArea.Value.FocusAsync();
-                        break;
-                    }
-
-                    await Task.Delay(100);
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-
         public async Task LoadChatMessage(string fbChatId)
         {
             var previousSelectedChatId = SelectedFbChatId;
@@ -316,8 +292,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 ChatMessages.Clear();
             }
 
-            await FocusTextArea();
-
             HandleSelectedChat(fbChatId);
 
             if (PlatformHelper.IsMobilePlatform)
@@ -325,7 +299,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 HandleMobileSideBar();
                 await HandlePushNotification(fbChatId);
             }
-
 
             var myAccountChats = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (myAccountChats is not null)
@@ -370,8 +343,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task NotifyLocalServer(string msg)
         {
-            await FocusTextArea();
-
             var isValidRequest = IsValidRequest(msg);
             if (!isValidRequest)
             {
@@ -446,7 +417,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     var isSubscriptionExpired = response.Data?.IsSubscriptionExpired ?? false;
                     Navigation.NavigateTo("/pricing");
-                    //Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={response.Message}");
                     return;
                 }
 
