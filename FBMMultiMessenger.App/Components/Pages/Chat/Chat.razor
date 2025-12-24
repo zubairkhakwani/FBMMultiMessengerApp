@@ -198,13 +198,16 @@
                     @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
                     {
                         <div class="message @messageClass @failedMessageClass">
-                            @if (isReceived) //TODO
+                            @if (isReceived)
                             {
                                 <div class="message-row">
-                                    <div class="profile-picture">
-                                        @* <img class="profile-picture" src="@UserProfileImage" /> *@
-                                        <p>Hello</p>
-                                    </div>
+                                    @if (UserProfileImage is not null)
+                                    {
+                                        <div class="profile-picture">
+                                            <img class="profile-picture" src="@UserProfileImage" />
+                                        </div>
+                                    }
+                                   
                                     <div class="message-bubble">
                                         @if (chatMessage.IsAudioMessage)
                                         {
