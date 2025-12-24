@@ -198,29 +198,34 @@
                     @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
                     {
                         <div class="message @messageClass @failedMessageClass">
-                            <div class="message-container">
-
-                                @if (isReceived && UserProfileImage is not null)
-                                {
-                                    <div class="profile-picture-container">
-                                        <img class="profile-picture" src="@UserProfileImage" />
+                            @if (isReceived) //TODO
+                            {
+                                <div class="message-row">
+                                    <div class="profile-picture">
+                                        @* <img class="profile-picture" src="@UserProfileImage" /> *@
+                                        <p>Hello</p>
                                     </div>
-                                }
-
-                                <div class="message-bubble">
-                                    @if (chatMessage.IsAudioMessage)
-                                    {
-                                        <audio controls>
-                                            <source src="@chatMessage.Message" type="audio/mpeg">
-                                            Your browser does not support the audio tag.
-                                        </audio>
-                                    }
-                                    else
-                                    {
-                                        @chatMessage.Message
-                                    }
+                                    <div class="message-bubble">
+                                        @if (chatMessage.IsAudioMessage)
+                                        {
+                                            <audio controls>
+                                                <source src="@chatMessage.Message" type="audio/mpeg">
+                                                Your browser does not support the audio tag.
+                                            </audio>
+                                        }
+                                        else
+                                        {
+                                            <span>@chatMessage.Message</span>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
+                            }
+                            else
+                            {
+                                <div class="message-bubble">
+                                    <span>@chatMessage.Message</span>
+                                </div>
+                            }
 
 
                             <div class="message-footer">
@@ -247,61 +252,53 @@
 
                     @if (chatMessage.FileData.Any())
                     {
-                        var row = chatMessage.FileData.Count > 1 ? "flex-row" : "";
                         var filesCount = chatMessage.FileData.Count;
                         var imageWidthStyle = "width: " + (filesCount == 1 ? 429 : filesCount == 2 ? 190 : 125) +"px";
 
-                        <div class="@row @messageClass">
-                            @for (int j = 0; j < chatMessage.FileData.Count; j++)
-                            {
-                                var file = chatMessage.FileData[j];
-                                <div class="message @messageClass  @failedMessageClass">
-                                    <div class="message-container">
-                                        @if (isReceived && UserProfileImage is not null && j==0)
-                                        {
-                                            <div class="profile-picture-container">
-                                                <img class="profile-picture" src="@UserProfileImage" />
-                                            </div>
-                                        }
-                                        <div>
-                                            @if (file.IsVideo)
-                                            {
-                                                <video width="320" height="240" controls>
-                                                    <source src="@file.FileUrl" type="video/mp4">
-                                                    Your browser does not support the video tag.
-                                                </video>
-                                            }
-                                            else
-                                            {
-                                                <img @onclick="() => ShowCarousal(chatMessage.FileData, file.FileUrl)" class="image-message" src="@file.FileUrl" style="@imageWidthStyle" />
-                                            }
-                                        </div>
-
-                                    </div>
-                                    @if (j == (chatMessage.FileData.Count - 1))
+                        <div class="message @messageClass">
+                            <div class="message-row @messageClass">
+                                @for (int j = 0; j < chatMessage.FileData.Count; j++)
+                                {
+                                    var file = chatMessage.FileData[j];
+                                    @if (isReceived && UserProfileImage is not null && j==0)
                                     {
-                                        <div class="message-footer">
-                                            <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
-                                            @if (isSent)
-                                            {
-                                                @if (chatMessage.Sending)
-                                                {
-                                                    <span class="message-status sending">
-                                                        <span class="status-icon">⏱</span> Sending...
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="message-status sent">
-                                                        <span class="status-icon">✓</span> Sent
-                                                    </span>
-                                                }
-                                            }
-
+                                        <div class="profile-picture">
+                                            <img class="profile-picture" src="@UserProfileImage" />
                                         </div>
                                     }
-                                </div>
-                            }
+                                    @if (file.IsVideo)
+                                    {
+                                        <video width="320" height="240" controls>
+                                            <source src="@file.FileUrl" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    }
+                                    else
+                                    {
+                                        <img @onclick="() => ShowCarousal(chatMessage.FileData, file.FileUrl)" class="image-message" src="@file.FileUrl" style="@imageWidthStyle" />
+                                    }
+                                }
+                            </div>
+                            <div class="message-footer">
+                                <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
+                                @if (isSent)
+                                {
+                                    @if (chatMessage.Sending)
+                                    {
+                                        <span class="message-status sending">
+                                            <span class="status-icon">⏱</span> Sending...
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="message-status sent">
+                                            <span class="status-icon">✓</span> Sent
+                                        </span>
+                                    }
+                                }
+
+                            </div>
+
                         </div>
                     }
                 }

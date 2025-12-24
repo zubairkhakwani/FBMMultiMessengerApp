@@ -22,8 +22,6 @@ body {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
-    max-width: 80vw;
-    margin-left: auto;
 }
 
     .flex-row.received {
@@ -272,12 +270,20 @@ body {
     background: #f0f2f5;
 }
 
-.message-container {
+.message-row {
     display: flex;
     align-items: end;
     gap: 5px;
-    max-width: 600px;
+    flex-wrap: wrap;
 }
+
+    .message-row.sent {
+        justify-content: flex-end;
+    }
+
+    .message-row.received {
+        justify-content: flex-start;
+    }
 
 .message-footer {
     display: flex;
@@ -292,21 +298,20 @@ body {
     display: flex;
     margin-bottom: 8px;
     flex-direction: column;
+    max-width: 70%;
 }
 
     .message .image-message {
         display: block;
-        object-fit: cover;
-        /*aspect-ratio: 1/1;*/
+        max-width:100%;
         cursor: pointer;
     }
 
-    .message.received {
-        align-items: flex-start;
-    }
+
 
     .message.sent {
         align-items: flex-end;
+        margin-left: auto;
     }
 
 
@@ -316,16 +321,16 @@ body {
     font-size: 14px;
     line-height: 1.6;
     word-wrap: break-word;
+    word-break: break-word;
     white-space: pre-wrap;
-    position: relative;
 }
 
-.profile-picture-container {
+.profile-picture {
     width: 30px;
     height: 30px;
 }
 
-.message.sent .profile-picture-container {
+.message.sent .profile-picture {
     border-radius: 50%;
     flex-shrink: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -339,7 +344,7 @@ body {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.profile-picture-container .profile-picture {
+.profile-picture .profile-picture {
     display: block;
     max-width: 100%;
     border-radius: 100%;
@@ -811,10 +816,18 @@ body {
     background-color: rgba(0, 0, 0, 0.7);
     padding: 20px;
 }
-.carousel-close-container{
-    cursor:pointer;
+
+.carousel-close-container {
+    cursor: pointer;
 }
 
 ::deep .navigation-btns {
     color: blue;
+}
+
+
+@media(max-width:320px) {
+    .message-row.sent {
+        justify-content: flex-start;
+    }
 }
