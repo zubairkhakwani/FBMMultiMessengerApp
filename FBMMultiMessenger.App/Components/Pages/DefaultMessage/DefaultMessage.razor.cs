@@ -93,7 +93,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
             }
         }
 
-        public async Task EditDefaultMessageAsync(int defaultMessageId, string defaultMessage, List<GetMyAccountsHttpResponse> selectedAccounts)
+        public async Task EditDefaultMessageAsync(int defaultMessageId, string defaultMessage, List<UserAccountsHttpResponse> selectedAccounts)
         {
             DefaultMessageHelper.SelectableAccounts = selectedAccounts;
 

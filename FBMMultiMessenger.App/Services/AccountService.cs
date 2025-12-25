@@ -36,7 +36,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<UpsertAccountHttpRequest, T>(request);
         }
 
-        public async Task<BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest)
+        public async Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest)
         {
             var request = new ApiRequest<object>()
             {
@@ -44,7 +44,7 @@ namespace FBMMultiMessenger.Services
                 Url =$"account/me?pageNo={httpRequest.PageNo}&pageSize={httpRequest.PageSize}&keyword={httpRequest.Keyword}",
                 Data = null
             };
-            return await _baseService.SendAsync<object, BaseResponse<PageableResponse<GetMyAccountsHttpResponse>>>(request);
+            return await _baseService.SendAsync<object, BaseResponse<UserAccountsOverviewHttpResponse>>(request);
         }
 
         public async Task<T> RemoveAccountAsync<T>(List<int> accountIds) where T : class, new()

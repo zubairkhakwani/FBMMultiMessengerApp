@@ -5,50 +5,67 @@
 
 <MudPaper Elevation="0" Style="display: flex; flex-direction: column;" Height="100%" Width="100%">
 
-    <div class="main-toolbar">
-        <h2 style="color: #333; margin: 0;">Accounts Management</h2>
-        <div class="toolbar-left">
-            <button @onclick="AddNewAccountAsync" class="btn btn-primary">
-                ➕ Add Account
-            </button>
-            <InputFile type="file" id="fileInput" style="display: none;" onchange="HandleImportFile" />
-            <label class="btn btn-secondary" for="fileInput" title="Attach files">📁 Import File</label>
-        </div>
-    </div>
+    <div class="accounts-toolbar">
 
-    <!-- FILTER BAR: Search & Filters -->
-    <div class="filter-bar">
-        <div class="filter-left">
-            <div class="search-group">
-                <input type="text"
-                       @onkeypress="HandleFilterKeyPressAsync"
-                       @bind-value="Keyword"
-                       class="search-input"
-                       id="searchInput"
-                       placeholder="Search accounts...">
-                <button @onclick="HandleFilterClickAsync" class="btn btn-primary btn-fullwidth">
-                    🔍 Filter
+        <!-- Header -->
+        <div class="main-toolbar">
+            <h2 style="color: #333; margin: 0;">Accounts Management</h2>
+            <div class="toolbar-left">
+                <button @onclick="AddNewAccountAsync" class="btn btn-primary">
+                    ➕ Add Account
                 </button>
+                <InputFile type="file" id="fileInput" style="display: none;" onchange="HandleImportFile" />
+                <label class="btn btn-secondary" for="fileInput" title="Attach files">📁 Import File</label>
+            </div>
+        </div>
+
+        <!-- FILTER BAR: Search & Filters -->
+        <div class="filter-bar">
+            <div class="filter-left">
+                <div class="search-group">
+                    <input type="text"
+                           @onkeypress="HandleFilterKeyPressAsync"
+                           @bind-value="Keyword"
+                           class="search-input"
+                           id="searchInput"
+                           placeholder="Search accounts...">
+                    <button @onclick="HandleFilterClickAsync" class="btn btn-primary btn-fullwidth">
+                        🔍 Filter
+                    </button>
+                </div>
+
             </div>
 
+            <div class="filter-right">
+                @if (selectedAccounts.Any())
+                {
+                    <span class="selection-badge" id="selectionBadge">
+                        <span id="selectedCount">@selectedAccounts.Count</span> selected
+                    </span>
+                }
+
+                <button @onclick="HandleMultipleRemoval" class="btn btn-danger btn-fullwidth">
+                    🗑️ Delete Selected
+                </button>
+
+            </div>
         </div>
 
-        <div class="filter-right">
-            @if (selectedAccounts.Any())
-            {
-                <span class="selection-badge" id="selectionBadge">
-                    <span id="selectedCount">@selectedAccounts.Count</span> selected
-                </span>
-            }
-
-            <button @onclick="HandleMultipleRemoval" class="btn btn-danger btn-fullwidth">
-                🗑️ Delete Selected
-            </button>
-
+        <!-- Summary  -->
+        <div class="summary-bar">
+            <MudChip T="string" Label="true" Color="Color.Warning" Style="color:black;">Total Accounts: <b> @TotalAccounts </b></MudChip>
+            <MudChip T="string" Label="true" Color="Color.Warning" Style="color:black;">Connected Accounts: <b> @ConnectedAccounts</b></MudChip>
+            <MudChip T="string" Label="true" Color="Color.Warning" Style="color:black;">Not Connected Accounts: <b> @NotConnectedAccounts </b></MudChip>
         </div>
     </div>
 
+
+
+
+
+
     <MudTable ServerData="ServerReload" Dense="true" Hover="true" @ref="table" MultiSelection=true @bind-SelectedItems="selectedAccounts">
+
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Cookie</MudTh>

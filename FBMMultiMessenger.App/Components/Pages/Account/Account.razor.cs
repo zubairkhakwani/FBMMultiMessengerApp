@@ -44,20 +44,27 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private GetMyAccountsHttpRequest RequestModel = new GetMyAccountsHttpRequest();
 
-        private HashSet<GetMyAccountsHttpResponse> selectedAccounts
+        private HashSet<UserAccountsHttpResponse> selectedAccounts
         {
             get;
             set;
 
         } = new();
 
-        private List<GetMyAccountsHttpResponse> AccountsData = new List<GetMyAccountsHttpResponse>();
+
+
+
+        private List<UserAccountsHttpResponse> AccountsData = new List<UserAccountsHttpResponse>();
+        private int TotalAccounts;
+        private int ConnectedAccounts;
+        private int NotConnectedAccounts;
+
         private string? Keyword { get; set; }
 
         [SupplyParameterFromQuery]
         public string? Message { get; set; }
 
-        private MudTable<GetMyAccountsHttpResponse> table;
+        private MudTable<UserAccountsHttpResponse> table;
 
         protected override async Task OnInitializedAsync()
         {
@@ -76,7 +83,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             SignalRService.OnAccountStatusChange += HandleAccountStatusChanged;
         }
 
-        private async Task<TableData<GetMyAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
+        private async Task<TableData<UserAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
         {
             int totalItems = 0;
             RequestModel.PageNo = state.Page > 0 ? state.Page + 1 : 1;
@@ -87,8 +94,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             if (response.IsSuccess && response.Data is not null)
             {
-                AccountsData = response.Data.Records;
-                totalItems = response.Data.TotalCount;
+                AccountsData = response.Data.UserAccounts.Records;
+                TotalAccounts = totalItems = response.Data.UserAccounts.TotalCount;
+                ConnectedAccounts = response.Data.ConnectedAccounts;
+                NotConnectedAccounts = response.Data.NotConnectedAccounts;
             }
             else
             {
@@ -96,7 +105,8 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
 
             table.Items = AccountsData;
-            return new TableData<GetMyAccountsHttpResponse>() { TotalItems = totalItems, Items = AccountsData };
+            await InvokeAsync(StateHasChanged);
+            return new TableData<UserAccountsHttpResponse>() { TotalItems = totalItems, Items = AccountsData };
         }
 
         private async Task HandleFilterClickAsync()
@@ -117,21 +127,20 @@ namespace FBMMultiMessenger.Components.Pages.Account
             if (accountsStatusRequest is null || !accountsStatusRequest.Any())
                 return;
 
-            var accountsToUpdate = AccountsData.Where(a => accountsStatusRequest.Any(x => x.AccountId == a.Id))
+            var affectedAccounts = AccountsData.Where(a => accountsStatusRequest.Any(x => x.AccountId == a.Id))
                                                .ToList();
 
-            foreach (var account in accountsToUpdate)
+            foreach (var account in affectedAccounts)
             {
                 var accountStatusRequest = accountsStatusRequest.FirstOrDefault(x => x.AccountId == account.Id);
 
                 if (accountStatusRequest is not null)
                 {
-                    if (!string.IsNullOrWhiteSpace(accountStatusRequest.AuthStatus))
+                    if (accountStatusRequest.AuthStatus is not null)
                     {
                         account.AuthStatus = accountStatusRequest.AuthStatus;
-
                     }
-                    if (!string.IsNullOrWhiteSpace(accountStatusRequest.ConnectionStatus))
+                    if (accountStatusRequest.ConnectionStatus is not null)
                     {
                         account.ConnectionStatus = accountStatusRequest.ConnectionStatus;
                     }
@@ -330,7 +339,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             {
                 var selectedAccountIds = selectedAccounts.Select(x => x.Id).ToList();
                 await RemoveAccountAsync(selectedAccountIds, true);
-                selectedAccounts = new HashSet<GetMyAccountsHttpResponse>();
+                selectedAccounts = new HashSet<UserAccountsHttpResponse>();
                 return;
             }
 

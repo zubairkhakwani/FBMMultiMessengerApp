@@ -207,7 +207,7 @@
                                             <img class="profile-picture" src="@UserProfileImage" />
                                         </div>
                                     }
-                                   
+
                                     <div class="message-bubble">
                                         @if (chatMessage.IsAudioMessage)
                                         {
@@ -372,14 +372,16 @@
             <PreviousButtonTemplate>
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
                     <span class="mud-icon-button-label">
-                        <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@Icons.Material.Filled.SkipPrevious" Color="@Color.Inherit" />
+                        <MudIcon Icon="@Icons.Material.Filled.SkipPrevious"
+                                 Size="Size.Large"
+                                 Color="Color.Inherit" />
                     </span>
                 </div>
             </PreviousButtonTemplate>
             <NextButtonTemplate>
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
                     <span class="mud-icon-button-label">
-                        <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@Icons.Material.Filled.SkipNext" Color="@Color.Inherit" />
+                        <MudIcon Icon="@Icons.Material.Filled.SkipNext" Size="Size.Large" Color="@Color.Inherit" />
                     </span>
                 </div>
             </NextButtonTemplate>

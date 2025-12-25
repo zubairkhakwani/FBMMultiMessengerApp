@@ -242,8 +242,8 @@
         border-color: #adb5bd;
     }
 
-/* Filter Bar - Secondary Actions */
-.filter-bar {
+/* Filter Bar */
+.filter-bar{
     padding: 15px 20px;
     background: #f8f9fa;
     border-bottom: 1px solid #dee2e6;
@@ -267,7 +267,15 @@
     gap: 12px;
     align-items: center;
 }
-
+.summary-bar {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
 /* Search Input */
 .search-group {
     display: flex;

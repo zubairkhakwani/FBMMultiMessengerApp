@@ -4,13 +4,13 @@ namespace FBMMultiMessenger.Helpers
 {
     public static class DefaultMessageHelper
     {
-        public static List<GetMyAccountsHttpResponse> AllAccounts { get; set; } = new List<GetMyAccountsHttpResponse>();
+        public static List<UserAccountsHttpResponse> AllAccounts { get; set; } = new List<UserAccountsHttpResponse>();
 
-        public static List<GetMyAccountsHttpResponse> AccountsUsedForDefaultMessages { get; set; } = new List<GetMyAccountsHttpResponse>();
+        public static List<UserAccountsHttpResponse> AccountsUsedForDefaultMessages { get; set; } = new List<UserAccountsHttpResponse>();
 
-        public static List<GetMyAccountsHttpResponse> AccountsNotUsedForDefaultMessages { get; set; } = new List<GetMyAccountsHttpResponse>();
+        public static List<UserAccountsHttpResponse> AccountsNotUsedForDefaultMessages { get; set; } = new List<UserAccountsHttpResponse>();
 
-        public static List<GetMyAccountsHttpResponse> SelectableAccounts { get; set; } = new List<GetMyAccountsHttpResponse>();
+        public static List<UserAccountsHttpResponse> SelectableAccounts { get; set; } = new List<UserAccountsHttpResponse>();
     }
 
     public class DefaultMessageAccount
