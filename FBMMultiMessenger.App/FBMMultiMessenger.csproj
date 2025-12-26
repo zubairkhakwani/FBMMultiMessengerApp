@@ -87,6 +87,7 @@
         <PackageReference Include="MudBlazor" Version="8.12.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="OneSignalSDK.DotNet" Version="5.2.2" />
+        <PackageReference Include="Sentry.Maui" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>

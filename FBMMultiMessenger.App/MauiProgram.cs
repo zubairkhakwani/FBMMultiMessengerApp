@@ -22,12 +22,24 @@ namespace FBMMultiMessenger
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                });
+            builder.UseMauiApp<App>()
+                   .ConfigureFonts(fonts =>
+                   {
+                       fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                   });
+
+
+            builder.UseSentry(options =>
+            {
+                options.SendDefaultPii = true;
+                options.Dsn = "https://22e97d6953cd92ecb6fb6d5e4948b90a@o4510596251385856.ingest.us.sentry.io/4510599401897984";
+                options.MinimumBreadcrumbLevel = LogLevel.Debug;
+                options.MinimumEventLevel = LogLevel.Warning;
+                options.AttachStacktrace = true;
+                options.DiagnosticLevel = SentryLevel.Error;
+                options.TracesSampleRate = 0.2;
+            });
+
 
             // Load appsettings.json from root
             var assembly = Assembly.GetExecutingAssembly();
@@ -64,7 +76,6 @@ namespace FBMMultiMessenger
 
             builder.Services.AddSingleton<BackButtonService>();
             builder.Services.AddSingleton<SignalRService>();
-
             builder.Services.AddHttpClient();
             builder.Services.AddMudServices(config =>
             {

@@ -1,8 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 
-<FBMMultiMessenger.Components.Shared.CustomErrorBoundary>
-
+<CustomErrorBoundary>
     <div class="page">
 
         @if (!PlatformHelper.IsMobilePlatform)
@@ -19,7 +18,7 @@
             }
             else
             {
-               <TopBar></TopBar>
+                <TopBar></TopBar>
             }
 
             <article class="content px-4">
@@ -27,6 +26,4 @@
             </article>
         </main>
     </div>
-
-
-</FBMMultiMessenger.Components.Shared.CustomErrorBoundary> 
+</CustomErrorBoundary> 
