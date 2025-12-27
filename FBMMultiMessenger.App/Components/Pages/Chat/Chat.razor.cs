@@ -115,12 +115,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public List<GetMyChatsHttpResponse> AccountChats = new List<GetMyChatsHttpResponse>();
 
         public List<GeChatMessagesHttpResponse> ChatMessages = new List<GeChatMessagesHttpResponse>();
+
         protected override async Task OnInitializedAsync()
         {
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
 
             BackButtonService.BackButtonPressed+= OnBackButtonPressed;
-
 
             //if a user opened notification so we have to open the right chat.
             if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
@@ -157,7 +157,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task GetAccountChats()
         {
-            var response = await AccountService.GetMyChatsAsync<BaseResponse<GetAllMyAccountsChatsHttpResponse>>();
+            var response = await AccountService.GetMyChatsAsync();
+
             IsLoading = false;
             if (response is null ||  !response.IsSuccess)
             {
@@ -167,9 +168,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             FilteredAccountChats = AccountChats = response?.Data?.Chats ?? new List<GetMyChatsHttpResponse>();
-
         }
-
 
         private List<FileData> GetFileData(string message)
         {
@@ -247,15 +246,16 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 var newChat = new GetMyChatsHttpResponse()
                 {
                     Id = receivedChat.ChatId,
-                    FbListingTitle = receivedChat.FbListingTitle,
+                    FbListingTitle = receivedChat.FbListingTitle ?? string.Empty,
                     FbListingImage = receivedChat.FbListingImage,
                     UserProfileImage = receivedChat.UserProfileImage,
-                    FbListingLocation = receivedChat.FbListingLocation,
+                    FbListingLocation = receivedChat.FbListingLocation ?? string.Empty,
                     FbListingPrice = receivedChat.FbListingPrice,
                     MessagePreview = receivedChat.MessagPreview,
                     SenderName = receivedChat.MessagePreviewFrom,
                     FbChatId = receivedChat.FbChatId,
                     StartedAt = receivedChat.StartedAt,
+                    IsAccountConnected = true,
                     IsRead = false,
                 };
 
@@ -272,7 +272,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             chat.MessagePreview = receivedChat.MessagPreview;
             chat.SenderName = receivedChat.MessagePreviewFrom;
             chat.FbListingImage = receivedChat.FbListingImage;
-            chat.FbListingTitle = receivedChat.FbListingTitle;
+            chat.FbListingTitle = receivedChat.FbListingTitle ?? string.Empty;
+            chat.IsAccountConnected = true;
             chat.IsRead = receivedChat.FbChatId == SelectedFbChatId;
 
             FilteredAccountChats.Remove(chat);

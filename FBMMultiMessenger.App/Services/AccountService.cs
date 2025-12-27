@@ -65,7 +65,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<List<int>, T>(request);
         }
 
-        public async Task<T> GetMyChatsAsync<T>() where T : class, new()
+        public async Task<BaseResponse<GetAllMyAccountsChatsHttpResponse>> GetMyChatsAsync()
         {
             var request = new ApiRequest<object>()
             {
@@ -74,7 +74,7 @@ namespace FBMMultiMessenger.Services
                 Data = null
             };
 
-            return await _baseService.SendAsync<object, T>(request);
+            return await _baseService.SendAsync<object, BaseResponse<GetAllMyAccountsChatsHttpResponse>>(request);
         }
 
         public async Task<T> OpenInBrowserAsync<T>(int accountId) where T : class, new()

@@ -152,6 +152,27 @@ body {
         font-size: 8px;
     }
 
+.status-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+    .status-indicator.active {
+        background-color: #10b981;
+    }
+
+    .status-indicator.inactive {
+        background-color: #ef4444;
+    }
+
+    
+
 .chat-info {
     flex: 1;
     min-width: 0;
@@ -303,7 +324,7 @@ body {
 
     .message .image-message {
         display: block;
-        max-width:100%;
+        max-width: 100%;
         cursor: pointer;
     }
 

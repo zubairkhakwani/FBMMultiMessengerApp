@@ -54,6 +54,7 @@
                     var fbListingPrice = chat.FbListingPrice;
                     var unreadCount = chat.UnReadCount;
                     var hide = (unreadCount == 0 || chat.IsRead) ? "hide" : "";
+                    var accountStatus = chat.IsAccountConnected ? "active" : "inactive";
 
                     <div @onclick="() => LoadChatMessage(fbChatId)" class="chat-item unread">
 
@@ -65,8 +66,9 @@
                             else
                             {
                                 <img src="@fbListingImage" alt="product-image" />
-                            }
 
+                            }
+                            <span class="status-indicator @accountStatus"></span>
                             <span class="unread-badge @hide">@unreadCount</span>
                         </div>
 

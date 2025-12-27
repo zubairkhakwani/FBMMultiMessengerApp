@@ -13,6 +13,6 @@ namespace FBMMultiMessenger.Services.IServices
 
         Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest);
 
-        Task<T> GetMyChatsAsync<T>() where T : class, new();
+        Task<BaseResponse<GetAllMyAccountsChatsHttpResponse>> GetMyChatsAsync();
     }
 }

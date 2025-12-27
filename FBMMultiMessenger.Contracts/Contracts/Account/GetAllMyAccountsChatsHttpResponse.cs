@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FBMMultiMessenger.Contracts.Contracts.Account
+﻿namespace FBMMultiMessenger.Contracts.Contracts.Account
 {
     public class GetAllMyAccountsChatsHttpResponse
     {
@@ -15,7 +9,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Account
     {
         public int Id { get; set; }
         public string FbChatId { get; set; } = null!;
-        public string? FbListingTitle { get; set; } 
+        public string? FbListingTitle { get; set; }
         public string? FbListingImage { get; set; }
         public string? UserProfileImage { get; set; }
         public string? FbListingLocation { get; set; }
@@ -24,7 +18,23 @@ namespace FBMMultiMessenger.Contracts.Contracts.Account
         public string? SenderName { get; set; } // You or Hadia.
         public bool IsRead { get; set; }
         public int UnReadCount { get; set; }
-       
+        public bool IsAccountConnected { get; set; }
         public DateTime StartedAt { get; set; }
+
+        public GetMyChatAccountHttpResponse? Account { get; set; } = new GetMyChatAccountHttpResponse();
+
+        public List<GetMyChatMessagesHttpResonse> ChatMessages { get; set; } = new List<GetMyChatMessagesHttpResonse>();
+    }
+
+    public class GetMyChatAccountHttpResponse
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class GetMyChatMessagesHttpResonse
+    {
+
     }
 }
