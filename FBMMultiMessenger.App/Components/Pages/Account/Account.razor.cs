@@ -80,7 +80,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 Snackbar.Add(Message, Severity.Success);
             }
 
-            SignalRService.OnAccountStatusChange += HandleAccountStatusChanged;
+            SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
         }
 
         private async Task<TableData<UserAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
@@ -94,8 +94,8 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             if (response.IsSuccess && response.Data is not null)
             {
-                AccountsData = response.Data.UserAccounts.Records;
-                TotalAccounts = totalItems = response.Data.UserAccounts.TotalCount;
+                AccountsData = response.Data.UserAccounts?.Records ?? [];
+                TotalAccounts = totalItems = response.Data.UserAccounts?.TotalCount ?? 0;
                 ConnectedAccounts = response.Data.ConnectedAccounts;
                 NotConnectedAccounts = response.Data.NotConnectedAccounts;
             }
@@ -122,7 +122,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        private async Task HandleAccountStatusChanged(List<AccountStatusSignalRModel> accountsStatusRequest)
+        private async Task HandleAccountStatusChangedAsync(List<AccountStatusSignalRModel> accountsStatusRequest)
         {
             if (accountsStatusRequest is null || !accountsStatusRequest.Any())
                 return;
