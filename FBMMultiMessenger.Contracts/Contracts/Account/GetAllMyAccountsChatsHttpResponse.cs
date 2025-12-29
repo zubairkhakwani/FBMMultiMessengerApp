@@ -21,7 +21,7 @@
         public bool IsAccountConnected { get; set; }
         public DateTime StartedAt { get; set; }
 
-        public GetMyChatAccountHttpResponse? Account { get; set; } = new GetMyChatAccountHttpResponse();
+        public GetMyChatAccountHttpResponse? Account { get; set; }
 
         public List<GetMyChatMessagesHttpResonse> ChatMessages { get; set; } = new List<GetMyChatMessagesHttpResonse>();
     }

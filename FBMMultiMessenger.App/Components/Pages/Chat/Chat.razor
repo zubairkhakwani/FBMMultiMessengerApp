@@ -237,12 +237,19 @@
                                 <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
                                 @if (isSent)
                                 {
-                                    @if (chatMessage.Sending)
+                                    @if (chatMessage.Sending && string.IsNullOrWhiteSpace(failedMessageClass))
                                     {
                                         <span class="message-status sending">
                                             <span class="status-icon">⏱</span> Sending...
                                         </span>
                                     }
+                                    else if (chatMessage.Sending && !string.IsNullOrWhiteSpace(failedMessageClass))
+                                    {
+                                        <span class="message-status failed">
+                                            <span class="status-icon">✗</span> Failed
+                                        </span>
+                                    }
+
                                     else
                                     {
                                         <span class="message-status sent">
@@ -274,13 +281,13 @@
                                     @if (file.IsVideo)
                                     {
                                         <video width="320" height="240" controls>
-                                            <source src="@file.FileUrl" type="video/mp4">
+                                            <source src="@file.PreviewUrl" type="video/mp4">
                                             Your browser does not support the video tag.
                                         </video>
                                     }
                                     else
                                     {
-                                        <img @onclick="() => ShowCarousal(chatMessage.FileData, file.FileUrl)" class="image-message" src="@file.FileUrl" style="@imageWidthStyle" />
+                                        <img @onclick="() => ShowCarousal(chatMessage.FileData, file.PreviewUrl)" class="image-message" src="@file.PreviewUrl" style="@imageWidthStyle" />
                                     }
                                 }
                             </div>
@@ -323,13 +330,17 @@
                             var file = PreviewMediaFiles[i];
 
                             <div class="file-preview-item">
-                                <img class="preview-media" src="@file.FileUrl" alt="@file.FileName">
                                 @if (file.IsVideo)
                                 {
                                     <div class="video-indicator">▶️</div>
+                                    <video class="preview-media" src="@file.PreviewUrl" disabled></video>
+                                }
+                                else
+                                {
+                                    <img class="preview-media" src="@file.PreviewUrl" alt="@file.Name">
                                 }
                                 <button class="remove-file-btn" @onclick="() => HandleFileRemoval(file.Id)">✕</button>
-                                <div class="file-name">@file.FileName</div>
+                                <div class="file-name">@file.Name</div>
                             </div>
                         }
                     </div>
@@ -393,13 +404,13 @@
                     @if (context.IsVideo)
                     {
                         <video width="450" height="340" controls>
-                            <source src="@context.FileUrl" type="video/mp4">
+                            <source src="@context.PreviewUrl" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                     }
                     else
                     {
-                        <img src="@context.FileUrl" alt="Image" />
+                        <img src="@context.PreviewUrl" alt="Image" />
                     }
                 </div>
             </ItemTemplate>

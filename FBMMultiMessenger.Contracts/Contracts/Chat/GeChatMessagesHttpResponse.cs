@@ -1,10 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.Contracts.Contracts.Chat
 {
@@ -26,11 +20,11 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
 
     public class FileData
     {
+        public int Index { get; set; }
         public string Id { get; set; } = string.Empty;
-        public string FileUrl { get; set; } = string.Empty;
-        public string FileName { get; set; } = string.Empty;
+        public string PreviewUrl { get; set; } = string.Empty; 
+        public string Name { get; set; } = string.Empty;
         public bool IsVideo { get; set; }
-
         public IBrowserFile File { get; set; } = null!;
     }
 }

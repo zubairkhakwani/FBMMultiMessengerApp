@@ -56,6 +56,7 @@
             return false;
         }
     },
+
     showSweetAlert: function (options = {}) {
         const {
             title = "Error",
@@ -85,7 +86,23 @@
         }
 
         return Swal.fire(config).then((result) => result.isConfirmed);
-    }
+    },
+
+    createPreviewUrlsFromInput: () => {
+        let mediaInput = document.getElementById('fileInput');
+        return Array.from(mediaInput?.files).map((file, index) => ({
+            index,
+            name: file.name,
+            isVideo: file.type.startsWith("video/"),
+            previewUrl: URL.createObjectURL(file)
+        }));
+       
+    },
+
+    revokePreviewUrl: (url) => {
+        URL.revokeObjectURL(url);
+    },
+
 };
 
 
