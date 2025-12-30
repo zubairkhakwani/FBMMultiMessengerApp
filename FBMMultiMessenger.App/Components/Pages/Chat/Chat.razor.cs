@@ -647,7 +647,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 if (totalSize > MaxMediaSize)
                 {
                     options.Message = $"The files you have selected is too large,The maximum size is {MaxMediaSize / (1024 * 1024)}MB.";
-                    await JS.InvokeVoidAsync("myInterop.handleMediaFailed", options);
+                    await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
                     return;
                 }
 

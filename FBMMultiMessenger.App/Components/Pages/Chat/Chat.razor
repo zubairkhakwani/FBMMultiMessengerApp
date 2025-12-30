@@ -281,7 +281,7 @@
                                     @if (file.IsVideo)
                                     {
                                         <video width="320" height="240" controls>
-                                            <source src="@file.PreviewUrl" type="video/mp4">
+                                            <source src="@(file.PreviewUrl + "#t=0.001")" type="video/mp4">
                                             Your browser does not support the video tag.
                                         </video>
                                     }
@@ -333,7 +333,7 @@
                                 @if (file.IsVideo)
                                 {
                                     <div class="video-indicator">▶️</div>
-                                    <video class="preview-media" src="@file.PreviewUrl" disabled></video>
+                                    <video class="preview-media" src="@(file.PreviewUrl + "#t=0.001")"></video>
                                 }
                                 else
                                 {
@@ -417,21 +417,6 @@
         </MudCarousel>
     </div>
 }
-
-
-
-@* Mobile Nav *@
-
-
-
-
-
-
-
-@* Mobile Nav *@
-
-
-
 
 
 <!-- Mobile NavBar -->
