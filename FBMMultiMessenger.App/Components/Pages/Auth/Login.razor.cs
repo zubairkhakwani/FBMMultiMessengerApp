@@ -58,9 +58,8 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                 ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyStateChanged();
 
                 //Tell OneSignal this device now belongs to this user
-                if (DeviceInfo.Platform != DevicePlatform.WinUI)
+                if (PlatformHelper.IsMobilePlatform)
                 {
-                    // Running on Android (either emulator or physical device)
                     OneSignalService.Login(response.Data.UserId.ToString());
                 }
             }

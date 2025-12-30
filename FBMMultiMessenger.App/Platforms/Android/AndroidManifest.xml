@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="FBM_Multi_Messenger.FBM_Multi_Messenger" android:versionName="1">
 	<application android:allowBackup="true" android:icon="@mipmap/fbm1" android:supportsRtl="true" android:label="FBM Multi Messenger">
+
 		<meta-data
-			android:name="com.onesignal.NotificationOpened.DEFAULT_ICON"
-			android:resource="@mipmap/fbm1" />
+    android:name="com.google.firebase.messaging.default_notification_icon"
+    android:resource="@drawable/fbm1" />
+
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />

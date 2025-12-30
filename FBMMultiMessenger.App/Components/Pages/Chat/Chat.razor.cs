@@ -445,7 +445,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             if (PlatformHelper.IsMobilePlatform)
             {
-                await OneSignalService.AskNotificationPermissionAsync();
+                 OneSignalService.AskNotificationPermissionAsync();
                 OneSignalService.OnNotificationClicked();
 
                 // Optional
