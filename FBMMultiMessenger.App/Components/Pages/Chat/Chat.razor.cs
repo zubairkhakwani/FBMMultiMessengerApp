@@ -52,10 +52,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
 
         [SupplyParameterFromQuery]
-        public string IsNotification { get; set; } //this bit tells if the user opens the notification from his app and we have to show him the right chat.
+        public string IsNotification { get; set; } = string.Empty; //tells if the user click on the notification
 
         [SupplyParameterFromQuery]
-        public string FbChatId { get; set; }
+        public string FbChatId { get; set; } = string.Empty;
 
 
         //For Media files
@@ -118,7 +118,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             //if a user opened notification so we have to open the right chat.
             if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
             {
-
                 await LoadChatMessage(FbChatId);
             }
 
@@ -160,6 +159,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 myAccountChats.UnReadCount = 0;
                 myAccountChats.IsRead = true;
                 UserProfileImage = myAccountChats.UserProfileImage;
+                await InvokeAsync(StateHasChanged);
             }
 
             var response = await ChatMessagesService.GetChatMessages<BaseResponse<List<GeChatMessagesHttpResponse>>>(fbChatId);
@@ -183,7 +183,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             ChatMessages  = response?.Data ?? new List<GeChatMessagesHttpResponse>();
 
-            await InvokeAsync(StateHasChanged);
+
         }
 
 
