@@ -55,6 +55,7 @@
                     var unreadCount = chat.UnReadCount;
                     var hide = (unreadCount == 0 || chat.IsRead) ? "hide" : "";
                     var accountStatus = chat.IsAccountConnected ? "active" : "inactive";
+                    var chatAccountName = chat.Account?.Name;
 
                     <div @onclick="() => LoadChatMessage(fbChatId)" class="chat-item unread">
 
@@ -66,7 +67,6 @@
                             else
                             {
                                 <img src="@fbListingImage" alt="product-image" />
-
                             }
                             <span class="status-indicator @accountStatus"></span>
                             <span class="unread-badge @hide">@unreadCount</span>
@@ -75,11 +75,16 @@
                         <div class="chat-info">
                             <div class="chat-name">@fbListingTitle</div>
                             <div class="chat-listing-info @isRead">
+                                @if (!string.IsNullOrWhiteSpace(chatAccountName))
+                                {
+                                    <div class="preview">Account: @chatAccountName</div>
+                                }
                                 @if (messagePreview is not null)
                                 {
                                     <div class="preview">@senderName: @messagePreview</div>
                                 }
-                                else if (fbListingLocation is not null)
+
+                                @if (fbListingLocation is not null)
                                 {
                                     <div class="listing-location">@fbListingLocation</div>
                                 }
@@ -89,7 +94,6 @@
                                 }
                             </div>
                         </div>
-                        @* <div class="chat-time">2m</div> *@
                     </div>
                 }
             </div>
@@ -131,6 +135,8 @@
         <!--  Chat header for the active conversation. Shows listing image, title, location/price,  and a back button on mobile for navigation.  -->
         @if (SelectedFbChatId is not null)
         {
+            var accountStatus = isSelectedAccountConnected ? "active" : "inactive";
+
             <div class="chat-header">
                 @if (PlatformHelper.IsMobilePlatform)
                 {
@@ -140,10 +146,10 @@
                 }
 
                 <div class="avatar" style="margin-left:@avatarMargin">
+                    <span class="status-indicator @accountStatus"></span>
                     @if (selectedListingImage is not null)
                     {
                         <img src="@selectedListingImage" />
-
                     }
                     else
                     {
@@ -156,13 +162,15 @@
                     @if (selectedListingTitle is not null)
                     {
                         <h3>@selectedListingTitle</h3>
-
+                    }
+                    @if (!string.IsNullOrWhiteSpace(selectedAccountChat))
+                    {
+                        <p>Account: @selectedAccountChat</p>
                     }
                     @if (selectedListingLocation is not null && selectedListingPrice is not null)
                     {
                         <p>@selectedListingLocation - @selectedListingPrice</p>
                     }
-
                 </div>
             </div>
         }
@@ -183,8 +191,6 @@
                     <p>Choose a conversation from the sidebar to start chatting with your Marketplace buyers and sellers.</p>
                 </div>
             }
-
-
 
             <div id="messagesList">
                 @for (int i = 0; i < ChatMessages.Count; i++)

@@ -88,6 +88,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private int MainChatZIndex = 0;
 
         //Selected Message Header
+        private string? selectedAccountChat;
+        private bool isSelectedAccountConnected;
         private string? selectedListingTitle;
         private string? selectedListingImage;
         private string? selectedListingLocation;
@@ -414,9 +416,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             foreach (var chat in FilteredAccountChats)
             {
-                if (chat.Account is not null
-                    && accountStatusMap.TryGetValue(chat.Account.Id, out var status))
+                if (chat.Account is not null && accountStatusMap.TryGetValue(chat.Account.Id, out var status))
                 {
+                    if (SelectedFbChatId == chat.FbChatId)
+                    {
+                        isSelectedAccountConnected = status.IsConnected;
+                    }
                     chat.IsAccountConnected = status.IsConnected;
                     hasChanges = true;
                 }
@@ -555,6 +560,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (chat is not null)
             {
+                isSelectedAccountConnected = chat.IsAccountConnected;
+                selectedAccountChat = chat.Account?.Name;
                 selectedListingTitle = chat.FbListingTitle;
                 selectedListingLocation = chat.FbListingLocation;
                 selectedListingPrice  = chat.FbListingPrice?.ToString();
