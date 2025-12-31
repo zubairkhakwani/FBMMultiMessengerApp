@@ -627,17 +627,35 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private void FilterChat()
         {
-            var filteredAccountChats = AccountChats.Where(x => x.FbListingTitle.ToLower().Contains(FilterKeyword)
-                                        ||
-                                        x.FbListingPrice.ToString().Contains(FilterKeyword)
-                                        ||
-                                        x.FbListingLocation.ToLower().Contains(FilterKeyword)).ToList();
+            if (string.IsNullOrWhiteSpace(FilterKeyword))
+            {
+                FilteredAccountChats = AccountChats.ToList();
+                StateHasChanged();
+                return;
+            }
 
-            FilteredAccountChats = new List<GetMyChatsHttpResponse>(filteredAccountChats);
+            var keyword = FilterKeyword.Trim();
+
+            FilteredAccountChats = AccountChats
+                .Where(x =>
+                    (!string.IsNullOrEmpty(x.FbListingTitle) &&
+                     x.FbListingTitle.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+
+                    || (x.FbListingPrice != null &&
+                        x.FbListingPrice.ToString()!.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+
+                    || (!string.IsNullOrEmpty(x.FbListingLocation) &&
+                        x.FbListingLocation.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+
+                    || x.Account != null &&
+                        (!string.IsNullOrEmpty(x.Account.Name) &&
+                         x.Account.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                )
+                .ToList();
 
             StateHasChanged();
-
         }
+
 
         private void CloseCarousel()
         {
