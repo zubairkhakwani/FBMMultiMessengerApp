@@ -118,7 +118,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             //if a user opened notification so we have to open the right chat.
             if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
             {
-                HandleMobileSideBar();
+
                 await LoadChatMessage(FbChatId);
             }
 
@@ -146,7 +146,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 ChatMessages.Clear();
             }
 
-            HandleSelectedChat(fbChatId);
+            if (PlatformHelper.IsMobilePlatform)
+            {
+                ShowMainChatView();
+            }
+
+            UpdateChatHeader(fbChatId);
 
             var myAccountChats = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (myAccountChats is not null)
@@ -177,6 +182,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             ChatMessages  = response?.Data ?? new List<GeChatMessagesHttpResponse>();
+
             await InvokeAsync(StateHasChanged);
         }
 
@@ -537,11 +543,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 return;
             }
 
-            HandleMobileMainChat();
+            ShowSidebarView();
             StateHasChanged();
         }
 
-        private void HandleSelectedChat(string fbChatId)
+        private void UpdateChatHeader(string fbChatId)
         {
             // Updates the main chat header with the listing details (title,image, location, and price)
             // of the chat selected by the user.
@@ -556,7 +562,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
-        private void HandleMobileMainChat()
+        private void ShowSidebarView()
         {
             // Displays the sidebar view on mobile by resetting the selected chat
             // and bringing the sidebar to the front.
@@ -565,7 +571,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             MainChatZIndex = 0;
         }
 
-        private void HandleMobileSideBar()
+        private void ShowMainChatView()
         {
             // Displays the main chat view on mobile by bringing the chat section
             // to the front and hiding the sidebar.
@@ -695,13 +701,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         #endregion
 
 
-
         public void Dispose()
         {
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
-            OneSignal.Notifications.Clicked -= HandleNotificationClicked;
 
             foreach (var file in PreviewMediaFiles)
             {
