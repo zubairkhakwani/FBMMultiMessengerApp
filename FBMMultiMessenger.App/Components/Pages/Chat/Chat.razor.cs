@@ -5,7 +5,6 @@ using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Models.SignalR;
-using FBMMultiMessenger.Notification;
 using FBMMultiMessenger.Services;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.SignalR;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
 using OneSignalSDK.DotNet;
+using OneSignalSDK.DotNet.Core.Notifications;
 using System.Text.Json;
 
 
@@ -46,8 +46,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [Inject]
         private BackButtonService BackButtonService { get; set; }
 
-        [Inject]
-        private OneSignalService OneSignalService { get; set; }
 
         [Inject]
         private ICurrentUserService CurrentUserService { get; set; }
@@ -69,8 +67,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private string? UserProfileImage;
 
         private List<FileData> PreviewMediaFiles { get; set; } = new List<FileData>();
-        private List<FileData> PreviewMediaInMessagesContainer = new List<FileData>();
-        private bool IsNotified = false;
         private bool IsLoading = true;
 
         private string? SelectedFbChatId = null;
@@ -101,20 +97,16 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         //Carousel
         private MudCarousel<string> _carousel = null!;
-
-        public bool _arrows { get; set; } = true;
-
-        public bool _bullets { get; set; } = true;
-
-        public bool _enableSwipeGesture { get; set; } = true;
-
-        public bool _autocycle { get; set; } = false;
-        public List<FileData> _carouselItems { get; set; } = new List<FileData>();
         public bool _showCarousel;
+        public List<FileData> _carouselItems { get; set; } = new List<FileData>();
 
-        public List<GetMyChatsHttpResponse> FilteredAccountChats = new List<GetMyChatsHttpResponse>();
+
+        //Sidebar Chats
         public List<GetMyChatsHttpResponse> AccountChats = new List<GetMyChatsHttpResponse>();
+        public List<GetMyChatsHttpResponse> FilteredAccountChats = new List<GetMyChatsHttpResponse>();
 
+
+        //Main Chat Messages
         public List<GeChatMessagesHttpResponse> ChatMessages = new List<GeChatMessagesHttpResponse>();
 
         protected override async Task OnInitializedAsync()
@@ -123,11 +115,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
 
-
-
             //if a user opened notification so we have to open the right chat.
             if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
             {
+                HandleMobileSideBar();
                 await LoadChatMessage(FbChatId);
             }
 
@@ -137,13 +128,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             await Task.WhenAll(taskSignalR, taskAccountsQuery);
 
-            await ConfigurePushNotificationsAsync();
+            ConfigurePushNotifications();
 
             await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
         }
 
 
         #region Domain Logic
+
         private async Task LoadChatMessage(string fbChatId)
         {
             var previousSelectedChatId = SelectedFbChatId;
@@ -156,12 +148,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             HandleSelectedChat(fbChatId);
 
-            if (PlatformHelper.IsMobilePlatform)
-            {
-                HandleMobileSideBar();
-                await HandlePushNotification(fbChatId);
-            }
-
             var myAccountChats = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (myAccountChats is not null)
             {
@@ -169,7 +155,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 myAccountChats.UnReadCount = 0;
                 myAccountChats.IsRead = true;
                 UserProfileImage = myAccountChats.UserProfileImage;
-                await InvokeAsync(StateHasChanged);
             }
 
             var response = await ChatMessagesService.GetChatMessages<BaseResponse<List<GeChatMessagesHttpResponse>>>(fbChatId);
@@ -192,6 +177,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             ChatMessages  = response?.Data ?? new List<GeChatMessagesHttpResponse>();
+            await InvokeAsync(StateHasChanged);
         }
 
 
@@ -441,12 +427,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
 
         #region OneSingnal - Push Notifications
-        private async Task ConfigurePushNotificationsAsync()
+        private void ConfigurePushNotifications()
         {
             if (PlatformHelper.IsMobilePlatform)
             {
-                 OneSignalService.AskNotificationPermissionAsync();
-                OneSignalService.OnNotificationClicked();
+                //Ask user to allow notification permission
+                OneSignal.Notifications.RequestPermissionAsync(true);
+
+                OneSignal.Notifications.Clicked += HandleNotificationClicked;
 
                 // Optional
                 var playerId = OneSignal.User.PushSubscription.Id;
@@ -454,14 +442,33 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
-        public async Task HandlePushNotification(string fbChatId)
+        public void HandleNotificationClicked(object sender, NotificationClickedEventArgs e)
         {
-            if (PlatformHelper.IsMobilePlatform)
+            var data = e.Notification.AdditionalData;
+            var hasFbChatIdKey = data.TryGetValue("chatId", out var fbChatIdObj);
+            var hasSubscriptionExpiredKey = data.TryGetValue("isSubscriptionExpired", out var subscriptionExpiredObj);
+            var messageKey = data.TryGetValue("message", out var message);
+
+            if (data != null && hasFbChatIdKey && hasSubscriptionExpiredKey)
             {
-                var deviceId = OneSignal.User.PushSubscription.Id;
-                await SignalRService.HandleNotification(deviceId, fbChatId);
+                string fbChatId = fbChatIdObj!.ToString()!;
+                bool isParsed = bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
+
+                // Navigate to chat if subscription is not expired otherwise navigate to subscription page.
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (!isSubscriptionExpired)
+                    {
+                        Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={fbChatId}");
+                    }
+                    else
+                    {
+                        Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={message}");
+                    }
+                });
             }
         }
+
         #endregion
 
 
@@ -564,7 +571,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             // to the front and hiding the sidebar.
             SidebarZIndex = 0;
             MainChatZIndex = 110;
-
         }
 
         private void ShowCarousal(List<FileData> selectedChatFiles, string selectedChatFileUrl, bool isVideo = false)
@@ -695,6 +701,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
+            OneSignal.Notifications.Clicked -= HandleNotificationClicked;
 
             foreach (var file in PreviewMediaFiles)
             {

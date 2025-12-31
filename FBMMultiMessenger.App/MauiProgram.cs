@@ -1,7 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy;
 using FBMMultiMessenger.Helpers;
-using FBMMultiMessenger.Notification;
 using FBMMultiMessenger.Services;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.SignalR;
@@ -66,7 +65,6 @@ namespace FBMMultiMessenger
             builder.Services.AddScoped<ISubscriptionSerivce, SubscriptionService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-            builder.Services.AddScoped<OneSignalService>();
             builder.Services.AddScoped<IDefaultMessageService, DefaultMessageService>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<IPricingService, PricingService>();

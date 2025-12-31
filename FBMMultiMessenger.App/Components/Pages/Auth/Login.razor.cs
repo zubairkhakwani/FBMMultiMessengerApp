@@ -1,6 +1,4 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Auth;
-using FBMMultiMessenger.Contracts.Contracts.Subscription;
-using FBMMultiMessenger.Notification;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
@@ -35,9 +33,6 @@ namespace FBMMultiMessenger.Components.Pages.Auth
         [Inject]
         public ISubscriptionSerivce SubscriptionSerivce { get; set; }
 
-        [Inject]
-        private OneSignalService OneSignalService { get; set; }
-
 
         public string? ResponseError;
         private bool ShowLoader = false;
@@ -60,7 +55,7 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                 //Tell OneSignal this device now belongs to this user
                 if (PlatformHelper.IsMobilePlatform)
                 {
-                    OneSignalService.Login(response.Data.UserId.ToString());
+                    OneSignal.Login(response.Data.UserId.ToString());
                 }
             }
 

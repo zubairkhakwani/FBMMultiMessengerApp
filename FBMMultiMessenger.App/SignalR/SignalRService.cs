@@ -98,10 +98,7 @@ namespace FBMMultiMessenger.SignalR
             _isReconnecting = false;
         }
 
-        public async Task HandleNotification(string deviceId, string fbChatId)
-        {
-            await _hubConnection.SendAsync("HandleNotification", deviceId, fbChatId);
-        }
+       
 
         public async Task DisconnectAsync()
         {
