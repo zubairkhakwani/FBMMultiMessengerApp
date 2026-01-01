@@ -353,15 +353,13 @@
                 </div>
             }
 
-
-
             <!--   Chat composer (text, attachments, send).  Rendered only when a conversation is selected. -->
             @if (SelectedFbChatId is not null)
             {
                 <div class="input-container">
                     <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
                     <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
-                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1" onblur="this.focus()" autofocus>  </textarea>
+                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1">  </textarea>
                     <button @onclick="() => NotifyLocalServer(Message)" class="send-button">➤</button>
                 </div>
             }
@@ -375,52 +373,52 @@
 @if (_showCarousel)
 {
     <div class="carousel-overlay">
-        <div class="carousel-close-container" @onclick="CloseCarousel">
-            <MudIcon Icon="@Icons.Material.Filled.Close"
-                     Color="@Color.Error"
-                     Size="@Size.Large" />
-        </div>
-        <MudCarousel ItemsSource="@_carouselItems" NavigationButtonsClass="navigation-btns" Class="mud-width-full" Style="height:100vh;" AutoCycle="false">
+        <MudCarousel Class="mud-width-full" Style="height:100%;" AutoCycle="false" ItemsSource="_carouselItems">
+
             <BulletTemplate Context="selected">
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
                     <span class="mud-icon-button-label">
-                        <MudIcon Icon="@(selected? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Circle)" Color="@Color.Inherit" />
+                        <MudIcon Icon="@(selected? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Circle)" Color="Color.Primary" />
                     </span>
                 </div>
             </BulletTemplate>
             <PreviousButtonTemplate>
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
                     <span class="mud-icon-button-label">
-                        <MudIcon Icon="@Icons.Material.Filled.SkipPrevious"
-                                 Size="Size.Large"
-                                 Color="Color.Inherit" />
+                        <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Size="Size.Large" Icon="@Icons.Material.Filled.SkipPrevious" Color="Color.Primary" />
                     </span>
                 </div>
             </PreviousButtonTemplate>
             <NextButtonTemplate>
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
                     <span class="mud-icon-button-label">
-                        <MudIcon Icon="@Icons.Material.Filled.SkipNext" Size="Size.Large" Color="@Color.Inherit" />
+                        <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Size="Size.Large" Icon="@Icons.Material.Filled.SkipNext" Color="Color.Primary" />
                     </span>
                 </div>
             </NextButtonTemplate>
             <ItemTemplate>
+                <div class="carousel-close-container" @onclick="CloseCarousel">
+                    <MudIcon Icon="@Icons.Material.Filled.Close"
+                             Color="@Color.Error"
+                             Size="@Size.Large" />
+                </div>
+                <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 
-                <div style="display:flex; justify-content:center;align-items:center;">
                     @if (context.IsVideo)
                     {
-                        <video width="450" height="340" controls>
-                            <source src="@context.PreviewUrl" type="video/mp4">
+                        <video width="320" height="240" controls>
+                            <source src="@(context.PreviewUrl + "#t=0.001")" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                     }
                     else
                     {
-                        <img src="@context.PreviewUrl" alt="Image" />
+                        <img style="max-width:100%;" src="@context.PreviewUrl" alt="image" />
                     }
                 </div>
             </ItemTemplate>
         </MudCarousel>
+
     </div>
 }
 

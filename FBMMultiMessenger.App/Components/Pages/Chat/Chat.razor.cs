@@ -98,7 +98,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
 
         //Carousel
-        private MudCarousel<string> _carousel = null!;
         public bool _showCarousel;
         public List<FileData> _carouselItems { get; set; } = new List<FileData>();
 
@@ -117,17 +116,17 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
 
-            //if a user opened notification so we have to open the right chat.
-            if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
-            {
-                await LoadChatMessage(FbChatId);
-            }
-
             var taskSignalR = ConnectToSignalR();
 
             var taskAccountsQuery = GetAccountChats();
 
             await Task.WhenAll(taskSignalR, taskAccountsQuery);
+
+            //if a user opened notification so we have to open the right chat.
+            if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
+            {
+                await LoadChatMessage(FbChatId);
+            }
 
             ConfigurePushNotifications();
 
@@ -547,7 +546,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 Navigation.NavigateTo("/Account");
                 return;
             }
-
+            _showCarousel = false;
             ShowSidebarView();
             StateHasChanged();
         }
