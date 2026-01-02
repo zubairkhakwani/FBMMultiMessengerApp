@@ -20,11 +20,14 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
 
     public class FileData
     {
-        public int Index { get; set; }
         public string Id { get; set; } = string.Empty;
-        public string PreviewUrl { get; set; } = string.Empty; 
+        public string PreviewUrl { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public bool IsVideo { get; set; }
+        public bool IsEmoji { get; set; }
+        public bool IsSticker { get; set; }
+
         public IBrowserFile File { get; set; } = null!;
+        public byte[] CompressedBytes { get; set; } = [];
     }
 }

@@ -346,9 +346,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
             Snackbar.Add("Please select any account to delete", Severity.Info);
         }
 
-        public async Task OpenBrowser(int accountId)
+        public async Task ConnectAccount(int accountId)
         {
-            var response = await AccountService.OpenInBrowserAsync<BaseResponse<object>>(accountId);
+            var response = await AccountService.Connect<BaseResponse<object>>(accountId);
             Snackbar.Add($"{response.Message}", response.IsSuccess ? Severity.Success : Severity.Error);
         }
 

@@ -19,11 +19,11 @@
     <!-- Sidebar -->
     <div class="sidebar @mobileClass" style="z-index:@SidebarZIndex;">
 
-        @if (IsLoading && (FilteredAccountChats?.Count ?? 0) == 0)
+        @if (IsChatsLoading && (FilteredAccountChats?.Count ?? 0) == 0)
         {
             <ChatLoadingSkelton></ChatLoadingSkelton>
         }
-        else if (!IsLoading && FilteredAccountChats?.Any() == true)
+        else if (!IsChatsLoading && FilteredAccountChats?.Any() == true)
         {
             <div class="sidebar-header">
                 <div style="display:flex;align-items:center;">
@@ -278,6 +278,13 @@
                                 @for (int j = 0; j < chatMessage.FileData.Count; j++)
                                 {
                                     var file = chatMessage.FileData[j];
+
+                                    if(file.IsEmoji){
+                                        imageWidthStyle = "width: 48px; height:48px;";
+                                    }
+                                    else if(file.IsSticker){
+                                            imageWidthStyle = "width: 96px; height:96px;";
+                                    }
                                     @if (isReceived && UserProfileImage is not null && j==0)
                                     {
                                         <div class="profile-picture">
@@ -293,7 +300,10 @@
                                     }
                                     else
                                     {
-                                        <img @onclick="() => ShowCarousal(chatMessage.FileData, file.PreviewUrl)" class="image-message" src="@file.PreviewUrl" style="@imageWidthStyle" />
+                                        <img @onclick="() => ShowCarousal(chatMessage.FileData, file.PreviewUrl)"
+                                             class="image-message @((file.IsEmoji || file.IsSticker) ? "not-clickable" : "clickable")"
+                                             src="@file.PreviewUrl"
+                                             style="@imageWidthStyle" />
                                     }
                                 }
                             </div>
@@ -360,7 +370,7 @@
                     <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
                     <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
                     <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1">  </textarea>
-                    <button @onclick="() => NotifyLocalServer(Message)" class="send-button">➤</button>
+                    <button @onclick="() => NotifyLocalServer(Message)" class="send-button" disabled="@isCompressingMedia">➤</button>
                 </div>
             }
 
@@ -400,7 +410,11 @@
                 <div class="carousel-close-container" @onclick="CloseCarousel">
                     <MudIcon Icon="@Icons.Material.Filled.Close"
                              Color="@Color.Error"
-                             Size="@Size.Large" />
+                             Size="@Size.Large"
+                             Style="background-color: rgba(0, 0, 0, 0.45);
+                                    padding: 5px;
+                                    border-radius:100px;
+                                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)"/>
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 

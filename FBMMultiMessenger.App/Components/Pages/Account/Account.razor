@@ -96,7 +96,7 @@
                     <MudMenu Icon="@Icons.Material.Filled.MoreHoriz" Dense="true" AnchorOrigin="Origin.BottomLeft" Style="align-self: auto;">
                         <MudPaper Style="min-width: 200px; max-width: 235px; box-shadow:none !important; padding:0 8px;">
 
-                            <MudButton OnClick="@(e => OpenBrowser(context.Id))"
+                            <MudButton OnClick="@(e => ConnectAccount(context.Id))"
                                        Size="Size.Small"
                                        StartIcon="@Icons.Material.Filled.OpenInBrowser"
                                        Color="Color.Success"
@@ -104,7 +104,7 @@
                                        Class="px-3 py-1 mb-1"
                                        FullWidth="true"
                                        Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
-                                <span style="margin-left: 8px;">Open Browser</span>
+                                <span style="margin-left: 8px;">Connect</span>
                             </MudButton>
                             <MudButton OnClick="@(e => EditAccountAsync(context.Id, context.Name, context.Cookie, proxyId))"
                                        Size="Size.Small"

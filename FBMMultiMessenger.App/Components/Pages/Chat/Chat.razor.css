@@ -171,7 +171,7 @@ body {
         background-color: #ef4444;
     }
 
-    
+
 
 .chat-info {
     flex: 1;
@@ -322,7 +322,6 @@ body {
     .message .image-message {
         display: block;
         max-width: 100%;
-        cursor: pointer;
     }
 
 
@@ -332,6 +331,13 @@ body {
         margin-left: auto;
     }
 
+.not-clickable {
+    pointer-events: none;
+}
+
+.clickable {
+    cursor: pointer;
+}
 
 .message-bubble {
     padding: 8px 12px;

@@ -9,7 +9,7 @@ namespace FBMMultiMessenger.Services.IServices
         Task<BaseResponse<UpsertAccountHttpResponse>> Import(List<UpsertAccountHttpRequest> httpRequest);
 
         Task<T> RemoveAccountAsync<T>(List<int> accountIds) where T : class, new();
-        Task<T> OpenInBrowserAsync<T>(int accountId) where T : class, new();
+        Task<T> Connect<T>(int accountId) where T : class, new();
 
         Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest);
 

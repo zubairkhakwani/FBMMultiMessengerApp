@@ -77,12 +77,12 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<object, BaseResponse<GetAllMyAccountsChatsHttpResponse>>(request);
         }
 
-        public async Task<T> OpenInBrowserAsync<T>(int accountId) where T : class, new()
+        public async Task<T> Connect<T>(int accountId) where T : class, new()
         {
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.POST,
-                Url = $"account/{accountId}/open-in-browser",
+                Url = $"account/{accountId}/connect",
                 Data = null
             };
 

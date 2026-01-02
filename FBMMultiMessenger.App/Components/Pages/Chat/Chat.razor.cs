@@ -14,7 +14,9 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using OneSignalSDK.DotNet;
 using OneSignalSDK.DotNet.Core.Notifications;
+using SixLabors.ImageSharp;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 
 namespace FBMMultiMessenger.Components.Pages.Chat
@@ -67,7 +69,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private string? UserProfileImage;
 
         private List<FileData> PreviewMediaFiles { get; set; } = new List<FileData>();
-        private bool IsLoading = true;
+        private bool isCompressingMedia = false;
+        private bool IsChatsLoading = true;
 
         private string? SelectedFbChatId = null;
         private CurrentUser CurrentUser = new();
@@ -239,14 +242,15 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 FilesMessage.FileData = PreviewMediaFiles;
 
                 messages.Add(FilesMessage);
-                ChatMessages.Add(FilesMessage);
 
-                PreviewMediaFiles = new();
+                ChatMessages.Add(FilesMessage);
 
                 foreach (var file in PreviewMediaFiles)
                 {
                     JS.InvokeVoidAsync("myInterop.revokePreviewUrl", file.PreviewUrl);
                 }
+
+                PreviewMediaFiles = new();
             }
 
             foreach (var chat in messages)
@@ -292,7 +296,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             var response = await AccountService.GetMyChatsAsync();
 
-            IsLoading = false;
+            IsChatsLoading = false;
             if (response is null ||  !response.IsSuccess)
             {
                 Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
@@ -507,6 +511,24 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
+        private bool IsFacebookEmoji(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return false;
+
+            return Regex.IsMatch(url, @"/t39\.1997-\d+/", RegexOptions.IgnoreCase) &&
+                   Regex.IsMatch(url, @"_n\.png(\?|$)", RegexOptions.IgnoreCase);
+        }
+
+        private bool IsFacebookSticker(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return false;
+
+            return Regex.IsMatch(url, @"/t39\.1997-\d+/", RegexOptions.IgnoreCase) &&
+                   Regex.IsMatch(url, @"_n\.webp(\?|$)", RegexOptions.IgnoreCase);
+        }
+
 
         private List<FileData> GetFileData(string message)
         {
@@ -515,7 +537,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             var fileModel = mediaUrls?.Select(url => new FileData()
             {
                 PreviewUrl = url,
-                IsVideo = IsVideo(url)
+                IsVideo = IsVideo(url),
+                IsEmoji = IsFacebookEmoji(url),
+                IsSticker = IsFacebookSticker(url)
 
             }).ToList();
 
@@ -589,7 +613,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             _showCarousel = true;
 
-            var shallowCopy = selectedChatFiles.Select(x => new FileData()
+            var shallowCopy = selectedChatFiles.Where(f => !f.IsEmoji && !f.IsSticker).Select(x => new FileData()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -617,6 +641,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             var allFileData = ChatMessages.Where(x => x.FileData.Count > 0)
                                           .SelectMany(x => x.FileData)
+                                          .Where(x => !x.IsEmoji && !x.IsSticker)
                                           .ToList();
 
             var remainingFileData = allFileData.Where(x => !shallowCopy.Any(s => s.PreviewUrl == x.PreviewUrl)).ToList();
@@ -687,19 +712,19 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     return;
                 }
 
-                var previews = await JS.InvokeAsync<List<FileData>>("myInterop.createPreviewUrlsFromInput");
+                isCompressingMedia = true;
+                var previews = await JS.InvokeAsync<List<FileData>>("myInterop.previewAndCompressImages");
 
                 foreach (var preview in previews)
                 {
-                    var browserFile = files[preview.Index];
-
                     var newFile = new FileData()
                     {
                         Id = $"File-{Guid.NewGuid()}",
-                        File = browserFile,
                         Name = preview.Name,
                         PreviewUrl = preview.PreviewUrl,
-                        IsVideo = preview.IsVideo
+                        CompressedBytes = preview.CompressedBytes,
+                        File = new CompressedBrowserFile(preview.Name, preview.CompressedBytes),
+                        IsVideo = preview.IsVideo,
                     };
 
                     PreviewMediaFiles.Add(newFile);
@@ -708,6 +733,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             catch (Exception ex)
             {
                 Snackbar.Add("Failed to select your file", Severity.Error);
+            }
+            finally
+            {
+                isCompressingMedia = false;
             }
 
         }
