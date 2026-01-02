@@ -245,11 +245,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
                 ChatMessages.Add(FilesMessage);
 
-                foreach (var file in PreviewMediaFiles)
-                {
-                    JS.InvokeVoidAsync("myInterop.revokePreviewUrl", file.PreviewUrl);
-                }
-
                 PreviewMediaFiles = new();
             }
 
