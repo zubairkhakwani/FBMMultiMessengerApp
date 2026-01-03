@@ -243,13 +243,13 @@
                                 <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
                                 @if (isSent)
                                 {
-                                    @if (chatMessage.Sending && string.IsNullOrWhiteSpace(failedMessageClass))
+                                    @if (chatMessage.Sending && !isMessageFailedToSend)
                                     {
                                         <span class="message-status sending">
                                             <span class="status-icon">⏱</span> Sending...
                                         </span>
                                     }
-                                    else if (chatMessage.Sending && !string.IsNullOrWhiteSpace(failedMessageClass))
+                                    else if (chatMessage.Sending && isMessageFailedToSend)
                                     {
                                         <span class="message-status failed">
                                             <span class="status-icon">✗</span> Failed
@@ -273,7 +273,7 @@
                         var filesCount = chatMessage.FileData.Count;
                         var imageWidthStyle = "width: " + (filesCount == 1 ? 429 : filesCount == 2 ? 190 : 125) +"px";
 
-                        <div class="message @messageClass">
+                        <div class="message @messageClass @failedMessageClass">
                             <div class="message-row @messageClass">
                                 @for (int j = 0; j < chatMessage.FileData.Count; j++)
                                 {
@@ -311,10 +311,16 @@
                                 <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
                                 @if (isSent)
                                 {
-                                    @if (chatMessage.Sending)
+                                    @if (chatMessage.Sending && !isMessageFailedToSend)
                                     {
                                         <span class="message-status sending">
                                             <span class="status-icon">⏱</span> Sending...
+                                        </span>
+                                    }
+                                    else if (chatMessage.Sending && isMessageFailedToSend)
+                                    {
+                                        <span class="message-status failed">
+                                            <span class="status-icon">✗</span> Failed
                                         </span>
                                     }
                                     else
@@ -383,7 +389,7 @@
 @if (_showCarousel)
 {
     <div class="carousel-overlay">
-        <MudCarousel Class="mud-width-full" Style="height:100%;" AutoCycle="false" ItemsSource="_carouselItems">
+        <MudCarousel Class="mud-width-full" Style="height:100%;" AutoCycle="false" ItemsSource="_carouselItems" >
 
             <BulletTemplate Context="selected">
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">

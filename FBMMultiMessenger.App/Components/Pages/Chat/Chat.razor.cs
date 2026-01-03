@@ -710,20 +710,21 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 isCompressingMedia = true;
                 var previews = await JS.InvokeAsync<List<FileData>>("myInterop.previewAndCompressImages");
 
-                foreach (var preview in previews)
+                for (int i = 0; i < previews.Count; i++)
                 {
+                    var preview = previews[i];
                     var newFile = new FileData()
                     {
                         Id = $"File-{Guid.NewGuid()}",
                         Name = preview.Name,
                         PreviewUrl = preview.PreviewUrl,
                         CompressedBytes = preview.CompressedBytes,
-                        File = new CompressedBrowserFile(preview.Name, preview.CompressedBytes),
+                        File = preview.IsVideo ? files[i] : new CompressedBrowserFile(preview.Name, preview.CompressedBytes),
                         IsVideo = preview.IsVideo,
                     };
-
                     PreviewMediaFiles.Add(newFile);
                 }
+
             }
             catch (Exception ex)
             {
