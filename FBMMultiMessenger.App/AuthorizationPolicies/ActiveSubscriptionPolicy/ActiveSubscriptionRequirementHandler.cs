@@ -28,12 +28,9 @@ namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
                 return;
             }
 
-            //await authService.Logout();
-
             if (DateTime.Now - _lastChecked < _cacheDuration && _lastResult)
             {
                 context.Succeed(requirement);
-
             }
 
             var response = await SubscriptionSerivce.GetMySubscription<BaseResponse<GetMySubscriptionHttpResponse>>();

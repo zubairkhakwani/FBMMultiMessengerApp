@@ -1,0 +1,10 @@
+﻿
+
+cd .\FBMMultiMessenger.App
+dotnet publish -f net9.0-windows10.0.19041.0 -p:SelfContained=true -c Release -o "C:\Users\Rizwan computers\Desktop\Published Profiles\FbMultiMessengerApp"
+
+
+dotnet publish -c Release -f:net9.0-android36.0 -property:OutDir='C:\Users\Rizwan computers\Desktop\Published Profiles\FbMultiMessengerApp Android APK'
+
+
+dotnet build -f net9.0-android

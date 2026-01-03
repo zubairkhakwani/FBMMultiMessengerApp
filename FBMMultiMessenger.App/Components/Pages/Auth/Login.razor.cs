@@ -61,13 +61,19 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
             if (!response.IsSuccess && response.RedirectToPackages)
             {
-                Navigation.NavigateTo($"/pricing?redirectReason={Uri.EscapeDataString(response.Message)}");
+                Navigation.NavigateTo($"/pricing?redirectReason={Uri.EscapeDataString(response.Message)}", new NavigationOptions
+                {
+                    ReplaceHistoryEntry = true
+                });
                 return;
             }
 
             if (response.IsSuccess)
             {
-                navManager.NavigateTo("/Chat");
+                navManager.NavigateTo("/Chat", new NavigationOptions
+                {
+                    ReplaceHistoryEntry = true
+                });
                 return;
             }
 
