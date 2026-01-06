@@ -9,9 +9,9 @@
 @{
     var mobileView = PlatformHelper.IsMobilePlatform ? "" : "messenger-container";
     var mobileClass = PlatformHelper.IsMobilePlatform ? "mobile" : "";
-    var sideBarHeight = PlatformHelper.IsMobilePlatform ? "auto" : "calc(100vh - 125px)";
     var messageContainerHeight = SelectedFbChatId is null ? "100vh" : "calc(100vh - 135px)";
     var avatarMargin = PlatformHelper.IsMobilePlatform ? "0px" : "12px";
+    var hideScrollBar = PlatformHelper.IsMobilePlatform ? "hide-scrollbar" : "";
 }
 
 
@@ -45,7 +45,7 @@
 
         else if (FilteredAccountChats?.Any() == true)
         {
-            <div class="chat-list" style="height:@sideBarHeight">
+            <div class="chat-list @hideScrollBar" style="height:calc(100vh - 125px)">
                 @for (int i = 0; i < FilteredAccountChats.Count; i++)
                 {
                     var fbChatId = FilteredAccountChats[i].FbChatId;
