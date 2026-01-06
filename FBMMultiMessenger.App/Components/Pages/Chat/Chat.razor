@@ -37,7 +37,7 @@
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
                     <input @bind-value="FilterKeyword"
-                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
+                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations" onblur="this.focus()">
                 </div>
             </div>
             <div class="chat-list" style="height:@sideBarHeight">
@@ -375,7 +375,7 @@
                 <div class="input-container">
                     <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
                     <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
-                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1">  </textarea>
+                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1" onblur="this.focus()" autofocus>  </textarea>
                     <button @onclick="() => NotifyLocalServer(Message)" class="send-button" disabled="@isCompressingMedia">➤</button>
                 </div>
             }

@@ -5,6 +5,7 @@ using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
 using Microsoft.AspNetCore.Components.Authorization;
+using OneSignalSDK.DotNet;
 
 namespace FBMMultiMessenger.Services
 {
@@ -50,6 +51,11 @@ namespace FBMMultiMessenger.Services
         {
             await TokenProvider.RemoveTokenAsync();
             ((CustomAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
+
+            if (PlatformHelper.IsMobilePlatform)
+            {
+                OneSignal.Logout();
+            }
         }
 
         public async Task<T> RegisterAsync<T>(RegisterHttpRequest httpRequest) where T : class, new()

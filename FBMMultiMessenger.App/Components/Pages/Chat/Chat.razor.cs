@@ -131,7 +131,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 await LoadChatMessage(FbChatId);
             }
 
-            ConfigurePushNotifications();
+            await ConfigurePushNotifications();
 
             await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
         }
@@ -436,18 +436,19 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
 
         #region OneSingnal - Push Notifications
-        private void ConfigurePushNotifications()
+        private async Task ConfigurePushNotifications()
         {
             if (PlatformHelper.IsMobilePlatform)
             {
                 //Ask user to allow notification permission
-                OneSignal.Notifications.RequestPermissionAsync(true);
+                await OneSignal.Notifications.RequestPermissionAsync(true);
 
+                var currentUser = await CurrentUserService.GetCurrentUser();
+
+                OneSignal.Login(currentUser.Id.ToString());
+
+                OneSignal.Notifications.Clicked -= HandleNotificationClicked;
                 OneSignal.Notifications.Clicked += HandleNotificationClicked;
-
-                // Optional
-                var playerId = OneSignal.User.PushSubscription.Id;
-                Console.WriteLine("Player Id :", playerId);
             }
         }
 
@@ -649,7 +650,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             if (string.IsNullOrWhiteSpace(FilterKeyword))
             {
                 FilteredAccountChats = AccountChats.ToList();
-                StateHasChanged();
+                //StateHasChanged();
                 return;
             }
 
@@ -672,7 +673,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 )
                 .ToList();
 
-            StateHasChanged();
+            //StateHasChanged();
         }
 
 

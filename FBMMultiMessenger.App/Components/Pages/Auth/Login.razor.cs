@@ -51,12 +51,6 @@ namespace FBMMultiMessenger.Components.Pages.Auth
             {
                 await TokenProvider.SetTokenAsync(response.Data.Token);
                 ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyStateChanged();
-
-                //Tell OneSignal this device now belongs to this user
-                if (PlatformHelper.IsMobilePlatform)
-                {
-                    OneSignal.Login(response.Data.UserId.ToString());
-                }
             }
 
             if (!response.IsSuccess && response.RedirectToPackages)
