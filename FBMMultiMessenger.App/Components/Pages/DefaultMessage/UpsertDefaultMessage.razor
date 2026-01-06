@@ -1,7 +1,7 @@
 ﻿@page "/create/defaultmessage"
 @page "/edit/{DefaultMessageId}/defaultmessage/{DefaultMessage}"
 
-@if (IsMobilePlatform)
+@if (PlatformHelper.IsMobilePlatform)
 {
     <div class="mobile-container">
         <div class="header">
@@ -83,8 +83,10 @@
 else
 {
     <PopupForm Model="@model" OnValidSubmit="OnValidSubmit" Setting="popupFormSettings">
+        <DataAnnotationsValidator />
         <div>
-            <MudTextField @bind-Value="model.Message" Label="Default Message" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.TwoTone.Markunread" />
+            <MudTextField @bind-Value="model.Message" Label="Default Message*" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.TwoTone.Markunread" />
+            <ValidationMessage For="@(() => model.Message)" class="validation-message" />
             <MudSelect T="string" Dense=true Variant="Variant.Outlined" MultiSelection="true" SelectAll="true" SelectAllText="Select all accounts" HelperText="Select one or more accounts that will use this default message" @bind-SelectedValues="Options" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" Label="Account" AdornmentIcon="@Icons.Material.Filled.Search">
                 @foreach (var account in DefaultMessagesAccounts)
                 {
