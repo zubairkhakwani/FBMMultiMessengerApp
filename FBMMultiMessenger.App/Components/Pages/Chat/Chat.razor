@@ -19,11 +19,7 @@
     <!-- Sidebar -->
     <div class="sidebar @mobileClass" style="z-index:@SidebarZIndex;">
 
-        @if (IsChatsLoading && (FilteredAccountChats?.Count ?? 0) == 0)
-        {
-            <ChatLoadingSkelton></ChatLoadingSkelton>
-        }
-        else if (!IsChatsLoading && FilteredAccountChats?.Any() == true)
+        @if (!IsChatsLoading)
         {
             <div class="sidebar-header">
                 <div style="display:flex;align-items:center;">
@@ -37,9 +33,18 @@
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
                     <input @bind-value="FilterKeyword"
-                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations" onblur="this.focus()">
+                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
                 </div>
             </div>
+        }
+
+        @if (IsChatsLoading)
+        {
+            <ChatLoadingSkelton></ChatLoadingSkelton>
+        }
+
+        else if (FilteredAccountChats?.Any() == true)
+        {
             <div class="chat-list" style="height:@sideBarHeight">
                 @for (int i = 0; i < FilteredAccountChats.Count; i++)
                 {
@@ -100,21 +105,7 @@
         }
         else
         {
-            <div class="sidebar-header">
-                <div style="display:flex;align-items:center;">
-                    <NavLink style="padding: 20px 10px 20px 20px;" href="Account">
-                        <i class="fa-sharp fa-solid fa-arrow-left"></i>
-                    </NavLink>
 
-                    <h2 class="sidebar-title">Marketplace Chat</h2>
-                </div>
-
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input @bind-value="FilterKeyword"
-                           @bind-value:event="oninput" type="text" class="search-input" placeholder="Search conversations">
-                </div>
-            </div>
             <div class="empty-state-sidebar">
                 <div class="empty-state-icon-sidebar">
                     <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
@@ -279,11 +270,13 @@
                                 {
                                     var file = chatMessage.FileData[j];
 
-                                    if(file.IsEmoji){
+                                    if (file.IsEmoji)
+                                    {
                                         imageWidthStyle = "width: 48px; height:48px;";
                                     }
-                                    else if(file.IsSticker){
-                                            imageWidthStyle = "width: 96px; height:96px;";
+                                    else if (file.IsSticker)
+                                    {
+                                        imageWidthStyle = "width: 96px; height:96px;";
                                     }
                                     @if (isReceived && UserProfileImage is not null && j==0)
                                     {
@@ -389,7 +382,7 @@
 @if (_showCarousel)
 {
     <div class="carousel-overlay">
-        <MudCarousel Class="mud-width-full" Style="height:100%;" AutoCycle="false" ItemsSource="_carouselItems" >
+        <MudCarousel Class="mud-width-full" Style="height:100%;" AutoCycle="false" ItemsSource="_carouselItems">
 
             <BulletTemplate Context="selected">
                 <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
@@ -418,9 +411,9 @@
                              Color="@Color.Error"
                              Size="@Size.Large"
                              Style="background-color: rgba(0, 0, 0, 0.45);
-                                    padding: 5px;
-                                    border-radius:100px;
-                                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)"/>
+                                                    padding: 5px;
+                                                    border-radius:100px;
+                                                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 

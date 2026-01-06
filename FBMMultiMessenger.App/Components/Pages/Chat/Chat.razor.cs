@@ -647,14 +647,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private void FilterChat()
         {
-            if (string.IsNullOrWhiteSpace(FilterKeyword))
+            var keyword = FilterKeyword.Trim();
+
+            if (string.IsNullOrWhiteSpace(keyword))
             {
                 FilteredAccountChats = AccountChats.ToList();
                 //StateHasChanged();
                 return;
             }
-
-            var keyword = FilterKeyword.Trim();
 
             FilteredAccountChats = AccountChats
                 .Where(x =>
