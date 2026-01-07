@@ -41,4 +41,5 @@
     });
     observer.observe(messageContainer, { childList: true, subtree: true, });
     observer.observe(inputWrapper, { childList: true, subtree: true, })
+
 })();
