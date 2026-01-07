@@ -90,8 +90,13 @@ body {
 }
 
     .chat-list.hide-scrollbar {
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none;
         scrollbar-width: none;
     }
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; 
+}
 
 .chat-item {
     display: flex;

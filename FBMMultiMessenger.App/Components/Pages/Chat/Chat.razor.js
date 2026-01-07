@@ -42,4 +42,19 @@
     observer.observe(messageContainer, { childList: true, subtree: true, });
     observer.observe(inputWrapper, { childList: true, subtree: true, })
 
+
+    document.addEventListener('click', function (e) {
+        const messageInput = document.querySelector('.message-input');
+        const searchInput = document.querySelector('.search-input');
+
+        // If clicked on search, let it focus naturally
+        if (e.target === searchInput || searchInput?.contains(e.target)) {
+            return;
+        }
+
+        // Otherwise, focus message input
+        if (messageInput && document.activeElement !== messageInput) {
+            messageInput.focus();
+        }
+    });
 })();

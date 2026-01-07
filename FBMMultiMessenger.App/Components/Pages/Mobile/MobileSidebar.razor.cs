@@ -1,7 +1,6 @@
 ﻿using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
-using OneSignalSDK.DotNet;
 
 namespace FBMMultiMessenger.Components.Pages.Mobile
 {
