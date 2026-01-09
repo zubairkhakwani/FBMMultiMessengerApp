@@ -85,34 +85,6 @@
     background-color: #3b82f6;
 }
 
-.add-new-account-container {
-    display: none;
-    position: fixed;
-    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
-    bottom: 90px;
-    right: 10px;
-    padding: .5rem;
-    border-radius: 50%;
-    width: 50px;
-    aspect-ratio: 1/1;
-    text-align: center;
-    cursor: pointer;
-    z-index: 3;
-    outline: none !important;
-    border: none !important;
-    color: #ffff;
-    box-shadow: 0 0 12px rgba(8, 102, 255, 0.6), 0 0 24px rgba(4, 43, 92, 0.4);
-}
-
-    .add-new-account-container:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .add-new-account-container:active {
-        transform: scale(0.92);
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
 .account-header--btn {
     background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
     color: #FFFFFF;
@@ -191,7 +163,7 @@
     transition: all 0.2s;
     display: inline-flex;
     align-items: center;
-    justify-content:center;
+    justify-content: center;
     gap: 8px;
 }
 
@@ -213,6 +185,18 @@
 
     .btn-secondary:hover {
         background: #545b62;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+    }
+
+.btn-success {
+    background-color: #00C853;
+}
+
+    .btn-success:hover {
+        background: #00A344;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,123,255,0.3);
     }
 
 .btn-danger {
@@ -222,6 +206,8 @@
 
     .btn-danger:hover {
         background: #c82333;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,123,255,0.3);
     }
 
     .btn-danger:disabled {
@@ -230,6 +216,10 @@
         cursor: not-allowed;
         transform: none;
     }
+
+.custom-disabled {
+    cursor: none;
+}
 
 .btn-outline {
     background: white;
@@ -243,7 +233,7 @@
     }
 
 /* Filter Bar */
-.filter-bar{
+.filter-bar {
     padding: 15px 20px;
     background: #f8f9fa;
     border-bottom: 1px solid #dee2e6;
@@ -267,6 +257,7 @@
     gap: 12px;
     align-items: center;
 }
+
 .summary-bar {
     padding: 15px 20px;
     background: #f8f9fa;
@@ -300,8 +291,6 @@
         border-color: #007bff;
         box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
     }
-
-/* Dropdown Filter */
 
 
 /* Selection Info Badge */
@@ -357,12 +346,7 @@
     }
 
 @media (max-width:560px) {
-    .add-new-account-container {
-        display: block;
-    }
     .btn {
         width: 100%;
     }
-
-   
 }

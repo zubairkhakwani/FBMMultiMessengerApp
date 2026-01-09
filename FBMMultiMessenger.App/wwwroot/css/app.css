@@ -111,6 +111,40 @@ h1:focus {
     display: none;
 }
 
+.floating-add-button {
+    display: none;
+    position: fixed;
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    bottom: 90px;
+    right: 10px;
+    padding: .5rem;
+    border-radius: 50%;
+    width: 50px;
+    aspect-ratio: 1/1;
+    text-align: center;
+    cursor: pointer;
+    z-index: 3;
+    outline: none !important;
+    border: none !important;
+    color: #ffff;
+    box-shadow: 0 0 12px rgba(8, 102, 255, 0.6), 0 0 24px rgba(4, 43, 92, 0.4);
+}
+
+    .floating-add-button:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+
+@media (max-width:560px) {
+    .floating-add-button{
+        display:block;
+    }
+    .btn-hide-mobile {
+        display:none;
+    }
+}
+
+
 @supports (-webkit-touch-callout: none) {
     .status-bar-safe-area {
         display: flex;
@@ -138,9 +172,6 @@ h1:focus {
     overflow: hidden;
     position: relative;
 }
-
-
-
 
 /* Particle containers */
 .particles-1,

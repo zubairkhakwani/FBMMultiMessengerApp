@@ -11,7 +11,7 @@
         <div class="main-toolbar">
             <h2 style="color: #333; margin: 0;">Accounts Management</h2>
             <div class="toolbar-left">
-                <button @onclick="AddNewAccountAsync" class="btn btn-primary">
+                <button @onclick="AddNewAccountAsync" class="btn btn-primary btn-hide-mobile">
                     ➕ Add Account
                 </button>
                 <InputFile type="file" id="fileInput" style="display: none;" onchange="HandleImportFile" />
@@ -53,16 +53,17 @@
 
         <!-- Summary  -->
         <div class="summary-bar">
-            <MudChip T="string" Label="true" Color="Color.Warning" Style="color:black;">Total Accounts: <b> @TotalAccounts </b></MudChip>
-            <MudChip T="string" Label="true" Color="Color.Warning" Style="color:black;">Connected Accounts: <b> @ConnectedAccounts</b></MudChip>
-            <MudChip T="string" Label="true" Color="Color.Warning" Style="color:black;">Not Connected Accounts: <b> @NotConnectedAccounts </b></MudChip>
+            <button class="btn btn-primary custom-disabled">
+                Total Accounts:<b> @TotalAccounts </b>
+            </button>
+            <button class="btn btn-success custom-disabled">
+               Connected Accounts:<b> @ConnectedAccounts</b>
+            </button>
+            <button class="btn btn-danger custom-disabled">
+                Not Connected Accounts:<b> @NotConnectedAccounts</b>
+                </button>
         </div>
     </div>
-
-
-
-
-
 
     <MudTable ServerData="ServerReload" Dense="true" Hover="true" @ref="table" MultiSelection=true @bind-SelectedItems="selectedAccounts">
 
@@ -143,7 +144,7 @@
         </PagerContent>
     </MudTable>
 
-    <button @onclick="AddNewAccountAsync" class="add-new-account-container">
+    <button @onclick="AddNewAccountAsync" class="floating-add-button">
         <i class="fa-solid fa-plus"></i>
     </button>
 </MudPaper>

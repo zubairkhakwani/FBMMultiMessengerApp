@@ -7,7 +7,7 @@
     <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
         <h2 style="color: #333; margin: 0;">Proxy Management</h2>
         <div>
-            <button @onclick="AddNewProxyAsync" class="btn btn-primary">
+            <button @onclick="AddNewProxyAsync" class="btn btn-primary btn-hide-mobile">
                 ➕ Add Proxy
             </button>
         </div>
@@ -64,9 +64,9 @@
         </PagerContent>
     </MudTable>
 
-    @* <button @onclick="AddNewAccountAsync" class="add-new-account-container">
+    <button @onclick="AddNewProxyAsync" class="floating-add-button">
         <i class="fa-solid fa-plus"></i>
-    </button> *@
+    </button>
 </MudPaper>
 
 

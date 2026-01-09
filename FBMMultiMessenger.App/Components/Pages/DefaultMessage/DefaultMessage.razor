@@ -5,9 +5,9 @@
 
 <MudPaper Elevation="0" Style="display: flex; flex-direction: column;" Height="100%" Width="100%">
     <div class="neeleez-page-header">
-        <h3 class="page-title">Default Message Management</h3>
+        <h2 style="color: #333; margin: 0;">Default Message Management</h2>
         <div class="neeleez-page-header--actions">
-            <button @onclick="AddDefaultMessage" class="add-account-btn">+ Add Default Message</button>
+            <button @onclick="AddDefaultMessage" class="add-account-btn btn-hide-mobile">+ Add Default Message</button>
         </div>
     </div>
 
@@ -45,10 +45,6 @@
                         </MudPaper>
                     </MudMenu>
                 </MudButtonGroup>
-
-
-
-
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
@@ -61,7 +57,7 @@
             <MudTablePager />
         </PagerContent>
     </MudTable>
-    <button @onclick="AddDefaultMessage" class="add-new-account-container">
+    <button @onclick="AddDefaultMessage" class="floating-add-button">
         <i class="fa-solid fa-plus"></i>
     </button>
 </MudPaper>
