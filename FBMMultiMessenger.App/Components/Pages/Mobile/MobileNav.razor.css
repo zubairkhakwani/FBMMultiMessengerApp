@@ -47,7 +47,9 @@
 }
 
 .active {
+    background-color: #e4e6eb;
     color: var(--primary-clr);
+    border-radius: 8px;
 }
 
 .active-menue {
