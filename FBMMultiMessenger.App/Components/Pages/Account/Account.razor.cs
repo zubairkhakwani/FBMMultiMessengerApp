@@ -523,13 +523,24 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public static string GetBadgeClass(string status)
+        public  string GetConnectionStatusBadgeClass(string status)
         {
             return status switch
             {
-                "Active" => "account-status-badge account-status-active",
-                "Inactive" => "account-status-badge account-status-inactive",
-                "In Progress" => "account-status-badge account-status-inprogress",
+                "Online" => "account-status-badge account-status-online",
+                "Offline" => "account-status-badge account-status-offline",
+                "Starting" => "account-status-badge account-status-starting",
+                _ => "account-status-badge"
+            };
+        }
+
+        public  string GetAuthStatusBadgeClass(string status)
+        {
+            return status switch
+            {
+                "LoggedIn" => "account-status-badge account-status-loggedin",
+                "LoggedOut" => "account-status-badge account-status-loggedout",
+                "Idle" => "account-status-badge account-status-idle",
                 _ => "account-status-badge"
             };
         }

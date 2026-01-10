@@ -15,117 +15,72 @@
     margin-bottom: 2rem;
 }
 
-
-::deep .account-status-badge {
+.account-status-badge {
     display: inline-flex;
     align-items: center;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     text-transform: capitalize;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* Active status - Green */
-::deep .account-status-active {
-    background-color: #d1fae5;
+/* Connection Status - Online (Green) */
+.account-status-online {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
     color: #065f46;
-    border: 1px solid #a7f3d0;
+    border: 1px solid #6ee7b7;
 }
 
-/* Inactive status - Gray */
-::deep .account-status-inactive {
-    background-color: #f3f4f6;
-    color: #4b5563;
+/* Connection Status - Offline (Gray) */
+.account-status-offline {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    color: #374151;
     border: 1px solid #d1d5db;
 }
 
-/* In Progress status - Blue */
-::deep .account-status-inprogress {
-    background-color: #dbeafe;
+
+/* Connection Status - Starting (Blue) */
+.account-status-starting {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     color: #1e40af;
     border: 1px solid #93c5fd;
 }
 
-/* Optional: Add pulse animation for In Progress */
-::deep .account-status-inprogress {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    
+
+/* Auth Status - Logged In (Emerald) */
+.account-status-loggedin {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 1px solid #6ee7b7;
 }
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
+/* Auth Status - Logged Out (Red) */
+.account-status-loggedout {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
 }
 
-/* Optional: Add dot indicator */
-::deep .account-status-badge::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 8px;
+
+/* Auth Status - Idle (Amber) */
+.account-status-idle {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+    border: 1px solid #fcd34d;
 }
 
-::deep .account-status-active::before {
-    background-color: #10b981;
+
+/* Hover effect */
+.account-status-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
 }
 
-::deep .account-status-inactive::before {
-    background-color: #6b7280;
-}
-
-::deep .account-status-inprogress::before {
-    background-color: #3b82f6;
-}
-
-.account-header--btn {
-    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
-    color: #FFFFFF;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 12px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(8, 102, 255, 0.3);
-}
-
-.add-account-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(8, 102, 255, 0.5);
-    background: linear-gradient(135deg, #0A74FF 0%, #053464 100%);
-}
-
-.btn-delete {
-    display: flex;
-    align-self: flex-end;
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-    margin-bottom: 0.5rem;
-}
-
-    .btn-delete:hover {
-        background: #c82333;
-    }
-
-    .btn-delete:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-    }
 
 
 .main-toolbar {

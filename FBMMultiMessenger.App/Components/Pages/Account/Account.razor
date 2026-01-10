@@ -87,8 +87,16 @@
 
             <MudTd title="@ipPort" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Ip Port">@ipPort</MudTd>
 
-            <MudTd Class="@GetBadgeClass(context.ConnectionStatus)" DataLabel="Status">@context.ConnectionStatus</MudTd>
-            <MudTd Class="@GetBadgeClass(context.AuthStatus)" DataLabel="Status">@context.AuthStatus</MudTd>
+            <MudTd DataLabel="Connection Status">
+                <span class="@GetConnectionStatusBadgeClass(context.ConnectionStatus)">
+                    @context.ConnectionStatus
+                </span>
+            </MudTd>
+            <MudTd DataLabel="Account Status">
+                <span class="@GetAuthStatusBadgeClass(context.AuthStatus)">
+                    @context.AuthStatus
+                </span>
+            </MudTd>
 
             <MudTd DataLabel="Account Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">
