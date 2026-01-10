@@ -78,14 +78,14 @@
 
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Account Name">@context.Name</MudTd>
-            <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Cookie">@context.Cookie</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Cookie">@context.Cookie</MudTd>
             @{
                 string ipPort = context.Proxy is null ? "-" : context.Proxy.Name;
                 int? proxyId = context.Proxy is null ? null : context.Proxy.Id;
             }
 
-            <MudTd title="@ipPort" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Account Ip Port">@ipPort</MudTd>
+            <MudTd title="@ipPort" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Ip Port">@ipPort</MudTd>
 
             <MudTd DataLabel="Connection Status">
                 <span class="@GetConnectionStatusBadgeClass(context.ConnectionStatus)">
@@ -98,7 +98,7 @@
                 </span>
             </MudTd>
 
-            <MudTd DataLabel="Account Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>
+            <MudTd DataLabel="Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">
 
                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
