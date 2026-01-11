@@ -311,11 +311,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             var currentUserId = $"App_{CurrentUser.Id}";
 
-            if (!SignalRService.IsConnected)
-            {
-                await SignalRService.ConnectAsync(currentUserId);
+            await SignalRService.ConnectAsync(currentUserId);
 
-            }
+            SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnHandleMessage += HandleMessageReceivedAsync;
         }
 
@@ -686,18 +684,18 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             try
             {
-                var files = e.GetMultipleFiles();
-
                 var options = new SweetAlertOptions();
                 options.Title = "Failed to upload files";
                 options.ConfirmButtonText = "Close";
 
-                if (files.Count > MaxMediaCount)
+                if (e.FileCount > MaxMediaCount)
                 {
                     options.Message = $"You can only attach {MaxMediaCount} files.";
                     await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
                     return;
                 }
+
+                var files = e.GetMultipleFiles(MaxMediaCount);
 
                 var totalSize = files.Sum(f => f.Size);
 

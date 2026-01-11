@@ -20,6 +20,19 @@ namespace FBMMultiMessenger.SignalR
         public SignalRService(IConfiguration configuration)
         {
             _baseURL = configuration.GetValue<string>("Urls:BaseUrl")!;
+            Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+        }
+
+        private void Connectivity_ConnectivityChanged(object? sender, ConnectivityChangedEventArgs e)
+        {
+            if (e.NetworkAccess == NetworkAccess.Internet)
+            {
+                Console.WriteLine("Internet restored, reconnecting...");
+            }
+            else
+            {
+                Console.WriteLine("Internet lost, stopping connection...");
+            }
         }
 
         public async Task ConnectAsync(string userId)
@@ -27,46 +40,63 @@ namespace FBMMultiMessenger.SignalR
             this.userId = userId;
             _shouldReconnect = true;
 
-            try
+            while(true)
             {
-                _hubConnection = new HubConnectionBuilder()
-                    .WithUrl($"{_baseURL}/chathub")
-                    .Build();
-
-                _hubConnection.On<HandleChatHttpResponse>("HandleMessage", async (messageData) =>
+                try
                 {
-                    if (OnHandleMessage != null)
+                    // Dispose existing connection if any
+                    if (_hubConnection != null)
                     {
-                        await OnHandleMessage.Invoke(messageData);
+                        await DisconnectAsync();
+                        _shouldReconnect = true;
                     }
-                });
 
-                _hubConnection.On<List<AccountStatusSignalRModel>>("HandleAccountStatus", async (accountsStatus) =>
+                    _hubConnection = new HubConnectionBuilder()
+                        .WithUrl($"{_baseURL}/chathub")
+                        .Build();
+
+                    RegisterEvents();
+
+                    await _hubConnection.StartAsync();
+                    await _hubConnection.SendAsync("RegisterApp", $"{userId}");
+
+                    //successfully connected, so breaking loop. if not connected it throw exception and while loop runs again.
+                    break;
+                }
+                catch (Exception ex)
                 {
-                    if (OnAccountStatusChange != null)
-                    {
-                        await OnAccountStatusChange.Invoke(accountsStatus);
-                    }
-                });
-
-                await _hubConnection.StartAsync();
-                await _hubConnection.SendAsync("RegisterApp", $"{userId}");
-
-                _hubConnection.Closed += async (error) =>
-                {
-
-                    if (_shouldReconnect)
-                    {
-                        Console.WriteLine("SignalR disconnected, attempting to reconnect...");
-                        await AttemptReconnect();
-                    }
-                };
-
+                    Console.WriteLine("Something went wrong when connecting user to signalR");
+                }
             }
-            catch (Exception ex)
+        }
+
+        private void RegisterEvents()
+        {
+            _hubConnection.On<HandleChatHttpResponse>("HandleMessage", async (messageData) =>
             {
-                Console.WriteLine("Something went wrong when connecting user to signalR");
-            }
+                if (OnHandleMessage != null)
+                {
+                    await OnHandleMessage.Invoke(messageData);
+                }
+            });
+
+            _hubConnection.On<List<AccountStatusSignalRModel>>("HandleAccountStatus", async (accountsStatus) =>
+            {
+                if (OnAccountStatusChange != null)
+                {
+                    await OnAccountStatusChange.Invoke(accountsStatus);
+                }
+            });
+
+            _hubConnection.Closed += async (error) =>
+            {
+                if (_shouldReconnect)
+                {
+                    Console.WriteLine("SignalR disconnected, attempting to reconnect...");
+                    await AttemptReconnect();
+                }
+            };
+
         }
 
         private async Task AttemptReconnect()
@@ -80,7 +110,6 @@ namespace FBMMultiMessenger.SignalR
                 try
                 {
                     Console.WriteLine("Reconnecting...");
-                    await Task.Delay(5000); // Wait 5 seconds
 
                     await _hubConnection.StartAsync();
                     await _hubConnection.SendAsync("RegisterApp", userId);
@@ -92,13 +121,12 @@ namespace FBMMultiMessenger.SignalR
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Reconnection failed: {ex.Message}, retrying in 5 seconds...");
+                    await Task.Delay(5000); // Wait 5 seconds
                 }
             }
 
             _isReconnecting = false;
         }
-
-       
 
         public async Task DisconnectAsync()
         {
@@ -108,6 +136,7 @@ namespace FBMMultiMessenger.SignalR
             {
                 await _hubConnection.StopAsync();
                 await _hubConnection.DisposeAsync();
+                _hubConnection = null;
             }
         }
     }

@@ -20,7 +20,7 @@ using Color = MudBlazor.Color;
 
 namespace FBMMultiMessenger.Components.Pages.Account
 {
-    public partial class Account
+    public partial class Account : IDisposable
     {
         [Inject]
         private IAccountService AccountService { get; set; }
@@ -80,6 +80,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 Snackbar.Add(Message, Severity.Success);
             }
 
+            SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
             SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
         }
 
@@ -350,6 +351,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
         {
             var response = await AccountService.Connect<BaseResponse<object>>(accountId);
             Snackbar.Add($"{response.Message}", response.IsSuccess ? Severity.Success : Severity.Error);
+        }
+
+        public void Dispose()
+        {
+            SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
         }
 
 
