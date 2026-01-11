@@ -222,7 +222,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             Message = string.Empty;
 
-            if (PreviewMediaFiles.Count > 0)
+            var videos = PreviewMediaFiles.Where(m => m.IsVideo).ToList();
+            var otherMediaMessages = PreviewMediaFiles.Where(m => !m.IsVideo).ToList();
+
+            if (otherMediaMessages.Count > 0)
             {
                 var FilesMessage = new GeChatMessagesHttpResponse()
                 {
@@ -239,14 +242,39 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     UniqueId = Guid.NewGuid().ToString()
                 };
 
-                FilesMessage.FileData = PreviewMediaFiles;
+                FilesMessage.FileData = otherMediaMessages;
 
                 messages.Add(FilesMessage);
 
                 ChatMessages.Add(FilesMessage);
-
-                PreviewMediaFiles = new();
             }
+
+            //facebook sends videos one by one, so otid will mismatch if we send them as a single message.
+            foreach(var video in videos)
+            {
+                var FilesMessage = new GeChatMessagesHttpResponse()
+                {
+                    FBChatId = SelectedFbChatId!,
+                    Message = string.Empty,
+                    IsReceived = false,
+                    IsSent = true,
+                    IsTextMessage = false,
+                    IsImageMessage = false,
+                    IsVideoMessage = true,
+                    IsAudioMessage = false,
+                    CreatedAt = DateTime.UtcNow,
+                    Sending = true,
+                    UniqueId = Guid.NewGuid().ToString()
+                };
+
+                FilesMessage.FileData = new List<FileData>() { video };
+
+                messages.Add(FilesMessage);
+
+                ChatMessages.Add(FilesMessage);
+            }
+
+            PreviewMediaFiles.Clear();
 
             foreach (var chat in messages)
             {
@@ -728,6 +756,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             catch (Exception ex)
             {
                 Snackbar.Add("Failed to select your file", Severity.Error);
+                SentrySdk.CaptureException(ex);
             }
             finally
             {
