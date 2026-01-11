@@ -14,9 +14,6 @@ namespace FBMMultiMessenger.Components.Pages.Auth
         public LoginHttpRequest RequestModel { get; set; } = new LoginHttpRequest() { Email="", Password="" };
 
         [Inject]
-        public NavigationManager navManager { get; set; }
-
-        [Inject]
         public IAuthService AuthService { get; set; }
 
 
@@ -64,7 +61,7 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
             if (response.IsSuccess)
             {
-                navManager.NavigateTo("/Chat", new NavigationOptions
+                Navigation.NavigateTo("/Chat", new NavigationOptions
                 {
                     ReplaceHistoryEntry = true
                 });

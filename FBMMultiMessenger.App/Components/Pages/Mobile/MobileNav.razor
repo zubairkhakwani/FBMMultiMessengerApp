@@ -21,42 +21,23 @@
         </div>
     </a>
 </div>
-@* 
+
 <script>
      (function () {
-         let iconContainers = document.querySelectorAll(".icon-container");
-         iconContainers = [...iconContainers];
-         iconContainers.forEach((iconContainer) => {
-             iconContainer.addEventListener('click', function (e) {
-                 RemovePreviousActiveElements();
-                 AddActiveElement(iconContainer);
-             });
-         });
+      let currentPath = window.location.pathname;
+
+      if (currentPath === "/" || currentPath === "") {
+        currentPath = "/Chat";
+    }
+      let anchor = document.querySelector(`a[href="${currentPath}" i]`); //here "i" is for case insensitive match
+      if(anchor){
+          let navItem = anchor.querySelector(".custom_nav-item");
+          navItem?.classList.add("active");
+      }
 
 
-         function RemovePreviousActiveElements(){
-             let bars = document.querySelectorAll(".bar");
-             bars.forEach((bar)=>{
-                if(bar.classList.contains("active-menue")){
-                    bar.classList.remove("active-menue");
-                }
-             });
-             let activeIconContainer = document.querySelector(".icon-container.active");
+      console.log(`currentPath ${currentPath}`)
+      console.log(`Anchor ${anchor}`)
 
-             activeIconContainer?.classList.remove("acitve");
-         }
-
-         function AddActiveElement(targetElement){
-            let bars = targetElement.querySelectorAll(".bar");
-            if(bars && bars.length >0){
-                bars = [...bars];
-               bars.forEach((bar)=>{
-                   bar.classList.add("active-menue");
-               });
-            }
-            else{
-                targetElement.classList.add("active");
-            }
-         }
     })();
-</script> *@
+</script>

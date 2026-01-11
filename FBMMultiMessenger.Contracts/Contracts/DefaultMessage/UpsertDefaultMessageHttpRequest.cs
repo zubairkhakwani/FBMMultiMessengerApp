@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FBMMultiMessenger.Contracts.Contracts.DefaultMessage
 {
@@ -12,8 +7,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.DefaultMessage
         [Required(ErrorMessage = "Please enter default message")]
         public string Message { get; set; } = null!;
 
-        [Required(ErrorMessage = "Please select any account")]
-        public List<int> SelectedAccounts { get; set; } = null!;
+        public List<int> SelectedAccounts { get; set; } = new List<int>();
     }
 
     public class UpsertDefaultMessageHttpResponse

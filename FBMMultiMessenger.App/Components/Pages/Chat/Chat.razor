@@ -9,9 +9,10 @@
 @{
     var mobileView = PlatformHelper.IsMobilePlatform ? "" : "messenger-container";
     var mobileClass = PlatformHelper.IsMobilePlatform ? "mobile" : "";
-    var sideBarHeight = PlatformHelper.IsMobilePlatform ? "auto" : "calc(100vh - 125px)";
     var messageContainerHeight = SelectedFbChatId is null ? "100vh" : "calc(100vh - 135px)";
+    var sidebarHeight = PlatformHelper.IsMobilePlatform ? "calc(100vh - 180px)" : "calc(100vh - 125px)";
     var avatarMargin = PlatformHelper.IsMobilePlatform ? "0px" : "12px";
+    var hideScrollBar =  PlatformHelper.IsMobilePlatform ? "hide-scrollbar" : "" ;
 }
 
 
@@ -45,7 +46,7 @@
 
         else if (FilteredAccountChats?.Any() == true)
         {
-            <div class="chat-list" style="height:@sideBarHeight">
+            <div class="chat-list @hideScrollBar" style="height:@sidebarHeight">
                 @for (int i = 0; i < FilteredAccountChats.Count; i++)
                 {
                     var fbChatId = FilteredAccountChats[i].FbChatId;
@@ -368,7 +369,7 @@
                 <div class="input-container">
                     <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
                     <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
-                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1" onblur="this.focus()" autofocus>  </textarea>
+                    <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1" autofocus>  </textarea>
                     <button @onclick="() => NotifyLocalServer(Message)" class="send-button" disabled="@isCompressingMedia">➤</button>
                 </div>
             }

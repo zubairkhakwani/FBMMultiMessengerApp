@@ -88,6 +88,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Resources\Images\drawable-mdpi\" />
+		<Folder Include="Resources\Images\drawable-xhdpi\" />
+		<Folder Include="Resources\Images\drawable-xxhdpi\" />
+		<Folder Include="Resources\Images\drawable-xxxhdpi\" />
 		<Folder Include="wwwroot\templates\" />
 	</ItemGroup>
 

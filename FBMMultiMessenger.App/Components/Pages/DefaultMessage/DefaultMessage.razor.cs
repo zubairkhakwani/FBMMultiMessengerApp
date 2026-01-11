@@ -29,8 +29,6 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
         [Inject]
         private ISnackbar Snackbar { get; set; }
 
-        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
-
         [SupplyParameterFromQuery]
         public string? Message { get; set; }
 
@@ -77,7 +75,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
         }
         public async Task AddDefaultMessage()
         {
-            if (IsMobilePlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 Navigation.NavigateTo("/create/defaultmessage");
                 return;
@@ -97,7 +95,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
         {
             DefaultMessageHelper.SelectableAccounts = selectedAccounts;
 
-            if (IsMobilePlatform)
+            if (PlatformHelper.IsMobilePlatform)
             {
                 Navigation.NavigateTo($"/edit/{defaultMessageId}/defaultmessage/{defaultMessage}/");
                 return;

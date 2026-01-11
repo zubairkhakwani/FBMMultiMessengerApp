@@ -43,6 +43,7 @@ body {
         inset: 0;
     }
 
+
 .sidebar-header {
     border-bottom: 1px solid #e4e6ea;
     background: white;
@@ -86,6 +87,15 @@ body {
 .chat-list {
     flex: 1;
     overflow-y: auto;
+}
+
+    .chat-list.hide-scrollbar {
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; 
 }
 
 .chat-item {

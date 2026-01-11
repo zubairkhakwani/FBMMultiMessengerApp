@@ -1,4 +1,4 @@
-﻿using FBMMultiMessenger.Models;
+﻿using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 
@@ -22,37 +22,14 @@ namespace FBMMultiMessenger.Components.Layout
             {
                 var profile = response.Data;
 
-                var name = profile?.Name ?? "Jhon Doe";
-                var splitedName = name.Trim().Split(" ");
-
-                var avatar = name[0].ToString();
-
-                if (splitedName.Length > 1)
-                {
-                    var firstLetter = splitedName[0][0];
-                    var secondLetter = splitedName[1][0];
-
-                    avatar = $"{firstLetter}{secondLetter}";
-                }
-
-                FullName = name;
-                Avatar = avatar;
+                FullName= profile.Name;
+                Avatar = UserHelper.GetShortName(profile.Name);
             }
         }
 
         private string GetWelcomeText()
         {
-            return string.IsNullOrWhiteSpace(FullName)
-                ? "Welcome back!"
-                : $"Welcome back, {FullName}";
-        }
-
-        private string GetShortName()
-        {
-            if (!string.IsNullOrWhiteSpace(Avatar))
-                return Avatar;
-
-            return "?";
+            return $"Welcome, {FullName}";
         }
     }
 }

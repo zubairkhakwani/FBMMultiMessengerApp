@@ -1,5 +1,4 @@
-﻿using FBMMultiMessenger.Contracts.Contracts.Account;
-using FBMMultiMessenger.Contracts.Contracts.DefaultMessage;
+﻿using FBMMultiMessenger.Contracts.Contracts.DefaultMessage;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
@@ -35,9 +34,6 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
         [Inject]
         private NavigationManager Navigation { get; set; }
 
-
-        private bool IsMobilePlatform = DeviceInfo.Platform != DevicePlatform.WinUI;
-
         private string Title = "Add Default Message";
         private string SubTitle = "Create an automatic reply for your connected accounts";
         private string Heading = "New Default Message";
@@ -47,7 +43,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
 
         protected override void OnInitialized()
         {
-            if (!IsMobilePlatform)
+            if (!PlatformHelper.IsMobilePlatform)
             {
                 popupFormSettings = new PopupFormSettings()
                 {
@@ -153,7 +149,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
             {
                 Snackbar.Add(response.Message, Severity.Success);
 
-                if (IsMobilePlatform)
+                if (PlatformHelper.IsMobilePlatform)
                 {
                     Navigation.NavigateTo($"/Default-Messages");
                 }
@@ -176,7 +172,7 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
                 return false;
             }
 
-            if (Options.Count() == 0)
+            if (DefaultMessageId is null &&  Options.Count() == 0)
             {
                 Snackbar.Add("Please select at least one account to continue", Severity.Info);
                 return false;

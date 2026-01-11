@@ -4,7 +4,7 @@
     {
         public static string GetShortName(string fullName)
         {
-            var splitedName = fullName.Split(" ");
+            var splitedName = fullName.Trim().Split(" ");
 
             var avatar = fullName[0].ToString();
 
