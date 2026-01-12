@@ -595,6 +595,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             _showCarousel = false;
             ShowSidebarView();
             StateHasChanged();
+
+            JS.InvokeVoidAsync("myInterop.stopAllMedia");
         }
 
         private void UpdateChatHeader(string fbChatId)

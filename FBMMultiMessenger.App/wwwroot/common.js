@@ -40,6 +40,17 @@
             return false;
         }
     },
+    stopAllMedia: function () {
+        try {
+            document.querySelectorAll("video, audio").forEach(m => {
+                m.pause();
+                m.currentTime = 0;
+            });
+        } catch (e) {
+            console.error("Something went wrong while stopping all media.");
+            return null;
+        }
+    },
 
     downloadAccountsFormat: async function (text) {
         try {
@@ -65,17 +76,80 @@
             confirmButtonText = "Yes",
             showCancelButton = false,
             cancelButtonText = "No",
-            footer = null
+            footer = null,
+            importData = null // New parameter for import results
         } = options;
+
+        let htmlContent = message;
+
+        // If importData is provided, build enhanced HTML
+        if (importData && importData.totalProcessed > 0) {
+            const { totalProcessed, successfullyValidated, totalSkipped, skippedAccounts } = importData;
+
+            // Build summary section
+            let summaryHtml = '<div style="margin-bottom: 20px;">';
+            if (successfullyValidated > 0) {
+                summaryHtml += `<p><strong style="color: #27ae60;">✓ ${successfullyValidated} accounts imported successfully</strong></p>`;
+            }
+            if (totalSkipped > 0) {
+                summaryHtml += `<p><strong style="color: #e74c3c;">✗ ${totalSkipped} accounts skipped</strong></p>`;
+            }
+            summaryHtml += '</div>';
+
+            // If there are skipped accounts, show details
+            if (skippedAccounts && skippedAccounts.length > 0) {
+                // Group by reason
+                const reasonGroups = skippedAccounts.reduce((acc, account) => {
+                    if (!acc[account.reason]) {
+                        acc[account.reason] = [];
+                    }
+                    acc[account.reason].push(account);
+                    return acc;
+                }, {});
+
+                let detailsHtml = '<div style="text-align: left; max-height: 300px; overflow-y: auto; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">';
+
+                Object.entries(reasonGroups).forEach(([reason, accounts]) => {
+                    const reasonText = formatReason(reason);
+                    detailsHtml += `
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #e74c3c;">${reasonText} (${accounts.length})</strong>
+                        <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em; color: #495057;">
+                `;
+
+                    accounts.forEach(account => {
+                        const nameText = account.name || 'Unknown';
+                        const proxyInfo = account.proxyId ? ` | Proxy: ${account.proxyId}` : '';
+                        detailsHtml += `<li>${nameText}${proxyInfo}</li>`;
+                    });
+
+                    detailsHtml += '</ul></div>';
+                });
+
+                detailsHtml += '</div>';
+
+                htmlContent = summaryHtml + detailsHtml;
+            } else {
+                // Only success message
+                htmlContent = summaryHtml;
+            }
+        }
 
         const config = {
             icon,
             title,
-            text: message,
             showCancelButton: showCancelButton,
             confirmButtonText: confirmButtonText,
             cancelButtonText: cancelButtonText,
+            width: importData && importData.totalSkipped > 0 ? '650px' : '400px'
         };
+
+        // Use html if we have importData, otherwise use text
+        if (importData) {
+            config.html = htmlContent;
+        } else {
+            config.text = htmlContent;
+        }
 
         if (footer) {
             if (footer.link) {
@@ -198,7 +272,7 @@ async function compressImage(file) {
 
     // Calculate compression percentage
     //const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
-   // const compressionRatio = (compressedSize / originalSize * 100).toFixed(1);
+    // const compressionRatio = (compressedSize / originalSize * 100).toFixed(1);
 
     //const end = performance.now();
 
@@ -211,6 +285,18 @@ async function compressImage(file) {
     //);
 
     return byteArray;
+}
+
+function formatReason(reason) {
+    const reasonMap = {
+        'DuplicateCookie': '🔄 Duplicate Cookies',
+        'InvalidProxyId': '❌ Invalid Proxy ID',
+        'UnauthorizedProxy': '🚫 Unauthorized Proxy',
+        'MissingRequiredProxy': '⚠️ Missing Required Proxy',
+        'InvalidCookie': '🍪 Invalid Cookie',
+        'AccountAlreadyExists': '📋 Account Already Exists'
+    };
+    return reasonMap[reason] || reason;
 }
 
 

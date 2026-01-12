@@ -86,7 +86,7 @@ namespace FBMMultiMessenger.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message} inner => {ex.InnerException?.Message}");
+                SentrySdk.CaptureException(ex);
                 var data = BaseResponse<TResponse>.Error("Something went wrong, please try later.");
                 data.IsSuccess = false;
                 data.APIRequestFailed = true;

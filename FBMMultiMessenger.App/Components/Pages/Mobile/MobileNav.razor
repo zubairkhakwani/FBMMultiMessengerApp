@@ -1,17 +1,17 @@
 ﻿<div class="mobile-nav">
-    <a href="/Account" class="icon-container">
+    <a class="icon-container" data-href="/Account">
         <div class="custom_nav-item">
             <i class="fa-solid fa-store"></i>
         </div>
     </a>
 
-    <a href="/Chat" class="icon-container">
+    <a class="icon-container " data-href="/Chat">
         <div class="custom_nav-item">
             <i class="fa fa-comments"> </i>
         </div>
     </a>
 
-    <a href="/mobile-sidebar" class="icon-container">
+    <a class="icon-container" data-href="/mobile-sidebar">
         <div class="custom_nav-item">
             <div class="hamburger">
                 <span class="bar"></span>
@@ -25,19 +25,28 @@
 <script>
      (function () {
       let currentPath = window.location.pathname;
+      let iconContainers = document.querySelectorAll(".icon-container");
 
       if (currentPath === "/" || currentPath === "") {
         currentPath = "/Chat";
     }
-      let anchor = document.querySelector(`a[href="${currentPath}" i]`); //here "i" is for case insensitive match
+      iconContainers.forEach(function(container){
+          container.addEventListener("click", function(e){
+              e.preventDefault();
+              let targetPath = container.getAttribute("data-href");
+              if(targetPath != currentPath){
+              window.location.href = targetPath;
+              }
+          });
+      });
+
+    let anchor = document.querySelector(`a[data-href="${currentPath}"]`);
+
+      // let anchor = document.querySelector(`a[href="${currentPath}" i]`); here "i" is for case insensitive match
       if(anchor){
           let navItem = anchor.querySelector(".custom_nav-item");
           navItem?.classList.add("active");
       }
-
-
-      console.log(`currentPath ${currentPath}`)
-      console.log(`Anchor ${anchor}`)
 
     })();
 </script>

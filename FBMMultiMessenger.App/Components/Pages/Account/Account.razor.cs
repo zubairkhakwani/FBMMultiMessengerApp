@@ -190,8 +190,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             bool isConfirmed = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
 
-            if (!isConfirmed)
-                return;
+            if (!isConfirmed) return;
 
             try
             {
@@ -216,30 +215,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     return;
                 }
 
-
-                List<UpsertAccountHttpRequest> parsedAccounts = result.Accounts;
-                List<UpsertAccountHttpRequest> validatedAccounts = new();
-
-                foreach (var account in parsedAccounts)
-                {
-                    var (isValidCookie, userId) = ValidateCookie(account.Cookie);
-
-                    if (!isValidCookie) continue;
-
-                    validatedAccounts.Add(account);
-                }
-
-                if (validatedAccounts.Count == 0)
-                {
-                    Snackbar.Add("No valid accounts to import", Severity.Info);
-                    return;
-                }
-
                 //Call Api
-                var distinctAccounts = validatedAccounts.DistinctBy(a => a.Cookie).ToList();
-                var response = await AccountService.Import(distinctAccounts);
+                var response = await AccountService.Import(result.Accounts);
 
-                if (response.Data is not null && response.Data.IsLimitExceeded)
+                if (response.ShowSweetAlert && response.Data is not null && response.Data.IsLimitExceeded)
                 {
                     var sweetAlertOptions = new SweetAlertOptions()
                     {
@@ -247,7 +226,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                         Message = response.Message,
                         ConfirmButtonText = "Upgrade now",
                         ShowCancelButton = true,
-                        CancelButtonText = "Later"
+                        CancelButtonText = "Later",
                     };
 
                     var upgradeNow = await JS.InvokeAsync<bool>("myInterop.showSweetAlert", sweetAlertOptions);
@@ -256,8 +235,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     {
                         Navigation.NavigateTo("/Pricing");
                     }
+
                     return;
                 }
+
                 else if (response.RedirectToPackages)
                 {
                     Navigation.NavigateTo($"/Pricing?redirectReason={response.Message}");
@@ -268,6 +249,53 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     Navigation.NavigateTo($"/verify-otp?ReturnUrl=/Account&ReturnTo=Account&OtpSuccessMessage={response.Message}&EmailSentTo={response.Data.EmailSendTo}&IsEmailVerification=true");
                 }
 
+                var skippedAccounts = response.Data?.SkippedAccounts ?? new List<SkippedAccountHttpResponse>();
+
+                if (response.ShowSweetAlert && response.Data is not null && skippedAccounts.Count > 0)
+                {
+                    var totalSkipped = skippedAccounts.Count;
+                    var successCount = response.Data.SuccessfullyValidated;
+
+                    string icon;
+                    string title;
+
+                    if (successCount > 0)
+                    {
+                        icon = "warning";
+                        title = "Import Partially Completed";
+                    }
+                    else
+                    {
+                        icon = "error";
+                        title = "Import Failed";
+                    }
+
+                    var sweetAlertOptions = new SweetAlertOptions()
+                    {
+                        Title = title,
+                        Message = response.Message,
+                        Icon = icon,
+                        ConfirmButtonText = "OK",
+                        ShowCancelButton = false,
+                        ImportData = new ImportResultData
+                        {
+                            TotalProcessed = response.Data.TotalProcessed,
+                            SuccessfullyValidated = response.Data.SuccessfullyValidated,
+                            TotalSkipped = totalSkipped,
+                            SkippedAccounts = response.Data.SkippedAccounts
+                        }
+                    };
+
+                    await JS.InvokeVoidAsync("myInterop.showSweetAlert", sweetAlertOptions);
+
+                    if (successCount > 0)
+                    {
+                        table?.ReloadServerData();
+                    }
+                    
+                    return;
+                }
+
                 if (response.IsSuccess)
                 {
                     Snackbar.Add(response.Message, Severity.Success);
@@ -275,7 +303,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     return;
                 }
 
-                Snackbar.Add(string.IsNullOrWhiteSpace(response.Message) ? "Something went wrong when importing accounts, please try later." : response.Message, Severity.Error);
+                Snackbar.Add(string.IsNullOrWhiteSpace(response.Message) ? "Something went wrong while importing accounts, please try later." : response.Message, Severity.Error);
             }
             catch (Exception ex)
             {
@@ -529,7 +557,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
-        public  string GetConnectionStatusBadgeClass(string status)
+        public string GetConnectionStatusBadgeClass(string status)
         {
             return status switch
             {
@@ -540,7 +568,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             };
         }
 
-        public  string GetAuthStatusBadgeClass(string status)
+        public string GetAuthStatusBadgeClass(string status)
         {
             return status switch
             {
