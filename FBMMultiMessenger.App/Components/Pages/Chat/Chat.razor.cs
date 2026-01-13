@@ -250,7 +250,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             //facebook sends videos one by one, so otid will mismatch if we send them as a single message.
-            foreach(var video in videos)
+            foreach (var video in videos)
             {
                 var FilesMessage = new GeChatMessagesHttpResponse()
                 {
@@ -471,7 +471,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
                 var currentUser = await CurrentUserService.GetCurrentUser();
 
-                OneSignal.Login(currentUser.Id.ToString());
+                var currentUserId = currentUser.Id;
+
+                var oneSignalExternalId = $"FBM_{currentUserId}";
+
+                OneSignal.Login(oneSignalExternalId);
 
                 OneSignal.Notifications.Clicked -= HandleNotificationClicked;
                 OneSignal.Notifications.Clicked += HandleNotificationClicked;

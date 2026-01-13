@@ -292,7 +292,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     {
                         table?.ReloadServerData();
                     }
-                    
+
                     return;
                 }
 
@@ -559,22 +559,24 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         public string GetConnectionStatusBadgeClass(string status)
         {
+            status = status.Trim().ToLower();
             return status switch
             {
-                "Online" => "account-status-badge account-status-online",
-                "Offline" => "account-status-badge account-status-offline",
-                "Starting" => "account-status-badge account-status-starting",
+                "online" => "account-status-badge account-status-online",
+                "offline" => "account-status-badge account-status-offline",
+                "starting" => "account-status-badge account-status-starting",
                 _ => "account-status-badge"
             };
         }
 
         public string GetAuthStatusBadgeClass(string status)
         {
+            status = status.Trim().ToLower();
             return status switch
             {
-                "LoggedIn" => "account-status-badge account-status-loggedin",
-                "LoggedOut" => "account-status-badge account-status-loggedout",
-                "Idle" => "account-status-badge account-status-idle",
+                "logged in" => "account-status-badge account-status-loggedin",
+                "logged out" => "account-status-badge account-status-loggedout",
+                "idle" => "account-status-badge account-status-idle",
                 _ => "account-status-badge"
             };
         }
