@@ -1,52 +1,47 @@
 ﻿<div class="mobile-nav">
-    <a class="icon-container" data-href="/Account">
-        <div class="custom_nav-item">
+    <div class="icon-container" @onclick='() => NavigateTo("/Account")' >
+        <div class="custom_nav-item @(IsActive("/Account") ? "active" : "")">
             <i class="fa-solid fa-store"></i>
         </div>
-    </a>
+    </div>
 
-    <a class="icon-container " data-href="/Chat">
-        <div class="custom_nav-item">
+    <div class="icon-container" @onclick='() => NavigateTo("/Chat")'' >
+        <div class="custom_nav-item @(IsActive("/Chat") ? "active" : "")">
             <i class="fa fa-comments"> </i>
         </div>
-    </a>
+    </div>
 
-    <a class="icon-container" data-href="/mobile-sidebar">
-        <div class="custom_nav-item">
+    <div class="icon-container" @onclick='() => NavigateTo("/mobile-sidebar")' >
+        <div class="custom_nav-item @(IsActive("/mobile-sidebar") ? "active" : "")">
             <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar half-size"></span>
             </div>
         </div>
-    </a>
+    </div>
 </div>
 
-<script>
-     (function () {
-      let currentPath = window.location.pathname;
-      let iconContainers = document.querySelectorAll(".icon-container");
+@code {
+    [Inject] private NavigationManager Navigation { get; set; }
 
-      if (currentPath === "/" || currentPath === "") {
-        currentPath = "/Chat";
+    private void NavigateTo(string path)
+    {
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        if (currentPath != path)
+        {
+            Navigation.NavigateTo(path);
+        }
     }
-      iconContainers.forEach(function(container){
-          container.addEventListener("click", function(e){
-              e.preventDefault();
-              let targetPath = container.getAttribute("data-href");
-              if(targetPath != currentPath){
-              window.location.href = targetPath;
-              }
-          });
-      });
 
-    let anchor = document.querySelector(`a[data-href="${currentPath}"]`);
+    private bool IsActive(string path)
+    {
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        if (currentPath == "/" || currentPath == "")
+            currentPath = "/Chat";
+        
+        return currentPath.Equals(path, StringComparison.OrdinalIgnoreCase);
+    }
+}
 
-      // let anchor = document.querySelector(`a[href="${currentPath}" i]`); here "i" is for case insensitive match
-      if(anchor){
-          let navItem = anchor.querySelector(".custom_nav-item");
-          navItem?.classList.add("active");
-      }
 
-    })();
-</script>
