@@ -23,46 +23,46 @@ namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ActiveSubscriptionRequirement requirement)
         {
-            //if (!context.User.Identity.IsAuthenticated)
-            //{
-            //    return;
-            //}
+            if (!context.User.Identity.IsAuthenticated)
+            {
+                return;
+            }
 
-            //if (DateTime.Now - _lastChecked < _cacheDuration && _lastResult)
-            //{
-            //    context.Succeed(requirement);
-            //}
+            if (DateTime.Now - _lastChecked < _cacheDuration && _lastResult)
+            {
+                context.Succeed(requirement);
+            }
 
-            //var response = await SubscriptionSerivce.GetMySubscription<BaseResponse<GetMySubscriptionHttpResponse>>();
+            var response = await SubscriptionSerivce.GetMySubscription<BaseResponse<GetMySubscriptionHttpResponse>>();
 
-            //var isRedirectRequest = response.RedirectToPackages;
+            var isRedirectRequest = response.RedirectToPackages;
 
-            //bool isSubscriptionExpired = response.Data?.IsExpired ?? false;
+            bool isSubscriptionExpired = response.Data?.IsExpired ?? false;
 
-            //bool hasActiveSubscription = response.Data?.HasActiveSubscription ?? false;
+            bool hasActiveSubscription = response.Data?.HasActiveSubscription ?? false;
 
-            //var identity = context.User.Identity as ClaimsIdentity;
+            var identity = context.User.Identity as ClaimsIdentity;
 
-            //if (hasActiveSubscription)
-            //{
-            //    identity?.AddClaim(new Claim("hasActiveSubscription", $"{hasActiveSubscription}"));
-            //}
+            if (hasActiveSubscription)
+            {
+                identity?.AddClaim(new Claim("hasActiveSubscription", $"{hasActiveSubscription}"));
+            }
 
-            //if (isSubscriptionExpired)
-            //{
-            //    identity?.AddClaim(new Claim("isSubscriptionExpired", $"{isSubscriptionExpired}"));
-            //}
+            if (isSubscriptionExpired)
+            {
+                identity?.AddClaim(new Claim("isSubscriptionExpired", $"{isSubscriptionExpired}"));
+            }
 
-            //if (!hasActiveSubscription)
-            //{
-            //    _lastResult = false;
-            //    _lastChecked = DateTime.Now;
+            if (!hasActiveSubscription)
+            {
+                _lastResult = false;
+                _lastChecked = DateTime.Now;
 
-            //    return;
-            //}
+                return;
+            }
 
-            //_lastResult = true;
-            //_lastChecked = DateTime.Now;
+            _lastResult = true;
+            _lastChecked = DateTime.Now;
 
             context.Succeed(requirement);
         }
