@@ -113,28 +113,36 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Main Chat Messages
         public List<GeChatMessagesHttpResponse> ChatMessages = new List<GeChatMessagesHttpResponse>();
 
+        private CancellationTokenSource _cts = new();
+
         protected override async Task OnInitializedAsync()
         {
             AddEventListneres();
 
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
 
-            var taskSignalR = ConnectToSignalR();
+            _ = ConnectToSignalR();
 
-            var taskAccountsQuery = GetAccountChats();
-
-            await Task.WhenAll(taskSignalR, taskAccountsQuery);
+            await GetAccountChats();
 
             //if a user opened notification so we have to open the right chat.
             if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
             {
                 await LoadChatMessage(FbChatId);
             }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
+            }
 
             await ConfigurePushNotifications();
-
-            await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
         }
+
+
 
 
         #region Domain Logic
@@ -166,7 +174,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 await InvokeAsync(StateHasChanged);
             }
 
-            var response = await ChatMessagesService.GetChatMessages<BaseResponse<List<GeChatMessagesHttpResponse>>>(fbChatId);
+            var response = await ChatMessagesService.GetChatMessages(fbChatId, _cts.Token);
+
 
             if (response is null || !response.IsSuccess)
             {
@@ -175,19 +184,19 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 return;
             }
 
-            var responseChatMesasge = response?.Data ?? new List<GeChatMessagesHttpResponse>();
+            var responseChatMessages = response?.Data ?? new List<GeChatMessagesHttpResponse>();
 
-            foreach (var chatMessge in responseChatMesasge)
+            foreach (var chatMessage in responseChatMessages)
             {
-                if (chatMessge.IsImageMessage || chatMessge.IsVideoMessage)
+                if (chatMessage.IsImageMessage || chatMessage.IsVideoMessage)
                 {
-                    chatMessge.FileData = GetFileData(chatMessge.Message);
+                    chatMessage.FileData = GetFileData(chatMessage.Message);
                 }
             }
 
-            ChatMessages  = response?.Data ?? new List<GeChatMessagesHttpResponse>();
+            ChatMessages = response?.Data ?? new List<GeChatMessagesHttpResponse>();
 
-
+            // await JS.InvokeVoidAsync("scrollToBottom");
         }
 
 
@@ -317,9 +326,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task GetAccountChats()
         {
-            var response = await AccountService.GetMyChatsAsync();
+            var response = await AccountService.GetMyChatsAsync(_cts.Token);
 
             IsChatsLoading = false;
+
             if (response is null ||  !response.IsSuccess)
             {
                 Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
@@ -372,6 +382,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                         IsVideoMessage = receivedChat.IsVideoMessage,
                         IsAudioMessage = receivedChat.IsAudioMessage,
                         IsSent = true,
+                        ScrollToBottom = false,
                         CreatedAt = receivedChat.StartedAt,
                     };
 
@@ -428,6 +439,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             FilteredAccountChats.Insert(0, chat);
 
             await InvokeAsync(StateHasChanged);
+
+            await JS.InvokeVoidAsync("handleNewMessage");
         }
 
         private async Task HandleAccountStatusChangedAsync(List<AccountStatusSignalRModel> accounts)
@@ -786,6 +799,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public void Dispose()
         {
+            _cts.Cancel();
+            _cts.Dispose();
+
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;

@@ -28,10 +28,7 @@ namespace FBMMultiMessenger.Services
             this._baseUrl = configuration.GetValue<string>("Urls:BaseUrl")!;
 
         }
-        public async Task<TResponse> SendAsync<TRequest, TResponse>(
-       ApiRequest<TRequest> apiRequest, bool withBearer = true)
-       where TRequest : class
-       where TResponse : class, new()
+        public async Task<TResponse> SendAsync<TRequest, TResponse>(ApiRequest<TRequest> apiRequest, bool withBearer = true, CancellationToken cancellationToken = default) where TRequest : class where TResponse : class, new()
         {
             try
             {
@@ -72,7 +69,7 @@ namespace FBMMultiMessenger.Services
                     _ => HttpMethod.Get
                 };
 
-                HttpResponseMessage responseMessage = await client.SendAsync(message);
+                HttpResponseMessage responseMessage = await client.SendAsync(message, cancellationToken);
                 var apiContent = await responseMessage.Content.ReadAsStringAsync();
 
                 if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
@@ -84,6 +81,18 @@ namespace FBMMultiMessenger.Services
                 var APIResponse = JsonConvert.DeserializeObject<TResponse>(apiContent);
                 return APIResponse ?? new TResponse();
             }
+            catch (OperationCanceledException ex)
+            {
+                var data = BaseResponse<TResponse>.Error("Operation was cancelled");
+                data.IsSuccess = true;
+                data.APIRequestFailed = true;
+
+                var res = JsonConvert.SerializeObject(data);
+                var APIResponse = JsonConvert.DeserializeObject<TResponse>(res);
+                return APIResponse ?? new TResponse();
+            }
+
+
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);

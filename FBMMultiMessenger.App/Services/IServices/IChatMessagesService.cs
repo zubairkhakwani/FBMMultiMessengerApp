@@ -1,14 +1,10 @@
-﻿using FBMMultiMessenger.Contracts.Contracts.Extension;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FBMMultiMessenger.Contracts.Contracts.Chat;
+using FBMMultiMessenger.Contracts.Response;
 
 namespace FBMMultiMessenger.Services.IServices
 {
     public interface IChatMessagesService
     {
-        Task<T> GetChatMessages<T>(string fbChatId) where T : class, new();
+        Task<BaseResponse<List<GeChatMessagesHttpResponse>>> GetChatMessages(string fbChatId, CancellationToken cancellationToken = default);
     }
 }

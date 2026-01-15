@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FBMMultiMessenger.Contracts.Contracts.Auth
 {
@@ -23,9 +18,6 @@ namespace FBMMultiMessenger.Contracts.Contracts.Auth
          ErrorMessage = "Password must match all the requirements")]
         public string Password { get; set; } = string.Empty;
 
-
-        [Required(ErrorMessage = "Please enter confirm password")]
-        [Compare(nameof(Password), ErrorMessage = "Password do not match")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
 
@@ -33,9 +25,6 @@ namespace FBMMultiMessenger.Contracts.Contracts.Auth
         [RegularExpression(@"^(\+?\d{1,4}\s?)?\d{7,15}$",
         ErrorMessage = "Please enter a valid contact number")]
         public string ContactNumber { get; set; } = string.Empty;
-
-        //[Required(ErrorMessage = "You must accept the terms")]
-        //public bool AcceptTerms { get; set; }
     }
 
     public class RegisterHttpResponse

@@ -11,8 +11,8 @@ namespace FBMMultiMessenger.Services.IServices
         Task<T> RemoveAccountAsync<T>(List<int> accountIds) where T : class, new();
         Task<T> Connect<T>(int accountId) where T : class, new();
 
-        Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest);
+        Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest, CancellationToken cancellationToken = default);
 
-        Task<BaseResponse<GetAllMyAccountsChatsHttpResponse>> GetMyChatsAsync();
+        Task<BaseResponse<GetAllMyAccountsChatsHttpResponse>> GetMyChatsAsync(CancellationToken cancellationToken = default);
     }
 }

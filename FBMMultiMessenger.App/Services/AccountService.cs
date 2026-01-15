@@ -36,7 +36,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<UpsertAccountHttpRequest, T>(request);
         }
 
-        public async Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest)
+        public async Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest, CancellationToken cancellationToken = default)
         {
             var request = new ApiRequest<object>()
             {
@@ -44,7 +44,7 @@ namespace FBMMultiMessenger.Services
                 Url =$"account/me?pageNo={httpRequest.PageNo}&pageSize={httpRequest.PageSize}&keyword={httpRequest.Keyword}",
                 Data = null
             };
-            return await _baseService.SendAsync<object, BaseResponse<UserAccountsOverviewHttpResponse>>(request);
+            return await _baseService.SendAsync<object, BaseResponse<UserAccountsOverviewHttpResponse>>(request, cancellationToken: cancellationToken);
         }
 
         public async Task<T> RemoveAccountAsync<T>(List<int> accountIds) where T : class, new()
@@ -65,7 +65,7 @@ namespace FBMMultiMessenger.Services
             return await _baseService.SendAsync<List<int>, T>(request);
         }
 
-        public async Task<BaseResponse<GetAllMyAccountsChatsHttpResponse>> GetMyChatsAsync()
+        public async Task<BaseResponse<GetAllMyAccountsChatsHttpResponse>> GetMyChatsAsync(CancellationToken cancellationToken = default)
         {
             var request = new ApiRequest<object>()
             {
@@ -74,7 +74,7 @@ namespace FBMMultiMessenger.Services
                 Data = null
             };
 
-            return await _baseService.SendAsync<object, BaseResponse<GetAllMyAccountsChatsHttpResponse>>(request);
+            return await _baseService.SendAsync<object, BaseResponse<GetAllMyAccountsChatsHttpResponse>>(request, cancellationToken: cancellationToken);
         }
 
         public async Task<T> Connect<T>(int accountId) where T : class, new()

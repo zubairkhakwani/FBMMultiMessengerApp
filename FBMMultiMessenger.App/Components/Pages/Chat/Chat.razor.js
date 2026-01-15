@@ -1,27 +1,39 @@
-﻿(function () {
+﻿
+(function () {
     let messageContainer = document.querySelector(".messages-container"); // Actual chat messages.
     let messageList = messageContainer.querySelector("#messagesList");
     let inputWrapper = document.querySelector(".input-wrapper");
+    let arrowDownButton = document.querySelector(".arrow-down");
 
     window.registerEnterHandler = (ref) => {
         window.dotnetHelper = ref;
-    };
+    }
+
+    window.handleNewMessage = () => {
+        var isHalfWay = isHalfWayScrolled();
+        if (isHalfWay) {
+            arrowDownButton?.classList.add("active");
+        } else {
+            messageContainer.scrollTo({
+                top: messageContainer.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+    }
 
     const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
             if (mutation.type === "childList") {
                 if (mutation.target === messageList) {
 
-                    messageContainer.scrollTo({
-                        top: messageContainer.scrollHeight,
-                        behavior: "smooth"
-                    });
+                    const messages = messageList.querySelectorAll('.message');
+                    const lastMessage = messages[messages.length - 1];
 
-                    let lastMessage = messageList.lastElementChild;
-                    lastMessage?.classList?.add("new-message");
-                    setTimeout(() => {
-                        lastMessage?.classList?.remove('new-message');
-                    }, 600)
+                    const scrollToBottom = lastMessage?.getAttribute('data-scroll-to-bottom');
+
+                    if (scrollToBottom === "True") {
+                        messageContainer.scrollTop = messageContainer.scrollHeight;
+                    }
                 }
                 else if (mutation.target === inputWrapper) {
                     const messageInput = document.querySelector(".message-input");
@@ -57,4 +69,44 @@
             messageInput.focus();
         }
     });
+
+
+
+    messageContainer.addEventListener('scroll', () => {
+
+        var data = isHalfWayScrolled();
+
+        if (data) {
+            arrowDownButton.style.display = "block";
+        }
+        else {
+            arrowDownButton.style.display = "none";
+        }
+    });
+
+    function isHalfWayScrolled() {
+        const viewportHeight = messageContainer.clientHeight;   // visible height
+        const totalHeight = messageContainer.scrollHeight;      // total content height
+        const scrolled = messageContainer.scrollTop;            // how far user scrolled from top
+
+        const scrollableDistance = totalHeight - viewportHeight;
+
+        // Show arrow if user is more than 15% away from bottom
+        if (scrolled < scrollableDistance * 0.85) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    arrowDownButton.addEventListener('click', () => {
+
+        arrowDownButton.classList.remove("active");
+        messageContainer.scrollTo({
+            top: messageContainer.scrollHeight,
+            behavior: "smooth"
+        });
+    });
+
+
 })();

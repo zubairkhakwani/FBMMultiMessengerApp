@@ -1,13 +1,8 @@
-﻿using FBMMultiMessenger.Contracts.Contracts.Extension;
+﻿using FBMMultiMessenger.Contracts.Contracts.Chat;
+using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.Utility;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FBMMultiMessenger.Services
 {
@@ -19,7 +14,7 @@ namespace FBMMultiMessenger.Services
         {
             this._baseService=baseService;
         }
-        public async Task<T> GetChatMessages<T>(string fbChatId) where T : class, new()
+        public async Task<BaseResponse<List<GeChatMessagesHttpResponse>>> GetChatMessages(string fbChatId, CancellationToken cancellationToken = default)
         {
             var request = new ApiRequest<object>()
             {
@@ -28,7 +23,7 @@ namespace FBMMultiMessenger.Services
                 Data = null
             };
 
-            return await _baseService.SendAsync<object, T>(request);
+            return await _baseService.SendAsync<object, BaseResponse<List<GeChatMessagesHttpResponse>>>(request, cancellationToken: cancellationToken);
         }
     }
 }

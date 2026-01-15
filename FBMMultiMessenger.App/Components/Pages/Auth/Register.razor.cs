@@ -35,9 +35,22 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
         private string PasswordType = "password";
         private string PasswordConfirmType = "password";
+        private string ConfirmPasswordErrorMessage = string.Empty;
+        private bool DoesPasswordMatch = false;
+
 
         public async Task OnValidSubmit()
         {
+            if (string.IsNullOrWhiteSpace(RequestModel.ConfirmPassword))
+            {
+                ConfirmPasswordErrorMessage = "Please enter confirm password";
+                return;
+            }
+
+            if (!DoesPasswordMatch)
+            {
+                return;
+            }
             ShowLoader = true;
             var registerResponse = await AuthService.RegisterAsync<BaseResponse<RegisterHttpResponse>>(RequestModel);
 
@@ -67,6 +80,22 @@ namespace FBMMultiMessenger.Components.Pages.Auth
         private void IsStrongPassword(ChangeEventArgs input)
         {
             Password = input?.Value?.ToString() ?? "";
+        }
+
+        private void HandleConfirmPassword(ChangeEventArgs e)
+        {
+            RequestModel.ConfirmPassword = e?.Value?.ToString() ?? "";
+
+            if (!string.Equals(RequestModel.ConfirmPassword, RequestModel.Password, StringComparison.Ordinal))
+            {
+                DoesPasswordMatch = false;
+                ConfirmPasswordErrorMessage = "Password do not match";
+            }
+            else
+            {
+                ConfirmPasswordErrorMessage = string.Empty;
+                DoesPasswordMatch = true;
+            }
         }
 
         public void HandlePasswordToggle(bool passwordToggle)

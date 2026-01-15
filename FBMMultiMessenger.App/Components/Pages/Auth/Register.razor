@@ -92,11 +92,12 @@
                     </div>
 
                     <div class="input-wrapper password-container">
-                        <InputText type="@PasswordConfirmType"
-                                   class="input"
-                                   id="confirm-password"
-                                   placeholder="Confirm Password"
-                                   @bind-Value="RequestModel.ConfirmPassword" />
+                     <input type="@PasswordConfirmType"
+                                class="input"
+                                id="confirm-password"
+                                placeholder="Confirm Password"
+                                @oninput="(e) => HandleConfirmPassword(e)"  />
+                             
                         <i class="fa-solid fa-lock input-icon"></i>
                         @if (ShowConfirmPassword)
                         {
@@ -106,19 +107,9 @@
                         {
                             <i @onclick="() => HandlePasswordToggle(false)" class="fa-solid fa-eye password-eye-icon"></i>
                         }
-                        <ValidationMessage For="@(() => RequestModel.ConfirmPassword)"
-                                           class="validation-message" />
+                        <div class="validation-message">@ConfirmPasswordErrorMessage</div>
                     </div>
                 </div>
-
-                <!-- Terms & Conditions -->
-                @* <div class="terms-checkbox">
-                    <InputCheckbox @bind-Value="RequestModel.AcceptTerms" id="terms" />
-                    <label for="terms">
-                        I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
-                    </label>
-                    <ValidationMessage For="@(() => RequestModel.AcceptTerms)" class="validation-message" />
-                </div> *@
 
                 <!-- Register Button -->
                 @if (ShowLoader)

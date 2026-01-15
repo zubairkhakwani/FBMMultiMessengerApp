@@ -194,10 +194,11 @@
                     var isSent = !isReceived;
                     var isMessageFailedToSend = !chatMessage.IsSent && isSent;
                     var failedMessageClass = isMessageFailedToSend ? "failed" : "";
+                    var scrollToBottom = chatMessage.ScrollToBottom.ToString();
 
                     @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
                     {
-                        <div class="message @messageClass @failedMessageClass">
+                        <div class="message @messageClass @failedMessageClass" data-scroll-to-bottom ="@scrollToBottom">
                             @if (isReceived)
                             {
                                 <div class="message-row">
@@ -442,7 +443,10 @@
 {
     <MobileNav></MobileNav>
 }
-
-
-
+                  
+  <div class="arrow-down pulse-animation" id="arrow">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+  </div>
 <script src="/Components/Pages/Chat/Chat.razor.js"></script>

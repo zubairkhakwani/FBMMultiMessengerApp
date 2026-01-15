@@ -27,8 +27,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         [Inject]
         private NavigationManager Navigation { get; set; }
-        [Inject]
-        private ITokenProvider TokenProvider { get; set; }
 
         [Inject]
         private IDialogService DialogService { get; set; }
@@ -51,9 +49,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         } = new();
 
-
-
-
         private List<UserAccountsHttpResponse> AccountsData = new List<UserAccountsHttpResponse>();
         private int TotalAccounts;
         private int ConnectedAccounts;
@@ -66,15 +61,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         private MudTable<UserAccountsHttpResponse> table;
 
+        private CancellationTokenSource _cts = new();
+
         protected override async Task OnInitializedAsync()
         {
-            string? token = await TokenProvider.GetTokenAsync();
-
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                Navigation.NavigateTo("/login");
-            }
-
             if (!string.IsNullOrWhiteSpace(Message))
             {
                 Snackbar.Add(Message, Severity.Success);
@@ -91,14 +81,14 @@ namespace FBMMultiMessenger.Components.Pages.Account
             RequestModel.PageSize = state.PageSize;
             RequestModel.Keyword = Keyword;
 
-            var response = await AccountService.GetMyAccountsAsync(RequestModel);
+            var response = await AccountService.GetMyAccountsAsync(RequestModel, _cts.Token);
 
-            if (response.IsSuccess && response.Data is not null)
+            if (response.IsSuccess)
             {
-                AccountsData = response.Data.UserAccounts?.Records ?? [];
-                TotalAccounts = totalItems = response.Data.UserAccounts?.TotalCount ?? 0;
-                ConnectedAccounts = response.Data.ConnectedAccounts;
-                NotConnectedAccounts = response.Data.NotConnectedAccounts;
+                AccountsData = response.Data?.UserAccounts?.Records ?? [];
+                TotalAccounts = totalItems = response.Data?.UserAccounts?.TotalCount ?? 0;
+                ConnectedAccounts = response.Data?.ConnectedAccounts ?? 0;
+                NotConnectedAccounts = response.Data?.NotConnectedAccounts ?? 0;
             }
             else
             {
@@ -106,7 +96,12 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
 
             table.Items = AccountsData;
-            await InvokeAsync(StateHasChanged);
+
+            if (TotalAccounts !=0)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+
             return new TableData<UserAccountsHttpResponse>() { TotalItems = totalItems, Items = AccountsData };
         }
 
@@ -383,6 +378,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         public void Dispose()
         {
+            _cts.Cancel();
+            _cts.Dispose();
+
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
         }
 

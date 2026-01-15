@@ -2,6 +2,7 @@
 using FBMMultiMessenger.Models.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using MudBlazor;
 
 namespace FBMMultiMessenger.SignalR
 {
@@ -40,7 +41,7 @@ namespace FBMMultiMessenger.SignalR
             this.userId = userId;
             _shouldReconnect = true;
 
-            while(true)
+            while (true)
             {
                 try
                 {
@@ -63,9 +64,13 @@ namespace FBMMultiMessenger.SignalR
                     //successfully connected, so breaking loop. if not connected it throw exception and while loop runs again.
                     break;
                 }
+                catch (OperationCanceledException ex)
+                {
+                    break;
+                }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Something went wrong when connecting user to signalR");
+                    await Task.Delay(500);
                 }
             }
         }
@@ -92,7 +97,6 @@ namespace FBMMultiMessenger.SignalR
             {
                 if (_shouldReconnect)
                 {
-                    Console.WriteLine("SignalR disconnected, attempting to reconnect...");
                     await AttemptReconnect();
                 }
             };

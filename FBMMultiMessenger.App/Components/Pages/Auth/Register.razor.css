@@ -145,13 +145,6 @@ body {
     text-align: center;
 }
 
-.validation-message {
-    color: #c53030;
-    font-size: 12px;
-    margin-top: 5px;
-    display: block;
-}
-
 .terms-checkbox {
     display: flex;
     align-items: flex-start;
