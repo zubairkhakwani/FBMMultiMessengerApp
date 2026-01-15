@@ -11,7 +11,7 @@
     {
         Snackbar.Add("Something went wrong, please try later.", Severity.Error);
 
-        //SentrySdk.CaptureException(exception);
+        SentrySdk.CaptureException(exception);
         return base.OnErrorAsync(exception);
     }
     public new void Recover()

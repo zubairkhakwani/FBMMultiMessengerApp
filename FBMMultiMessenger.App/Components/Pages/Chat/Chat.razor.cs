@@ -130,15 +130,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 await LoadChatMessage(FbChatId);
             }
+
+            await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
-            {
-                await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
-            }
-
             await ConfigurePushNotifications();
         }
 
@@ -440,7 +437,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             await InvokeAsync(StateHasChanged);
 
-            await JS.InvokeVoidAsync("handleNewMessage");
+
+            if (receivedChat.FbChatId == SelectedFbChatId)
+            {
+                await JS.InvokeVoidAsync("handleNewMessage");
+            }
         }
 
         private async Task HandleAccountStatusChangedAsync(List<AccountStatusSignalRModel> accounts)

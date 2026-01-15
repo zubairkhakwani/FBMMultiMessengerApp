@@ -92,6 +92,7 @@
 		<Folder Include="Resources\Images\drawable-xhdpi\" />
 		<Folder Include="Resources\Images\drawable-xxhdpi\" />
 		<Folder Include="Resources\Images\drawable-xxxhdpi\" />
+		<Folder Include="wwwroot\js\" />
 		<Folder Include="wwwroot\templates\" />
 	</ItemGroup>
 
