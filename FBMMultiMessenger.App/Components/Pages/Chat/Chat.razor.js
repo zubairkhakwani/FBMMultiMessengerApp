@@ -1,25 +1,10 @@
-﻿
-(function () {
+﻿(function () {
     let messageContainer = document.querySelector(".messages-container"); // Actual chat messages.
     let messageList = messageContainer.querySelector("#messagesList");
     let inputWrapper = document.querySelector(".input-wrapper");
-    let arrowDownButton = document.querySelector(".arrow-down");
+    var arrowDownBtn = document.querySelector(".arrow-down");
 
-    window.registerEnterHandler = (ref) => {
-        window.dotnetHelper = ref;
-    }
 
-    window.handleNewMessage = () => {
-        var isHalfWay = isHalfWayScrolled();
-        if (isHalfWay) {
-            arrowDownButton?.classList.add("active");
-        } else {
-            messageContainer.scrollTo({
-                top: messageContainer.scrollHeight,
-                behavior: "smooth"
-            });
-        }
-    }
 
     const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
@@ -59,29 +44,35 @@
         const messageInput = document.querySelector('.message-input');
         const searchInput = document.querySelector('.search-input');
 
-        // If clicked on search, let it focus naturally
-        if (e.target === searchInput || searchInput?.contains(e.target)) {
+        // If clicked on search or arrow down button, let it focus naturally
+        if (e.target === searchInput || searchInput?.contains(e.target) || e.target === arrowDownBtn || arrowDownBtn?.contains(e.target)) {
             return;
         }
-
         // Otherwise, focus message input
         if (messageInput && document.activeElement !== messageInput) {
             messageInput.focus();
         }
     });
 
-
-
     messageContainer.addEventListener('scroll', () => {
+        var halfWaf = isHalfWayScrolled();
 
-        var data = isHalfWayScrolled();
-
-        if (data) {
-            arrowDownButton.style.display = "block";
+        if (halfWaf) {
+            arrowDownBtn.style.display = "block";
         }
         else {
-            arrowDownButton.style.display = "none";
+            arrowDownBtn.style.display = "none";
+            arrowDownBtn?.classList.remove("active");
         }
+    });
+
+
+    arrowDownBtn.addEventListener('click', () => {
+        arrowDownBtn.classList.remove("active");
+        messageContainer.scrollTo({
+            top: messageContainer.scrollHeight,
+            behavior: "smooth"
+        });
     });
 
     function isHalfWayScrolled() {
@@ -91,22 +82,29 @@
 
         const scrollableDistance = totalHeight - viewportHeight;
 
-        // Show arrow if user is more than 15% away from bottom
-        if (scrolled < scrollableDistance * 0.85) {
-            return true;
+        //user is more than 15% away from bottom
+        return scrolled < scrollableDistance * 0.85;
+    }
+
+    //Called via Razor component code
+    window.registerEnterHandler = (ref) => {
+        window.dotnetHelper = ref;
+    }
+
+    window.handleNewMessage = () => {
+        var isHalfWay = isHalfWayScrolled();
+        if (isHalfWay) {
+            arrowDownBtn?.classList.add("active");
         } else {
-            return false;
+            messageContainer.scrollTo({
+                top: messageContainer.scrollHeight,
+                behavior: "smooth"
+            });
         }
     }
 
-    arrowDownButton.addEventListener('click', () => {
-
-        arrowDownButton.classList.remove("active");
-        messageContainer.scrollTo({
-            top: messageContainer.scrollHeight,
-            behavior: "smooth"
-        });
-    });
-
-
+    window.hideArrowDownBtn = () => {
+        arrowDownBtn.style.display = "none";
+        arrowDownBtn?.classList.remove("active");
+    }
 })();

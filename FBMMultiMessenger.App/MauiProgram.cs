@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using OneSignalSDK.DotNet;
+using OneSignalSDK.DotNet.Core.Notifications;
 using System.Reflection;
 
 
@@ -26,7 +27,6 @@ namespace FBMMultiMessenger
                    {
                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                    });
-
 
             builder.UseSentry(options =>
             {

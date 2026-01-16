@@ -11,23 +11,25 @@ body {
     overflow: hidden;
 }
 
+
+
 .arrow-down {
     display: none;
     position: fixed;
     background: linear-gradient(135deg, #0f0f0f 0%, #3a3a3a 100%);
-    bottom: 90px;
-    right: 10px;
+    bottom: 140px;
+    right: 15px;
     padding: .5rem;
     border-radius: 50%;
     width: 40px;
     aspect-ratio: 1/1;
     text-align: center;
     cursor: pointer;
-    z-index: 3;
+    z-index: 150;
     outline: none !important;
     border: none !important;
     color: #ffff;
-    box-shadow: 0 0 12px rgba(8, 102, 255, 0.6), 0 0 24px rgba(4, 43, 92, 0.4);
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
 @keyframes pulseRing {
@@ -867,7 +869,7 @@ body {
 .carousel-overlay {
     position: fixed;
     inset: 0;
-    z-index: 120;
+    z-index: 200;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 20px;
 }
@@ -886,3 +888,6 @@ body {
         justify-content: flex-start;
     }
 }
+
+
+

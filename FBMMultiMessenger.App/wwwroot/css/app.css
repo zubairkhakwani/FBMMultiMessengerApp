@@ -116,7 +116,7 @@ h1:focus {
     position: fixed;
     background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
     bottom: 90px;
-    right: 10px;
+    right: 15px;
     padding: .5rem;
     border-radius: 50%;
     width: 40px;
@@ -127,7 +127,7 @@ h1:focus {
     outline: none !important;
     border: none !important;
     color: #ffff;
-    box-shadow: 0 0 12px rgba(8, 102, 255, 0.6), 0 0 24px rgba(4, 43, 92, 0.4);
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
     .floating-add-button:hover {

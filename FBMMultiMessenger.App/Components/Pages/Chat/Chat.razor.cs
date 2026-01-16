@@ -89,6 +89,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //For Mobile layout we overlap the side bar and messages
         private int SidebarZIndex = 100;
         private int MainChatZIndex = 0;
+        private bool ShowScrollToBottomButton = true;
 
         //Selected Message Header
         private string? selectedAccountChat;
@@ -125,12 +126,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             await GetAccountChats();
 
-            //if a user opened notification so we have to open the right chat.
-            if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
-            {
-                await LoadChatMessage(FbChatId);
-            }
+            await OpenRightChat();
 
+            //this function is okay here, as it needs to be called after a sec after rendering..
             await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
         }
 
@@ -148,6 +146,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             var previousSelectedChatId = SelectedFbChatId;
             SelectedFbChatId = fbChatId;
+
 
             if (previousSelectedChatId != SelectedFbChatId)
             {
@@ -193,7 +192,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             ChatMessages = response?.Data ?? new List<GeChatMessagesHttpResponse>();
 
-            // await JS.InvokeVoidAsync("scrollToBottom");
         }
 
 
@@ -508,18 +506,45 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 string fbChatId = fbChatIdObj!.ToString()!;
                 bool isParsed = bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
 
+                string CurrentRoute = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0];
+
                 // Navigate to chat if subscription is not expired otherwise navigate to subscription page.
-                MainThread.BeginInvokeOnMainThread(() =>
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    if (!isSubscriptionExpired)
-                    {
-                        Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={fbChatId}");
-                    }
-                    else
+                    //if subscription has expired
+                    if (isSubscriptionExpired)
                     {
                         Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={message}");
                     }
+                    //if the user is another chat or in the chat sidebar
+                    else if (fbChatId != SelectedFbChatId)
+                    {
+                        await LoadChatMessage(fbChatId);
+                    }
+                    // The user is not in the chat page so we have to redirect
+                    else if (!CurrentRoute.Equals("/Chat", StringComparison.OrdinalIgnoreCase) || !CurrentRoute.Equals("/", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={fbChatId}");
+                    }
                 });
+            }
+        }
+
+        private async Task OpenRightChat()
+        {
+            //if a user opened notification so we have to open the right chat.
+            if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
+            {
+                await LoadChatMessage(FbChatId);
+                return;
+            }
+
+            var pendingLink = Preferences.Get("PendingDeepLink", string.Empty);
+
+            if (!string.IsNullOrEmpty(pendingLink))
+            {
+                Preferences.Remove("PendingDeepLink");
+                Navigation.NavigateTo(pendingLink);
             }
         }
 
@@ -641,6 +666,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             SelectedFbChatId = null;
             SidebarZIndex = 100;
             MainChatZIndex = 0;
+
+            JS.InvokeVoidAsync("hideArrowDownBtn");
         }
 
         private void ShowMainChatView()
@@ -649,6 +676,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             // to the front and hiding the sidebar.
             SidebarZIndex = 0;
             MainChatZIndex = 110;
+
+            //JS.InvokeVoidAsync("hideArrowDownBtn");
         }
 
         private void ShowCarousal(List<FileData> selectedChatFiles, string selectedChatFileUrl, bool isVideo = false)
