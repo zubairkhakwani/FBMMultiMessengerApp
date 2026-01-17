@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using OneSignalSDK.DotNet;
-using OneSignalSDK.DotNet.Core.Notifications;
 using System.Reflection;
 
 
@@ -108,6 +107,14 @@ namespace FBMMultiMessenger
             {
                 var appId = builder.Configuration.GetValue<string>("OneSignal:AppId")!;
                 OneSignal.Initialize(appId);
+
+                OneSignal.Notifications.WillDisplay += (sender, args) =>
+                {
+                    //var notificationReceiver = new NotificationReceiver();
+                    //notificationReceiver.OnNotificationReceived(args);
+                };
+
+
             }
 
             return builder.Build();

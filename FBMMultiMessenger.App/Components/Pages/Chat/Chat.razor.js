@@ -93,9 +93,15 @@
 
     window.handleNewMessage = () => {
         var isHalfWay = isHalfWayScrolled();
+        console.log(`Arrow down button ${arrowDownBtn}`)
+        console.log(`Half way scrolled ${isHalfWay}`);
         if (isHalfWay) {
+
+            console.log(`Adding active class`)
             arrowDownBtn?.classList.add("active");
         } else {
+            console.log(`Smooth Scrolling`)
+
             messageContainer.scrollTo({
                 top: messageContainer.scrollHeight,
                 behavior: "smooth"

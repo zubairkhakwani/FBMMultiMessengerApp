@@ -438,6 +438,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             if (receivedChat.FbChatId == SelectedFbChatId)
             {
+                Snackbar.Add("Handle New Message");
                 await JS.InvokeVoidAsync("handleNewMessage");
             }
         }

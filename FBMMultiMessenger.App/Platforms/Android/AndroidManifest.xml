@@ -6,8 +6,9 @@
 		android:supportsRtl="true"
 		android:label="FBM Multi Messenger">
 
-
-
+		<meta-data
+			android:name="com.onesignal.NotificationServiceExtension"
+			android:value="FBM_Multi_Messenger.FBM_Multi_Messenger.NotificationServiceExtension" />
 
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
