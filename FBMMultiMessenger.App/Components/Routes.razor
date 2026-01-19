@@ -52,3 +52,32 @@
         </Router>
     </CustomErrorBoundary>
 </CascadingAuthenticationState>
+
+@code
+{
+    [Inject] private NavigationManager Navigation { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
+    }
+
+    private async Task OnNotificaitonClickedHandler(NotificationAdditionalData data)
+    {
+        string currentRoute = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0];
+        bool isOnChatPage = currentRoute.Equals("/Chat", StringComparison.OrdinalIgnoreCase)
+                          &&
+                          currentRoute.Equals("/", StringComparison.OrdinalIgnoreCase);
+
+        if (data.IsSubscriptionExpired)
+        {
+            Navigation.NavigateTo($"packages?isExpired=true&message={Uri.EscapeDataString(data.Message)}");
+        }
+        else if (!isOnChatPage)
+        {
+            Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={data.FbChatId}");
+        }
+
+
+    }
+}

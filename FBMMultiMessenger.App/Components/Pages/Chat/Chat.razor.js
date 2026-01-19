@@ -1,116 +1,155 @@
 ﻿(function () {
-    let messageContainer = document.querySelector(".messages-container"); // Actual chat messages.
-    let messageList = messageContainer.querySelector("#messagesList");
-    let inputWrapper = document.querySelector(".input-wrapper");
-    var arrowDownBtn = document.querySelector(".arrow-down");
-
-
-
-    const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-            if (mutation.type === "childList") {
-                if (mutation.target === messageList) {
-
-                    const messages = messageList.querySelectorAll('.message');
-                    const lastMessage = messages[messages.length - 1];
-
-                    const scrollToBottom = lastMessage?.getAttribute('data-scroll-to-bottom');
-
-                    if (scrollToBottom === "True") {
-                        messageContainer.scrollTop = messageContainer.scrollHeight;
-                    }
-                }
-                else if (mutation.target === inputWrapper) {
-                    const messageInput = document.querySelector(".message-input");
-                    if (!messageInput) { console.log("Cannot find message input"); return; }
-                    messageInput.onkeydown = async e => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-
-                            let message = messageInput.value;
-                            messageInput.value = "";
-                            e.preventDefault();
-                            await window.dotnetHelper?.invokeMethodAsync('HandleEnterKey', message);
-                        }
-                    };
-                }
-            }
-        }
-    });
-    observer.observe(messageContainer, { childList: true, subtree: true, });
-    observer.observe(inputWrapper, { childList: true, subtree: true, })
-
-
-    document.addEventListener('click', function (e) {
-        const messageInput = document.querySelector('.message-input');
-        const searchInput = document.querySelector('.search-input');
-
-        // If clicked on search or arrow down button, let it focus naturally
-        if (e.target === searchInput || searchInput?.contains(e.target) || e.target === arrowDownBtn || arrowDownBtn?.contains(e.target)) {
-            return;
-        }
-        // Otherwise, focus message input
-        if (messageInput && document.activeElement !== messageInput) {
-            messageInput.focus();
-        }
-    });
-
-    messageContainer.addEventListener('scroll', () => {
-        var halfWaf = isHalfWayScrolled();
-
-        if (halfWaf) {
-            arrowDownBtn.style.display = "block";
-        }
-        else {
-            arrowDownBtn.style.display = "none";
-            arrowDownBtn?.classList.remove("active");
-        }
-    });
-
-
-    arrowDownBtn.addEventListener('click', () => {
-        arrowDownBtn.classList.remove("active");
-        messageContainer.scrollTo({
-            top: messageContainer.scrollHeight,
-            behavior: "smooth"
-        });
-    });
+    // get fresh DOM references
+    function getElements() {
+        return {
+            messageContainer: document.querySelector(".messages-container"),
+            messageList: document.querySelector("#messagesList"),
+            inputWrapper: document.querySelector(".input-wrapper"),
+            arrowDownBtn: document.querySelector(".arrow-down")
+        };
+    }
 
     function isHalfWayScrolled() {
-        const viewportHeight = messageContainer.clientHeight;   // visible height
-        const totalHeight = messageContainer.scrollHeight;      // total content height
-        const scrolled = messageContainer.scrollTop;            // how far user scrolled from top
+        const { messageContainer } = getElements();
+        if (!messageContainer) return false;
 
+        const viewportHeight = messageContainer.clientHeight;
+        const totalHeight = messageContainer.scrollHeight;
+        const scrolled = messageContainer.scrollTop;
         const scrollableDistance = totalHeight - viewportHeight;
 
-        //user is more than 15% away from bottom
         return scrolled < scrollableDistance * 0.85;
     }
 
-    //Called via Razor component code
-    window.registerEnterHandler = (ref) => {
-        window.dotnetHelper = ref;
+    function initializeObservers() {
+        const { messageContainer, messageList, inputWrapper } = getElements();
+        if (!messageContainer || !messageList || !inputWrapper) {
+            console.warn("Required elements not found for observers");
+            return;
+        }
+
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.type === "childList") {
+                    if (mutation.target === messageList) {
+                        const messages = messageList.querySelectorAll('.message');
+                        const lastMessage = messages[messages.length - 1];
+                        const scrollToBottom = lastMessage?.getAttribute('data-scroll-to-bottom');
+
+                        if (scrollToBottom === "True") {
+                            messageContainer.scrollTop = messageContainer.scrollHeight;
+                        }
+                    }
+                    else if (mutation.target === inputWrapper) {
+                        const messageInput = document.querySelector(".message-input");
+                        if (!messageInput) {
+                            console.log("Cannot find message input");
+                            return;
+                        }
+                        messageInput.onkeydown = async e => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                console.log("Enter pressed")
+                                let message = messageInput.value;
+                                messageInput.value = "";
+                                e.preventDefault();
+                                await window.dotnetHelper?.invokeMethodAsync('HandleEnterKey', message);
+                            }
+                        };
+                    }
+                }
+            }
+        });
+
+        observer.observe(messageContainer, { childList: true, subtree: true });
+        observer.observe(inputWrapper, { childList: true, subtree: true });
     }
 
+    function initializeEventListeners() {
+        const { messageContainer, arrowDownBtn } = getElements();
+
+        // Click handler for focusing message input
+        document.addEventListener('click', function (e) {
+            const messageInput = document.querySelector('.message-input');
+            const searchInput = document.querySelector('.search-input');
+            const { arrowDownBtn } = getElements();
+
+            if (e.target === searchInput || searchInput?.contains(e.target) ||
+                e.target === arrowDownBtn || arrowDownBtn?.contains(e.target)) {
+                return;
+            }
+
+            if (messageInput && document.activeElement !== messageInput) {
+                messageInput.focus();
+            }
+        });
+
+        // Scroll handler
+        if (messageContainer) {
+            messageContainer.addEventListener('scroll', () => {
+                const { arrowDownBtn } = getElements();
+                if (!arrowDownBtn) return;
+
+                const halfWay = isHalfWayScrolled();
+
+                if (halfWay) {
+                    arrowDownBtn.style.display = "block";
+                } else {
+                    arrowDownBtn.style.display = "none";
+                    arrowDownBtn.classList.remove("active");
+                }
+            });
+        }
+
+        // Arrow down button click handler
+        if (arrowDownBtn) {
+            arrowDownBtn.addEventListener('click', () => {
+                const { messageContainer, arrowDownBtn } = getElements();
+                if (!messageContainer || !arrowDownBtn) return;
+
+                arrowDownBtn.classList.remove("active");
+                messageContainer.scrollTo({
+                    top: messageContainer.scrollHeight,
+                    behavior: "smooth"
+                });
+            });
+        }
+    }
+
+    // Initialize on load
+    initializeObservers();
+    initializeEventListeners();
+
+    // Public API
+    window.registerEnterHandler = (ref) => {
+
+        window.dotnetHelper = ref;
+    };
+
     window.handleNewMessage = () => {
-        var isHalfWay = isHalfWayScrolled();
-        console.log(`Arrow down button ${arrowDownBtn}`)
-        console.log(`Half way scrolled ${isHalfWay}`);
+        const { messageContainer, arrowDownBtn } = getElements();
+
+        if (!messageContainer || !arrowDownBtn) {
+            return;
+        }
+
+        const isHalfWay = isHalfWayScrolled();
+
+
         if (isHalfWay) {
-
-            console.log(`Adding active class`)
-            arrowDownBtn?.classList.add("active");
+            arrowDownBtn.classList.add("active");
         } else {
-            console.log(`Smooth Scrolling`)
-
             messageContainer.scrollTo({
                 top: messageContainer.scrollHeight,
                 behavior: "smooth"
             });
         }
-    }
+    };
 
     window.hideArrowDownBtn = () => {
+        const { arrowDownBtn } = getElements();
+        if (!arrowDownBtn) return;
+
         arrowDownBtn.style.display = "none";
-        arrowDownBtn?.classList.remove("active");
-    }
+        arrowDownBtn.classList.remove("active");
+    };
 })();

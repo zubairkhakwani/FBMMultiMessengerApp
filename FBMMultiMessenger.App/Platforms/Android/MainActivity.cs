@@ -3,7 +3,11 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using FBMMultiMessenger.Helpers;
+using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services;
+using OneSignalSDK.DotNet;
+using OneSignalSDK.DotNet.Core.Notifications;
 
 namespace FBMMultiMessenger.Platforms.Android
 {
@@ -25,15 +29,28 @@ namespace FBMMultiMessenger.Platforms.Android
             WebViewSoftInputPatch.Initialize();
 
             HandleIntent(Intent);
+
+            OneSignal.Notifications.Clicked += HandleNotificationClicked;
         }
 
-        protected override void OnNewIntent(Intent? intent)
+        private void HandleNotificationClicked(object sender, NotificationClickedEventArgs e)
         {
-            base.OnNewIntent(intent);
-            if (intent != null)
+            var data = e.Notification.AdditionalData;
+
+            data.TryGetValue("fbChatId", out var fbChatIdObj);
+            data.TryGetValue("isSubscriptionExpired", out var subscriptionExpiredObj);
+            data.TryGetValue("message", out var message);
+
+            bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
+
+            var additionalData = new NotificationAdditionalData()
             {
-                HandleIntent(intent);
-            }
+                FbChatId = fbChatIdObj?.ToString() ?? string.Empty,
+                IsSubscriptionExpired = isSubscriptionExpired,
+                Message = message?.ToString() ?? string.Empty
+            };
+
+            BlazorMauiCommunicator.NotificationArrived(additionalData);
         }
 
         private void HandleIntent(Intent? intent)

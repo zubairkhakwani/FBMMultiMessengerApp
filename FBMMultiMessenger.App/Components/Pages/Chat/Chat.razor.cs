@@ -17,6 +17,7 @@ using OneSignalSDK.DotNet.Core.Notifications;
 using SixLabors.ImageSharp;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Web;
 
 
 namespace FBMMultiMessenger.Components.Pages.Chat
@@ -89,7 +90,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //For Mobile layout we overlap the side bar and messages
         private int SidebarZIndex = 100;
         private int MainChatZIndex = 0;
-        private bool ShowScrollToBottomButton = true;
 
         //Selected Message Header
         private string? selectedAccountChat;
@@ -126,7 +126,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             await GetAccountChats();
 
-            await OpenRightChat();
+            await OpenNotificationChat();
 
             //this function is okay here, as it needs to be called after a sec after rendering..
             await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
@@ -138,15 +138,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         }
 
 
-
-
         #region Domain Logic
 
         private async Task LoadChatMessage(string fbChatId)
         {
             var previousSelectedChatId = SelectedFbChatId;
             SelectedFbChatId = fbChatId;
-
 
             if (previousSelectedChatId != SelectedFbChatId)
             {
@@ -167,7 +164,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 myAccountChats.UnReadCount = 0;
                 myAccountChats.IsRead = true;
                 UserProfileImage = myAccountChats.UserProfileImage;
-                await InvokeAsync(StateHasChanged);
             }
 
             var response = await ChatMessagesService.GetChatMessages(fbChatId, _cts.Token);
@@ -192,6 +188,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             ChatMessages = response?.Data ?? new List<GeChatMessagesHttpResponse>();
 
+            await InvokeAsync(StateHasChanged);
         }
 
 
@@ -438,7 +435,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             if (receivedChat.FbChatId == SelectedFbChatId)
             {
-                Snackbar.Add("Handle New Message");
                 await JS.InvokeVoidAsync("handleNewMessage");
             }
         }
@@ -489,63 +485,64 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 var oneSignalExternalId = $"FBM_{currentUserId}";
 
                 OneSignal.Login(oneSignalExternalId);
-
-                OneSignal.Notifications.Clicked -= HandleNotificationClicked;
-                OneSignal.Notifications.Clicked += HandleNotificationClicked;
             }
         }
 
-        public void HandleNotificationClicked(object sender, NotificationClickedEventArgs e)
+        private async Task OnNotificaitonClicked(NotificationAdditionalData notification)
         {
-            var data = e.Notification.AdditionalData;
-            var hasFbChatIdKey = data.TryGetValue("chatId", out var fbChatIdObj);
-            var hasSubscriptionExpiredKey = data.TryGetValue("isSubscriptionExpired", out var subscriptionExpiredObj);
-            var messageKey = data.TryGetValue("message", out var message);
+            var notificaitonFbChatId = notification.FbChatId;
 
-            if (data != null && hasFbChatIdKey && hasSubscriptionExpiredKey)
+            //If the user is on different chat or on sidebar, then load the chat messages
+            if (notificaitonFbChatId != SelectedFbChatId)
             {
-                string fbChatId = fbChatIdObj!.ToString()!;
-                bool isParsed = bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
-
-                string CurrentRoute = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0];
-
-                // Navigate to chat if subscription is not expired otherwise navigate to subscription page.
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    //if subscription has expired
-                    if (isSubscriptionExpired)
-                    {
-                        Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={message}");
-                    }
-                    //if the user is another chat or in the chat sidebar
-                    else if (fbChatId != SelectedFbChatId)
-                    {
-                        await LoadChatMessage(fbChatId);
-                    }
-                    // The user is not in the chat page so we have to redirect
-                    else if (!CurrentRoute.Equals("/Chat", StringComparison.OrdinalIgnoreCase) || !CurrentRoute.Equals("/", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={fbChatId}");
-                    }
-                });
+                await LoadChatMessage(notificaitonFbChatId);
             }
         }
 
-        private async Task OpenRightChat()
+        private async Task OpenNotificationChat()
         {
-            //if a user opened notification so we have to open the right chat.
+            // Executes when user taps a notification while the app is running
             if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
             {
                 await LoadChatMessage(FbChatId);
                 return;
             }
 
+            //Exectutes when app is opened from a terminated state via a notification
             var pendingLink = Preferences.Get("PendingDeepLink", string.Empty);
 
-            if (!string.IsNullOrEmpty(pendingLink))
+            if (!string.IsNullOrWhiteSpace(pendingLink))
             {
                 Preferences.Remove("PendingDeepLink");
-                Navigation.NavigateTo(pendingLink);
+
+                var uri = new Uri(pendingLink);
+
+                var queryParams = HttpUtility.ParseQueryString(uri.Query);
+
+                foreach (var item in queryParams)
+                {
+                    Snackbar.Add($"Query paramter {item}");
+                }
+                var fbChatId = queryParams["fbChatId"];
+                Snackbar.Add($"Chat Id {fbChatId}");
+
+                var isSubscriptionExpiredString = queryParams["isSubscriptionExpired"];
+                bool.TryParse(isSubscriptionExpiredString, out var isSubscriptionExpired);
+
+
+                //Extra safety check
+                if (string.IsNullOrWhiteSpace(fbChatId))
+                {
+                    Navigation.NavigateTo(pendingLink);
+                    return;
+                }
+                else if (isSubscriptionExpired)
+                {
+                    Navigation.NavigateTo(pendingLink);
+                    return;
+                }
+
+                await LoadChatMessage(fbChatId);
             }
         }
 
@@ -559,7 +556,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             BackButtonService.BackButtonPressed+= OnBackButtonPressed;
             SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
+            BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClicked;
         }
+
+
 
         private bool IsVideo(string url)
         {
@@ -836,6 +836,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
+            BlazorMauiCommunicator.OnNotificationClicked -= OnNotificaitonClicked;
 
             foreach (var file in PreviewMediaFiles)
             {
