@@ -58,9 +58,7 @@ namespace FBMMultiMessenger.Platforms.Android
             if (intent?.Data != null)
             {
                 var deepLink = intent.Data.ToString() ?? string.Empty;
-                var uri = new Uri(deepLink);
-                var route = $"/{uri.Host}{uri.Query}";
-                Preferences.Set("PendingDeepLink", route);
+                Preferences.Set("PendingDeepLink", deepLink);
             }
         }
 

@@ -516,33 +516,22 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 Preferences.Remove("PendingDeepLink");
 
                 var uri = new Uri(pendingLink);
-
                 var queryParams = HttpUtility.ParseQueryString(uri.Query);
 
-                foreach (var item in queryParams)
-                {
-                    Snackbar.Add($"Query paramter {item}");
-                }
-                var fbChatId = queryParams["fbChatId"];
-                Snackbar.Add($"Chat Id {fbChatId}");
-
+                var chatId = queryParams["fbChatId"];
+                var messageText = queryParams["message"];
                 var isSubscriptionExpiredString = queryParams["isSubscriptionExpired"];
+
                 bool.TryParse(isSubscriptionExpiredString, out var isSubscriptionExpired);
 
-
-                //Extra safety check
-                if (string.IsNullOrWhiteSpace(fbChatId))
+                if (isSubscriptionExpired)
                 {
-                    Navigation.NavigateTo(pendingLink);
-                    return;
+                    Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={messageText}");
                 }
-                else if (isSubscriptionExpired)
+                else if (!string.IsNullOrEmpty(chatId))
                 {
-                    Navigation.NavigateTo(pendingLink);
-                    return;
+                    await LoadChatMessage(chatId);
                 }
-
-                await LoadChatMessage(fbChatId);
             }
         }
 
