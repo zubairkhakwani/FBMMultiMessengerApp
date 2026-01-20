@@ -92,14 +92,14 @@
                 const halfWay = isHalfWayScrolled();
 
                 if (halfWay) {
-                    arrowDownBtn.style.display = "block";
+                    arrowDownBtn.classList.add("visible");
                 } else {
-                    arrowDownBtn.style.display = "none";
+                    arrowDownBtn.classList.remove("visible");
                     arrowDownBtn.classList.remove("active");
                 }
             });
         }
-
+                                                                                     
         // Arrow down button click handler
         if (arrowDownBtn) {
             arrowDownBtn.addEventListener('click', () => {
@@ -149,7 +149,7 @@
         const { arrowDownBtn } = getElements();
         if (!arrowDownBtn) return;
 
-        arrowDownBtn.style.display = "none";
+        arrowDownBtn.classList.remove("visible");
         arrowDownBtn.classList.remove("active");
     };
 })();

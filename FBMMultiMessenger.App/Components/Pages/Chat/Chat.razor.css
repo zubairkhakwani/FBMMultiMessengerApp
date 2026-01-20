@@ -11,10 +11,7 @@ body {
     overflow: hidden;
 }
 
-
-
 .arrow-down {
-    display: none;
     position: fixed;
     background: linear-gradient(135deg, #0f0f0f 0%, #3a3a3a 100%);
     bottom: 140px;
@@ -29,7 +26,19 @@ body {
     outline: none !important;
     border: none !important;
     color: #ffff;
+    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.45), opacity 0.3s ease;
+    transform: translateY(200px);
+    opacity: 0;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.pulse-animation.active {
+    animation: pulseRing 1s ease-out infinite;
+}
+
+.arrow-down.visible {
+    transform: translateY(0);
+    opacity: 1;
 }
 
 @keyframes pulseRing {
@@ -46,9 +55,7 @@ body {
     }
 }
 
-.pulse-animation.active {
-    animation: pulseRing 1s ease-out infinite;
-}
+
 
 .messenger-container {
     display: grid;
@@ -888,6 +895,3 @@ body {
         justify-content: flex-start;
     }
 }
-
-
-
