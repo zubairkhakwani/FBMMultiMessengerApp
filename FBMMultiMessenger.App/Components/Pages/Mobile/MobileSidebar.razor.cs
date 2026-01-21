@@ -6,7 +6,6 @@ namespace FBMMultiMessenger.Components.Pages.Mobile
 {
     public partial class MobileSidebar
     {
-
         [Inject]
         public IAuthService AuthService { get; set; }
 
@@ -15,6 +14,10 @@ namespace FBMMultiMessenger.Components.Pages.Mobile
 
         [Inject]
         public NavigationManager Navigation { get; set; }
+
+        [Inject]
+        private IAppService AppService { get; set; }
+
 
         public string FullName = string.Empty;
         public string ShortName { get; set; } = string.Empty;
@@ -31,6 +34,21 @@ namespace FBMMultiMessenger.Components.Pages.Mobile
             ShortName = shortName;
 
         }
+
+
+        private void HandleUpdateClick()
+        {
+            if (PlatformHelper.IsMobilePlatform)
+            {
+                AppService.UpdateAndriodApk();
+            }
+            else
+            {
+                // Desktop update (future)  
+            }
+        }
+
+
         public async Task Logout()
         {
             await AuthService.Logout();

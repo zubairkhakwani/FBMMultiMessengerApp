@@ -13,7 +13,7 @@ body {
 .container {
     max-width: 1450px;
     margin: 1rem auto;
-    padding:1em;
+    padding: 1em;
 }
 
 
@@ -37,6 +37,8 @@ body {
         background: #f8f9fa;
         transform: translateX(-3px);
     }
+
+
 
 .profile-header {
     background: white;
@@ -412,4 +414,3 @@ body {
     width: 100%;
     background: #2ed573; /* Bright Green */
 }
-

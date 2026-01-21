@@ -1,19 +1,20 @@
-﻿<div class="mobile-nav">
-    <div class="icon-container" @onclick='() => NavigateTo("/Account")' >
+﻿@using FBMMultiMessenger.Services.IServices
+<div class="mobile-nav">
+    <div class="icon-container" @onclick='() => NavigateTo("/Account")'>
         <div class="custom_nav-item @(IsActive("/Account") ? "active" : "")">
             <i class="fa-solid fa-store"></i>
         </div>
     </div>
 
-    <div class="icon-container" @onclick='() => NavigateTo("/Chat")'' >
+    <div class="icon-container" @onclick='() => NavigateTo("/Chat")'>
         <div class="custom_nav-item @(IsActive("/Chat") ? "active" : "")">
             <i class="fa fa-comments"> </i>
         </div>
     </div>
 
-    <div class="icon-container" @onclick='() => NavigateTo("/mobile-sidebar")' >
+    <div class="icon-container" @onclick='() => NavigateTo("/mobile-sidebar")'>
         <div class="custom_nav-item @(IsActive("/mobile-sidebar") ? "active" : "")">
-            <div class="hamburger">
+            <div class="hamburger @(VersionHelper.IsUpdateAvailable ? "shimmer" : "") ">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar half-size"></span>
@@ -22,26 +23,5 @@
     </div>
 </div>
 
-@code {
-    [Inject] private NavigationManager Navigation { get; set; }
-
-    private void NavigateTo(string path)
-    {
-        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
-        if (currentPath != path)
-        {
-            Navigation.NavigateTo(path);
-        }
-    }
-
-    private bool IsActive(string path)
-    {
-        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
-        if (currentPath == "/" || currentPath == "")
-            currentPath = "/Chat";
-        
-        return currentPath.Equals(path, StringComparison.OrdinalIgnoreCase);
-    }
-}
 
 

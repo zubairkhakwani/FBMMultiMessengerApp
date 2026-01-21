@@ -163,3 +163,112 @@ body {
         background: #dc3545;
         color: white;
     }
+
+
+
+.update-available-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    margin-left: 12px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(8, 102, 255, 0.3);
+}
+
+    .update-available-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(8, 102, 255, 0.4);
+    }
+
+    /* Shimmer effect */
+    .update-available-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.3), transparent );
+        animation: shimmer 2s infinite;
+    }
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+.update-icon {
+    font-size: 18px;
+    animation: ring 2s ease-in-out infinite;
+}
+
+@keyframes ring {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+
+    10%, 30% {
+        transform: rotate(-15deg);
+    }
+
+    20%, 40% {
+        transform: rotate(15deg);
+    }
+
+    50% {
+        transform: rotate(0deg);
+    }
+}
+
+.update-text {
+    position: relative;
+    z-index: 1;
+}
+
+.update-badge {
+    background: #ff4757;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .update-available-btn {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -1,18 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="FBM_Multi_Messenger.FBM_Multi_Messenger" android:versionName="1">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="FBM_Multi_Messenger.FBM_Multi_Messenger"
+          android:versionName="1">
+
 	<application
-		android:allowBackup="true"
-		android:icon="@mipmap/fbm1"
+        android:allowBackup="true"
+        android:icon="@mipmap/fbm1"
 		android:supportsRtl="true"
-		android:label="FBM Multi Messenger">
+        android:label="FBM Multi Messenger">
 
 		<meta-data
-			android:name="com.onesignal.NotificationServiceExtension"
-			android:value="FBM_Multi_Messenger.FBM_Multi_Messenger.NotificationServiceExtension" />
+            android:name="com.onesignal.NotificationServiceExtension"
+            android:value="FBM_Multi_Messenger.FBM_Multi_Messenger.NotificationServiceExtension" />
+
+		<provider
+    android:name="androidx.core.content.FileProvider"
+    android:authorities="${applicationId}.fileprovider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/file_paths" />
+		</provider>
+
 
 	</application>
+
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+
 </manifest>

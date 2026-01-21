@@ -1,15 +1,16 @@
 ﻿@page "/Profile"
+@using System.Diagnostics;
+@using FBMMultiMessenger.Services.IServices
+
 <div class="container">
     <a class="back-button" href="/account">
         ← Back to Dashboard
     </a>
-    @* <div class="profile-header">
-        <div class="profile-avatar">@ShortName</div>
-        <div class="profile-header-info">
-            <h1>Shaheer Ahmad</h1>
-            <p>Premium Member • Joined January 15, 2025</p>
-        </div>
-    </div> *@
+
+   
+
+
+
 
     <div class="cards-grid">
         <!-- Personal Information Card -->
@@ -54,15 +55,15 @@
                 </div>
                 @if (ShowProfileLoader)
                 {
-                        <button disabled class="btn-primary">
-                            <div class="loader"></div>
-                        </button>
+                    <button disabled class="btn-primary">
+                        <div class="loader"></div>
+                    </button>
                 }
                 else
                 {
-                        <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
                 }
-                
+
             </EditForm>
         </div>
 
@@ -90,7 +91,7 @@
                     </div>
                 </div>
 
-                 <PasswordRequirement Password="@Password"/>
+                <PasswordRequirement Password="@Password" />
 
                 <div class="form-group">
                     <label class="form-label" for="newPassword">New Password <span class="aestaric">*</span></label>
@@ -105,10 +106,10 @@
                         <ValidationMessage For="@(() => PasswordModel.NewPassword)" class="validation-message" />
 
                         <button type="button" class="toggle-password">
-                           @*  👁️ *@
+                            @*  👁️ *@
                         </button>
                     </div>
-                   
+
                 </div>
 
                 <div class="form-group">
@@ -131,15 +132,15 @@
                 </div>
                 @if (ShowPasswordLoader)
                 {
-                        <button disabled class="btn-primary">
-                            <div class="loader"></div>
-                        </button>
+                    <button disabled class="btn-primary">
+                        <div class="loader"></div>
+                    </button>
                 }
                 else
                 {
                     <button type="submit" class="btn-primary">Change Password</button>
                 }
-               
+
             </EditForm>
         </div>
 
@@ -196,3 +197,4 @@
         </div>
     </div>
 </div>
+

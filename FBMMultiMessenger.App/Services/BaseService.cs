@@ -39,9 +39,9 @@ namespace FBMMultiMessenger.Services
                 var url = $"{_baseUrl}/api/{apiRequest.Url}";
                 message.RequestUri = new Uri(url);
 
-                var token = await _tokenProvider.GetTokenAsync();
-                if (token is not null && withBearer)
+                if (withBearer)
                 {
+                    var token = await _tokenProvider.GetTokenAsync();
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
 

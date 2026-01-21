@@ -56,6 +56,15 @@
             </div>
             <span>Profile</span>
         </NavLink>
+
+         @if (VersionHelper.IsUpdateAvailable)
+         {
+            <button class="update-available-btn" @onclick="HandleUpdateClick">
+                <span class="update-icon">🔔</span>
+                <span class="update-text">Update Available</span>
+                <span class="update-badge">New</span>
+            </button>
+        }
     </div>
 
     <!-- Mobile Logout Button -->
