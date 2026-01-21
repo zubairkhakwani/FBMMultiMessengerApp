@@ -1,5 +1,4 @@
-﻿using FBMMultiMessenger.Services.IServices;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace FBMMultiMessenger.Components.Pages.Mobile
 {

@@ -12,10 +12,8 @@ namespace FBMMultiMessenger.Services
     {
         private string _downloadFolder;
         private string _versionFilePath;
-        private ISnackbar _snackbarService;
-        public AppService(ISnackbar snackbar)
+        public AppService()
         {
-            this._snackbarService = snackbar;
             this._downloadFolder = GetDownloadPath();
             this._versionFilePath = Path.Combine(_downloadFolder, "version.json");
         }
@@ -55,8 +53,6 @@ namespace FBMMultiMessenger.Services
 
                         var data = await client.GetByteArrayAsync(downloadUrl);
                         await File.WriteAllBytesAsync(downloadPath, data);
-
-                        _snackbarService.Add("Update downloaded successfully.", Severity.Success);
 
                         currentApp.DownloadedVersion = latestVersionString;
                         await SaveVersionAsync(currentApp);
