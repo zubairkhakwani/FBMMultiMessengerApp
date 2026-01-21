@@ -23,7 +23,7 @@ body {
 /* Mobile Menu Header */
 .mobile-menu-header {
     padding: 24px 20px;
-    background: linear-gradient(135deg, #0084ff 0%, #00a5ff 100%);
+    background: var(--primary-bg-clr);
     color: white;
 }
 
@@ -38,6 +38,41 @@ body {
         color: inherit;
     }
 
+/* Version Glass Container */
+.version-glass {
+    margin-top:.5rem;
+    padding: 16px;
+    background: var(--primary-bg-clr);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.version-icon {
+    font-size: 20px;
+}
+
+.version-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+}
+
+.version-badge-latest {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
 /* Mobile Close Button */
 .mobile-close-btn {
     color: white;

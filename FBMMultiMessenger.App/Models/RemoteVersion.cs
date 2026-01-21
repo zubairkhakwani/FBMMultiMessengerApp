@@ -20,7 +20,6 @@
     public class Platform
     {
         public string LatestVersion { get; set; } = string.Empty;
-        public string ApkUrl { get; set; } = string.Empty;
-        public string ExeUrl { get; set; } = string.Empty;
+        public string AppUrl { get; set; } = string.Empty;
     }
 }

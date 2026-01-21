@@ -22,7 +22,14 @@ namespace FBMMultiMessenger.Services
             try
             {
                 var client = new HttpClient();
-                string json = await client.GetStringAsync("https://raw.githubusercontent.com/ShaheerKhawajikzai/FBM-MultiMessenger-Resources/main/version.json");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("FbmMultiMessenger"); // GitHub API requires User-Agent
+
+                string jsonBase64 = await client.GetStringAsync("https://api.github.com/repos/ShaheerKhawajikzai/FBM-MultiMessenger-Resources/contents/version.json");
+
+                // The API returns JSON with base64 content
+                var doc = JsonDocument.Parse(jsonBase64);
+                string base64Content = doc.RootElement.GetProperty("content").GetString();
+                string json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64Content));
 
                 var remoteVersion = JsonConvert.DeserializeObject<RemoteVersion>(json);
 
@@ -32,15 +39,16 @@ namespace FBMMultiMessenger.Services
                 var latestVersionString = PlatformHelper.IsMobilePlatform ? remoteVersion.Android.LatestVersion : remoteVersion.Desktop.LatestVersion;
 
 
-                var downloadUrl = PlatformHelper.IsMobilePlatform ? remoteVersion.Android.ApkUrl : remoteVersion.Desktop.ExeUrl;
+                var downloadUrl = PlatformHelper.IsMobilePlatform ? remoteVersion.Android.AppUrl : remoteVersion.Desktop.AppUrl;
 
                 var latestVer = new Version(latestVersionString);
+                var currentVer = new Version(VersionHelper.CurrentVersion);
 
                 string fileName = Path.GetFileName(downloadUrl);
 
                 var downloadPath = Path.Combine(_downloadFolder, fileName);
 
-                if (latestVer > VersionHelper.CurrentVersion)
+                if (latestVer > currentVer)
                 {
                     bool needsDownload = currentApp.DownloadedVersion != latestVersionString;
 
