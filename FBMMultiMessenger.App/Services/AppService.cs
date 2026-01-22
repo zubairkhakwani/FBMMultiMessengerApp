@@ -1,8 +1,6 @@
 ﻿using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
-using MudBlazor;
-using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -22,16 +20,13 @@ namespace FBMMultiMessenger.Services
             try
             {
                 var client = new HttpClient();
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("FbmMultiMessenger"); // GitHub API requires User-Agent
 
-                string jsonBase64 = await client.GetStringAsync("https://api.github.com/repos/ShaheerKhawajikzai/FBM-MultiMessenger-Resources/contents/version.json");
+                string jsonBase64 = await client.GetStringAsync("https://github.com/user-attachments/files/24786123/version.json");
 
-                // The API returns JSON with base64 content
-                var doc = JsonDocument.Parse(jsonBase64);
-                string base64Content = doc.RootElement.GetProperty("content").GetString();
-                string json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64Content));
-
-                var remoteVersion = JsonConvert.DeserializeObject<RemoteVersion>(json);
+                var remoteVersion = JsonSerializer.Deserialize<RemoteVersion>(jsonBase64, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
                 if (remoteVersion is null) return;
 
