@@ -41,8 +41,6 @@
 		<MauiSplashScreen Include="Resources\Splash\splash1.png" Color="#512BD4" BaseSize="128,128" />
 
 		<!-- Images -->
-		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -54,6 +52,11 @@
 
 	<ItemGroup>
 		<None Remove="Platforms\Android\Resources\xml\file_paths.xml" />
+		<None Remove="Resources\Images\drawable-hdpi\ic_stat_onesignal_default.png" />
+		<None Remove="Resources\Images\drawable-mdpi\ic_stat_onesignal_default.png" />
+		<None Remove="Resources\Images\drawable-xhdpi\ic_stat_onesignal_default.png" />
+		<None Remove="Resources\Images\drawable-xxhdpi\ic_stat_onesignal_default.png" />
+		<None Remove="Resources\Images\drawable-xxxhdpi\ic_stat_onesignal_default.png" />
 	</ItemGroup>
 
 
@@ -86,6 +89,14 @@
 	<ItemGroup>
 		<Folder Include="wwwroot\js\" />
 		<Folder Include="wwwroot\templates\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AndroidResource Include="Resources\Images\drawable-hdpi\ic_stat_onesignal_default.png" />
+	  <AndroidResource Include="Resources\Images\drawable-mdpi\ic_stat_onesignal_default.png" />
+	  <AndroidResource Include="Resources\Images\drawable-xhdpi\ic_stat_onesignal_default.png" />
+	  <AndroidResource Include="Resources\Images\drawable-xxhdpi\ic_stat_onesignal_default.png" />
+	  <AndroidResource Include="Resources\Images\drawable-xxxhdpi\ic_stat_onesignal_default.png" />
 	</ItemGroup>
 
 
