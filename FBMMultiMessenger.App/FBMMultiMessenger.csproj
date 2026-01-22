@@ -92,11 +92,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AndroidResource Include="Resources\Images\drawable-hdpi\ic_stat_onesignal_default.png" />
-	  <AndroidResource Include="Resources\Images\drawable-mdpi\ic_stat_onesignal_default.png" />
-	  <AndroidResource Include="Resources\Images\drawable-xhdpi\ic_stat_onesignal_default.png" />
-	  <AndroidResource Include="Resources\Images\drawable-xxhdpi\ic_stat_onesignal_default.png" />
-	  <AndroidResource Include="Resources\Images\drawable-xxxhdpi\ic_stat_onesignal_default.png" />
+		<AndroidResource Include="Resources\Images\drawable-hdpi\ic_stat_onesignal_default.png" />
+		<AndroidResource Include="Resources\Images\drawable-mdpi\ic_stat_onesignal_default.png" />
+		<AndroidResource Include="Resources\Images\drawable-xhdpi\ic_stat_onesignal_default.png" />
+		<AndroidResource Include="Resources\Images\drawable-xxhdpi\ic_stat_onesignal_default.png" />
+		<AndroidResource Include="Resources\Images\drawable-xxxhdpi\ic_stat_onesignal_default.png" />
 	</ItemGroup>
 
 

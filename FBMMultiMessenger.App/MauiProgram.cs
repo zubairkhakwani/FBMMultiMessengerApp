@@ -18,7 +18,7 @@ namespace FBMMultiMessenger
 {
     public static class MauiProgram
     {
-       
+
         public static MauiApp CreateMauiApp()
         {
 
@@ -74,6 +74,7 @@ namespace FBMMultiMessenger
                 builder.Services.AddScoped<IPaymentService, PaymentService>();
                 builder.Services.AddScoped<IProxyService, ProxyService>();
                 builder.Services.AddScoped<IAppService, AppService>();
+                builder.Services.AddScoped<IFacebookService, FacebookService>();
 
                 builder.Services.AddSingleton<BackButtonService>();
                 builder.Services.AddSingleton<SignalRService>();
@@ -119,8 +120,8 @@ namespace FBMMultiMessenger
 
                 throw;
             }
-           
-          
+
+
         }
     }
 }

@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
 using OneSignalSDK.DotNet;
-using OneSignalSDK.DotNet.Core.Notifications;
 using SixLabors.ImageSharp;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -92,17 +91,20 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private int MainChatZIndex = 0;
 
         //Selected Message Header
-        private string? selectedAccountChat;
-        private bool isSelectedAccountConnected;
-        private string? selectedListingTitle;
-        private string? selectedListingImage;
-        private string? selectedListingLocation;
-        private string? selectedListingPrice;
+        private string? SelectedAccountName;
+        private string? ChattingWithName;
+        private string? ChattingWithId;
+        private bool IsSelectedChatsAccountConnected;
+        private string? SelectedChatListingTitle;
+        private string? SelectedChatListingImage;
+        private string? SelectedChatListingLocation;
+        private string? SelectedChatListingPrice;
 
-
+        //Chat Menu Action
+        private bool ShowChatMenuAction;
 
         //Carousel
-        public bool _showCarousel;
+        private bool ShowCarousel;
         public List<FileData> _carouselItems { get; set; } = new List<FileData>();
 
 
@@ -453,7 +455,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     if (SelectedFbChatId == chat.FbChatId)
                     {
-                        isSelectedAccountConnected = status.IsConnected;
+                        IsSelectedChatsAccountConnected = status.IsConnected;
                     }
                     chat.IsAccountConnected = status.IsConnected;
                     hasChanges = true;
@@ -625,7 +627,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 Navigation.NavigateTo("/Account");
                 return;
             }
-            _showCarousel = false;
+            ShowCarousel = false;
             ShowSidebarView();
             StateHasChanged();
 
@@ -640,12 +642,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
             if (chat is not null)
             {
-                isSelectedAccountConnected = chat.IsAccountConnected;
-                selectedAccountChat = chat.Account?.Name;
-                selectedListingTitle = chat.FbListingTitle;
-                selectedListingLocation = chat.FbListingLocation;
-                selectedListingPrice  = chat.FbListingPrice?.ToString();
-                selectedListingImage = chat.FbListingImage;
+                IsSelectedChatsAccountConnected = chat.IsAccountConnected;
+                SelectedAccountName = chat.Account?.Name;
+                SelectedChatListingTitle = chat.FbListingTitle;
+                SelectedChatListingLocation = chat.FbListingLocation;
+                SelectedChatListingPrice  = chat.FbListingPrice?.ToString();
+                SelectedChatListingImage = chat.FbListingImage;
+                ChattingWithName = chat.ChattingWithName;
+                ChattingWithId = chat.ChattingWithId;
             }
         }
 
@@ -666,13 +670,22 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             // to the front and hiding the sidebar.
             SidebarZIndex = 0;
             MainChatZIndex = 110;
+        }
 
-            //JS.InvokeVoidAsync("hideArrowDownBtn");
+
+        private void HandleChatMenuOpen()
+        {
+            ShowChatMenuAction = true;
+        }
+
+        private void HandleChatMenuClose()
+        {
+            ShowChatMenuAction = false;
         }
 
         private void ShowCarousal(List<FileData> selectedChatFiles, string selectedChatFileUrl, bool isVideo = false)
         {
-            _showCarousel = true;
+            ShowCarousel = true;
 
             var shallowCopy = selectedChatFiles.Where(f => !f.IsEmoji && !f.IsSticker).Select(x => new FileData()
             {
@@ -744,7 +757,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private void CloseCarousel()
         {
-            _showCarousel = false;
+            ShowCarousel = false;
         }
 
         public async Task HandleFileUpload(InputFileChangeEventArgs e)

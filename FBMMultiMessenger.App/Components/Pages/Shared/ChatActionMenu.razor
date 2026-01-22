@@ -1,0 +1,86 @@
+﻿@using FBMMultiMessenger.Services.IServices
+@using System.Threading.Tasks
+<!-- Chat Menu -->
+
+<div class="chat-menu-container">
+
+    <!-- Chat Menu Header -->
+    <div class="chat-menu-header">
+
+        <button class="chat-menu-title-row" @onclick="CloseMenu">
+            <span class="chat-menu-back-btn">
+                <i class="fa-sharp fa-solid fa-arrow-left"></i>
+            </span>
+            <div class="chat-menu-title">Chat Menu</div>
+        </button>
+    </div>
+
+    <!-- Chat Menu Divider -->
+    <div class="chat-menu-divider"></div>
+
+    <!-- Chat Menu Actions -->
+    <div class="chat-menu-actions">
+
+        <div class="chat-menu-section-title">Actions</div>
+
+        <div class="chat-menu-item" @onclick="ViewUserProfile">
+            <div class="chat-menu-icon"><i class="fa fa-id-badge"></i></div>
+            <span>View @(string.IsNullOrWhiteSpace(ProfileName) ? "Profile" : $"{ProfileName}'s Profile")</span>
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public string? ProfileName { get; set; }
+
+    [Parameter]
+    public string? ProfileId { get; set; }
+
+     [Inject]
+     private NavigationManager Navigation { get; set; }
+
+    [Inject]
+    private IJSRuntime JS { get; set; }
+
+    [Inject]
+    private IFacebookService FacebookService { get; set; }
+
+
+    private async Task ViewUserProfile()
+    {
+        if (string.IsNullOrWhiteSpace(ProfileId))
+        {
+            var options = new SweetAlertOptions();
+
+            options.Title = "Unable to Load Profile";
+            options.Message = "We couldn’t find this profile at the moment. Please try again later.";
+            options.Icon = "info";
+            options.ConfirmButtonText = "OK";
+            JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
+            return;
+        }
+
+        try
+        {
+            Navigation.NavigateTo($"https://www.facebook.com/{ProfileId}");
+            //await FacebookService.OpenProfile(ProfileId);
+        }
+        catch (Exception ex)
+        {
+            
+            throw;
+        }
+    }
+
+
+    private async Task CloseMenu()
+    {
+        await OnClose.InvokeAsync();
+    }
+}
