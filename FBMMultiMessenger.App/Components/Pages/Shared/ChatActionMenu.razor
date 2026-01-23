@@ -11,7 +11,7 @@
             <span class="chat-menu-back-btn">
                 <i class="fa-sharp fa-solid fa-arrow-left"></i>
             </span>
-            <div class="chat-menu-title">Chat Menu</div>
+            <div class="chat-menu-title">Chat Menu</div> 
         </button>
     </div>
 
@@ -30,57 +30,3 @@
     </div>
 
 </div>
-
-@code {
-
-    [Parameter]
-    public EventCallback OnClose { get; set; }
-
-    [Parameter]
-    public string? ProfileName { get; set; }
-
-    [Parameter]
-    public string? ProfileId { get; set; }
-
-     [Inject]
-     private NavigationManager Navigation { get; set; }
-
-    [Inject]
-    private IJSRuntime JS { get; set; }
-
-    [Inject]
-    private IFacebookService FacebookService { get; set; }
-
-
-    private async Task ViewUserProfile()
-    {
-        if (string.IsNullOrWhiteSpace(ProfileId))
-        {
-            var options = new SweetAlertOptions();
-
-            options.Title = "Unable to Load Profile";
-            options.Message = "We couldn’t find this profile at the moment. Please try again later.";
-            options.Icon = "info";
-            options.ConfirmButtonText = "OK";
-            JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
-            return;
-        }
-
-        try
-        {
-            Navigation.NavigateTo($"https://www.facebook.com/{ProfileId}");
-            //await FacebookService.OpenProfile(ProfileId);
-        }
-        catch (Exception ex)
-        {
-            
-            throw;
-        }
-    }
-
-
-    private async Task CloseMenu()
-    {
-        await OnClose.InvokeAsync();
-    }
-}

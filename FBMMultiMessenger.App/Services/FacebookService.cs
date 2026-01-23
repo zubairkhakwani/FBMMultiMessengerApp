@@ -1,11 +1,5 @@
-﻿
-#if ANDROID
-using Android.Webkit;
-#endif
-
-using FBMMultiMessenger.Services.IServices;
+﻿using FBMMultiMessenger.Services.IServices;
 using System.Diagnostics;
-
 
 namespace FBMMultiMessenger.Services
 {
@@ -14,13 +8,13 @@ namespace FBMMultiMessenger.Services
         public async Task OpenProfile(string profileId)
         {
 #if ANDROID
-            await OpenProfileAndroid(profileId);
+            await OpenProfileAndriod(profileId);
 #elif WINDOWS
             await OpenProfileWindows(profileId);
 #endif
         }
 
-        private async Task OpenProfileAndroid(string profileId)
+        private async Task OpenProfileAndriod(string profileId)
         {
 #if ANDROID
             await MainThread.InvokeOnMainThreadAsync(() =>
@@ -28,59 +22,40 @@ namespace FBMMultiMessenger.Services
                 var activity = Platform.CurrentActivity;
                 if (activity == null) return;
 
-                // Root layout
+                var dialog = new Android.App.Dialog(activity, Android.Resource.Style.ThemeNoTitleBarFullScreen);
                 var rootLayout = new Android.Widget.FrameLayout(activity);
 
-                // WebView
                 var webView = new Android.Webkit.WebView(activity);
-                webView.Settings.JavaScriptEnabled = true;
-                webView.Settings.DomStorageEnabled = true;
-                webView.LoadUrl($"https://www.facebook.com/{profileId}");
 
-                // Close Button
-                //var closeButton = new Android.Widget.ImageButton(activity);
-                //closeButton.SetImageResource(Android.Resource.Drawable.IcMenuCloseClearCancel);
-                //closeButton.SetBackgroundColor(Android.Graphics.Color.Transparent);
+                // Configure WebView
+                var settings = webView.Settings;
+                settings.JavaScriptEnabled = true;
+                settings.DomStorageEnabled = true;
+                settings.SetSupportMultipleWindows(false);
 
-                //var closeParams = new Android.Widget.FrameLayout.LayoutParams(
-                //    Android.Widget.FrameLayout.LayoutParams.WrapContent,
-                //    Android.Widget.FrameLayout.LayoutParams.WrapContent
-                //);
-                //closeParams.Gravity = Android.Views.GravityFlags.Top | Android.Views.GravityFlags.End;
-                //closeParams.SetMargins(20, 40, 20, 20);
+                // Use custom WebViewClient
+                webView.SetWebViewClient(new FacebookWebViewClient());
 
-                //closeButton.LayoutParameters = closeParams;
+                webView.LoadUrl($"https://m.facebook.com/{profileId}");
 
-                // Add views
+                // Close button
+                var closeButton = new Android.Widget.Button(activity) { Text = "✕" };
+                var closeParams = new Android.Widget.FrameLayout.LayoutParams(120, 120)
+                {
+                    Gravity = Android.Views.GravityFlags.Top | Android.Views.GravityFlags.End
+                };
+                closeParams.SetMargins(20, 40, 20, 20);
+                closeButton.LayoutParameters = closeParams;
+                closeButton.Click += (s, e) => dialog.Dismiss();
+
                 rootLayout.AddView(webView);
-                // rootLayout.AddView(closeButton);
-
-                // Dialog
-                //var dialog = new Android.App.Dialog(activity, Android.Resource.Style.ThemeNoTitleBarFullScreen);
-                //dialog.SetContentView(rootLayout);
-
-                //closeButton.Click += (s, e) =>
-                //{
-                //    dialog.Dismiss(); // User returns back
-                //};
-
-                //dialog.Show();
+                rootLayout.AddView(closeButton);
+                dialog.SetContentView(rootLayout);
+                dialog.Show();
             });
 #endif
         }
 
-#if ANDROID
-        private void SetFacebookCookiesAndroid(CookieManager cookieManager)
-        {
-            // TODO: Replace with YOUR actual Facebook cookies
-            cookieManager.SetCookie(".facebook.com", "c_user=YOUR_USER_ID");
-            cookieManager.SetCookie(".facebook.com", "xs=YOUR_XS_VALUE");
-            cookieManager.SetCookie(".facebook.com", "datr=YOUR_DATR_VALUE");
-            cookieManager.SetCookie(".facebook.com", "fr=YOUR_FR_VALUE");
-
-            cookieManager.Flush();
-        }
-#endif
 
         private async Task OpenProfileWindows(string profileId)
         {
@@ -104,6 +79,66 @@ namespace FBMMultiMessenger.Services
                 }
             });
         }
+
+
+
+        // Custom WebViewClient
+#if ANDROID
+        public class FacebookWebViewClient : Android.Webkit.WebViewClient
+        {
+            public override bool ShouldOverrideUrlLoading(
+                Android.Webkit.WebView view,
+                Android.Webkit.IWebResourceRequest request)
+            {
+                var url = request.Url.ToString();
+
+                // Handle normal web URLs (http/https)
+                if (url.StartsWith("http://") || url.StartsWith("https://"))
+                {
+                    // Keep Facebook URLs in WebView
+                    if (url.Contains("facebook.com") || url.Contains("fb.com"))
+                    {
+                        view.LoadUrl(url);
+                        return true;
+                    }
+
+                    // For other web URLs, you can decide
+                    view.LoadUrl(url);
+                    return true;
+                }
+
+                // Handle special URL schemes (fb://, intent://, tel:, etc.)
+                try
+                {
+                    var intent = new Android.Content.Intent(Android.Content.Intent.ActionView);
+                    intent.SetData(Android.Net.Uri.Parse(url));
+
+                    // Check if any app can handle this URL
+                    var activity = Platform.CurrentActivity;
+                    if (activity != null &&
+                        intent.ResolveActivity(activity.PackageManager) != null)
+                    {
+                        activity.StartActivity(intent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // If it fails, just ignore it
+                }
+
+                return true; // We handled it (or tried to)
+            }
+
+            // Handle errors
+            public override void OnReceivedError(
+                Android.Webkit.WebView view,
+                Android.Webkit.IWebResourceRequest request,
+                Android.Webkit.WebResourceError error)
+            {
+                base.OnReceivedError(view, request, error);
+            }
+        }
+#endif
     }
 }
 
