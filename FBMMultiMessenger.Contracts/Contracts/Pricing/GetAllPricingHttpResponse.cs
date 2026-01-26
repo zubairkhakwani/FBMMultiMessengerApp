@@ -4,7 +4,8 @@
     {
         public int MinAccounts { get; set; }
         public int MaxAccounts { get; set; }
-        public decimal PricePerAccount { get; set; }
-        public bool IsActive { get; set; } // Frontend-only flag; API never sets or receives this value.
-    } 
+        public decimal MonthlyPricePerAccount { get; set; }
+        public decimal SemiAnnualPricePerAccount { get; set; }
+        public decimal AnnualPricePerAccount { get; set; }
+    }
 }

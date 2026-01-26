@@ -1,5 +1,5 @@
-﻿@page "/"
-@page "/Chat"
+﻿@* @page "/"
+@page "/Chat" *@
 
 @layout EmptyLayout
 
@@ -18,6 +18,7 @@
 
 <div class="@mobileView">
     <!-- Sidebar -->
+
     <div class="sidebar @mobileClass" style="z-index:@SidebarZIndex;">
 
         @if (!IsChatsLoading)
@@ -149,7 +150,7 @@
                     }
 
                 </div>
-                <div class="header-info" >
+                <div class="header-info">
 
                     @if (SelectedChatListingTitle is not null)
                     {
@@ -261,6 +262,13 @@
                                     }
                                 }
 
+                            </div>
+
+                            <div class="copy-menu">
+                                <button class="copy-btn">
+                                    <span>📋</span>
+                                    <span>Copy</span>
+                                </button>
                             </div>
                         </div>
                     }
@@ -378,7 +386,6 @@
                     <button @onclick="() => NotifyLocalServer(Message)" class="send-button" disabled="@isCompressingMedia">➤</button>
                 </div>
             }
-
         </div>
     </div>
 </div>
@@ -417,9 +424,9 @@
                              Color="@Color.Error"
                              Size="@Size.Large"
                              Style="background-color: rgba(0, 0, 0, 0.45);
-                                                                    padding: 5px;
-                                                                    border-radius:100px;
-                                                                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
+                                                                                        padding: 5px;
+                                                                                        border-radius:100px;
+                                                                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 
@@ -443,8 +450,9 @@
 
 
 
-@if(ShowChatMenuAction){
-  <ChatActionMenu ProfileName="@ChattingWithName" ProfileId="@ChattingWithId" OnClose="HandleChatMenuClose" />
+@if (ShowChatMenuAction)
+{
+    <ChatActionMenu ProfileName="@ChattingWithName" ProfileId="@ChattingWithId" OnClose="HandleChatMenuClose" />
 }
 
 <!-- Mobile NavBar -->
@@ -452,7 +460,6 @@
 {
     <MobileNav></MobileNav>
 }
-
 
 
 <div class="arrow-down pulse-animation">

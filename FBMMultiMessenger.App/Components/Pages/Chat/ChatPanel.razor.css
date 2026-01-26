@@ -1,0 +1,19 @@
+﻿.main-chat {
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+    .main-chat.mobile {
+        position: fixed;
+        inset: 0;
+    }
+
+    .main-chat.no-chat-selected .chat-header,
+    .main-chat.no-chat-selected .input-container {
+        display: none;
+    }
+
+    .main-chat.no-chat-selected .messages-container {
+        background: #f8f9fa;
+    }

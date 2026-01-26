@@ -1,0 +1,44 @@
+﻿<div class="input-wrapper">
+
+    <!--  Media attachment preview. Allows users to review and remove files before sending.  -->
+    @if (PreviewMediaFiles.Any())
+        {
+            <div class="file-preview-container" id="filePreview">
+                <div class="file-preview-grid">
+
+                    @for (int i = 0; i < PreviewMediaFiles.Count; i++)
+                    {
+                        var file = PreviewMediaFiles[i];
+
+                        <div class="file-preview-item">
+                            @if (file.IsVideo)
+                            {
+                                <div class="video-indicator">▶️</div>
+                                <video class="preview-media" src="@(file.PreviewUrl + "#t=0.001")"></video>
+                            }
+                            else
+                            {
+                                <img class="preview-media" src="@file.PreviewUrl" alt="@file.Name">
+                            }
+                            <button class="remove-file-btn" @onclick="() => HandleFileRemoval(file.Id)">✕</button>
+                            <div class="file-name">@file.Name</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+
+    <!--   Chat composer (text, attachments, send).  Rendered only when a conversation is selected. -->
+    @if (SelectedFbChatId is not null)
+    {
+        <div class="input-container">
+            <InputFile type="file" id="fileInput" accept="image/*,video/*" multiple style="display: none;" onchange="HandleFileUpload" />
+            <label for="fileInput" class="file-upload-btn" title="Attach files">📎</label>
+            <textarea @bind="Message" class="message-input" placeholder="Type a message..." rows="1" autofocus>  </textarea>
+            <button @onclick="() => NotifyLocalServer(Message)"  class="send-button" disabled="@isCompressingMedia">➤</button>
+        </div>
+    }
+</div>
+
+<script src="/Components/Pages/Chat/ChatComposer.razor.js"></script>

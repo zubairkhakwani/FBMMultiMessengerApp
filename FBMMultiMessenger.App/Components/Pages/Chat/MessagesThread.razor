@@ -1,0 +1,171 @@
+﻿@{
+    var messageContainerHeight = SelectedFbChatId is null ? "100vh" : "calc(100vh - 135px)";
+}
+
+<div class="messages-container" id="messagesContainer" style="height:@messageContainerHeight">
+    <!-- Empty state shown on desktop when no conversation is selected -->
+    @if (SelectedFbChatId is null && !PlatformHelper.IsMobilePlatform)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="60" height="60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+            </div>
+            <h3>Select a conversation</h3>
+            <p>Choose a conversation from the sidebar to start chatting with your Marketplace buyers and sellers.</p>
+        </div>
+    }
+
+    <div id="messagesList">
+        @for (int i = 0; i < ChatMessages.Count; i++)
+        {
+            var chatMessage = ChatMessages[i];
+
+            var isReceived = chatMessage.IsReceived;
+            var messageClass = isReceived ? "received" : "sent";
+            var isSent = !isReceived;
+            var isMessageFailedToSend = !chatMessage.IsSent && isSent;
+            var failedMessageClass = isMessageFailedToSend ? "failed" : "";
+            var scrollToBottom = chatMessage.ScrollToBottom.ToString();
+
+            @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
+            {
+                <div class="message @messageClass @failedMessageClass" data-scroll-to-bottom="@scrollToBottom">
+                    @if (isReceived)
+                    {
+                        <div class="message-row">
+                            @if (RecipientProfileImage is not null)
+                            {
+                                <div class="profile-picture">
+                                    <img class="profile-picture" src="@RecipientProfileImage" />
+                                </div>
+                            }
+
+                            <div class="message-bubble">
+                                @if (chatMessage.IsAudioMessage)
+                                {
+                                    <audio controls>
+                                        <source src="@chatMessage.Message" type="audio/mpeg">
+                                        Your browser does not support the audio tag.
+                                    </audio>
+                                }
+                                else
+                                {
+                                    <span>@chatMessage.Message</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="message-bubble">
+                            <span>@chatMessage.Message</span>
+                        </div>
+                    }
+
+
+                    <div class="message-footer">
+                        <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
+                        @if (isSent)
+                        {
+                            @if (chatMessage.Sending && !isMessageFailedToSend)
+                            {
+                                <span class="message-status sending">
+                                    <span class="status-icon">⏱</span> Sending...
+                                </span>
+                            }
+                            else if (chatMessage.Sending && isMessageFailedToSend)
+                            {
+                                <span class="message-status failed">
+                                    <span class="status-icon">✗</span> Failed
+                                </span>
+                            }
+
+                            else
+                            {
+                                <span class="message-status sent">
+                                    <span class="status-icon">✓</span> Sent
+                                </span>
+                            }
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+            @if (chatMessage.FileData.Any())
+            {
+                var filesCount = chatMessage.FileData.Count;
+                var imageWidthStyle = "width: " + (filesCount == 1 ? 429 : filesCount == 2 ? 190 : 125) +"px";
+
+                <div class="message @messageClass @failedMessageClass">
+                    <div class="message-row @messageClass">
+                        @for (int j = 0; j < chatMessage.FileData.Count; j++)
+                        {
+                            var file = chatMessage.FileData[j];
+
+                            if (file.IsEmoji)
+                            {
+                                imageWidthStyle = "width: 48px; height:48px;";
+                            }
+                            else if (file.IsSticker)
+                            {
+                                imageWidthStyle = "width: 96px; height:96px;";
+                            }
+                            @if (isReceived && RecipientProfileImage is not null && j==0)
+                            {
+                                <div class="profile-picture">
+                                    <img class="profile-picture" src="@RecipientProfileImage" />
+                                </div>
+                            }
+                            @if (file.IsVideo)
+                            {
+                                <video width="320" height="240" controls>
+                                    <source src="@(file.PreviewUrl + "#t=0.001")" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            }
+                            else
+                            {
+                                <img @onclick="() => ShowCarousal(chatMessage.FileData, file.PreviewUrl)"
+                                     class="image-message @((file.IsEmoji || file.IsSticker) ? "not-clickable" : "clickable")"
+                                     src="@file.PreviewUrl"
+                                     style="@imageWidthStyle" />
+                            }
+                        }
+                    </div>
+                    <div class="message-footer">
+                        <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
+                        @if (isSent)
+                        {
+                            @if (chatMessage.Sending && !isMessageFailedToSend)
+                            {
+                                <span class="message-status sending">
+                                    <span class="status-icon">⏱</span> Sending...
+                                </span>
+                            }
+                            else if (chatMessage.Sending && isMessageFailedToSend)
+                            {
+                                <span class="message-status failed">
+                                    <span class="status-icon">✗</span> Failed
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="message-status sent">
+                                    <span class="status-icon">✓</span> Sent
+                                </span>
+                            }
+                        }
+                    </div>
+
+                </div>
+            }
+        }
+           
+    </div> 
+</div>
+
+<script src="/Components/Pages/Chat/MessagesThread.razor.js"></script>

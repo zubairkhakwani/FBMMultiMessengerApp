@@ -1,6 +1,6 @@
 ﻿@page "/Pricing"
-<div class="parent-container">
-    <div class="container">
+<div class="parent-pricing-container">
+    <div class="pricing-container">
         <a class="back-button" href="/account">
             ← Back to Dashboard
         </a>
@@ -11,68 +11,82 @@
             <p class="punchline">"Growth isn't expensive, staying small is"</p>
         </div>
 
-        <!-- Calculator Section -->
+        <!-- Discount Section START -->
         <div class="card">
-            <h2> Pricing Calculator</h2>
-            <div class="calculator-section">
-                <!-- Pricing Tiers Info -->
-                <div class="pricing-tiers">
-                    <h3>💡 Volume Discounts Available</h3>
-                    <div class="tier-list">
-                        @for (int i = 0; i < Pricings.Count; i++)
-                        {
-                            var pricing = Pricings[i];
-                            var minAccounts = pricing.MinAccounts;
-                            var maxAccounts = pricing.MaxAccounts;
-                            var pricePerAccount = pricing.PricePerAccount;
-                            var activeTier = pricing.IsActive ? "active" : "";
+            <h2>💰 Pricing Calculator</h2>
 
-
-                            <div class="tier-item @activeTier">
-                                @if (minAccounts > 100 || maxAccounts > 100)
-                                {
-                                    <span class="tier-range">100+ accounts</span>
-                                }
-                                else
-                                {
-                                    <span class="tier-range">@minAccounts-@maxAccounts accounts</span>
-                                }
-                                <span class="tier-price">PKR @pricePerAccount / account</span>
-                                <span class="tier-badge">Save @GetDiscount(pricePerAccount)%</span>
-                            </div>
-                        }
-                    </div>
+            <!-- Billing Period Section -->
+            <div class="billing-section">
+                <h3>📅 Select Billing Period</h3>
+                <div class="billing-tabs">
+                    <button class="billing-tab @(CurrentBillingCycle == BillingCylce.Monthly ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Monthly)'>
+                        Monthly
+                    </button>
+                    <button class="billing-tab @(CurrentBillingCycle == BillingCylce.SemiAnnual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.SemiAnnual)'>
+                        Semi-Annual
+                        @*  <span class="save-tag">⚡ Save 10%</span> *@
+                    </button>
+                    <button class="billing-tab @(CurrentBillingCycle == BillingCylce.Annual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Annual)'>
+                        Annual
+                        @*   <span class="save-tag">🔥 Save 20%</span> *@
+                    </button>
                 </div>
-
-                <div class="input-group">
-                    <label for="accounts">Number of Accounts</label>
-                    <input @bind-value="AccountsInput" @bind-value:event="oninput" type="number" id="accounts" placeholder="Enter number of accounts" min="1">
-                </div>
-
-                <div class="pricing-display">
-                    <div class="price-item">
-                        <div class="label">Price Per Account</div>
-                        <div class="value" id="pricePerAccount">PKR @PricePerAccount</div>
-                    </div>
-                    <div class="price-item">
-                        <div class="label">Total Accounts</div>
-                        <div class="value" id="totalAccounts">@AccountsInput</div>
-                    </div>
-                    <div class="price-item">
-                        <div class="label">Total Cost</div>
-                        <div class="value" id="totalCost">PKR @TotalCost</div>
-                    </div>
-                </div>
-
-                <button class="purchase-btn" id="purchaseBtn">
-                  Proceed to Purchase
-                </button>
             </div>
+         
+
+            <!-- Volume Discounts Section -->
+            <div class="pricing-tiers">
+                <h3>💡 Volume Discounts Available</h3>
+                <div class="tier-list" id="tierList">
+
+                    @for (int i = 0; i < DisplayedPricings.Count; i++)
+                    {
+                        var pricing = DisplayedPricings[i];
+                        var minAccounts = pricing.MinAccounts;
+                        var maxAccounts = pricing.MaxAccounts;
+                        var perAccountPrice = pricing.PricePerAccount;
+                        var active = pricing.IsActive ? "active" : "";
+                        <div class="tier-item @active">
+                            <span class="tier-range">@minAccounts-@maxAccounts accounts</span>
+                            <span class="tier-price">PKR @perAccountPrice / account</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Account Input -->
+            <div class="input-group">
+                <label for="accounts">Number of Accounts</label>
+                <input type="number" @bind-value="AccountsInput" @bind-value:event="oninput" placeholder="Enter number of accounts" min="1">
+            </div>
+
+            <!-- Combined Discount Banner -->
+            @* <div class="discount-banner" id="banner1">
+                💰 Current Monthly Price
+                <div class="big-savings">Total: PKR 1,200</div>
+            </div> *@
+
+            <!-- Price Display -->
+            <div class="pricing-display">
+                <div class="price-item">
+                    <div class="label">Price Per Account</div>
+                    <div class="value" id="pricePerAccount1">PKR @PricePerAccount</div>
+                </div>
+                <div class="price-item">
+                    <div class="label">Total Accounts</div>
+                    <div class="value" id="totalAccounts1">@AccountsInput</div>
+                </div>
+                <div class="price-item">
+                    <div class="label" id="costLabel1">Total Cost</div>
+                    <div class="value" id="totalCost1">PKR @TotalCost</div>
+                </div>
+            </div>
+
+            <button class="purchase-btn">Proceed to Purchase</button>
         </div>
-
-
+        <!-- Discount Section END -->
         <!-- Banking Details Section -->
-        <div class="card  hidden scroll-to-section" id="bankingSection">
+        <div class="card hidden scroll-to-section" id="bankingSection">
             <h2><span class="icon">🏦</span> Banking Details</h2>
             <p style="margin-bottom: 20px; color: #666;">Please use the following details to complete your payment</p>
             <div class="banking-details">
@@ -86,7 +100,7 @@
                         <span class="info-value">Your Company Name</span>
                     </div>
                     <div @onclick="() => HandleCopyToClipboardAsync()" class="info-row">
-                        <span class="info-label">Account Number:</span>
+                        <span class="info-label">Account No:</span>
                         <span class="info-value">
                             @AccountNo
                             <span class="copy-icon" title="Copy to clipboard">📋</span>
@@ -156,7 +170,7 @@
                 else
                 {
                     <button type="submit" class="submit-btn">
-                        Submit for Approval 🚀
+                        SUBMIT FOR APPROVAL
                     </button>
                 }
 

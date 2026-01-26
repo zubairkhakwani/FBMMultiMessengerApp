@@ -7,7 +7,6 @@
         return {
             messageContainer: document.querySelector(".messages-container"),
             messageList: document.querySelector("#messagesList"),
-            inputWrapper: document.querySelector(".input-wrapper"),
             arrowDownBtn: document.querySelector(".arrow-down"),
             messages: document.querySelectorAll('.message'),
             copyBtns: document.querySelectorAll('.copy-btn')
@@ -27,8 +26,8 @@
     }
 
     function initializeObservers() {
-        const { messageContainer, messageList, inputWrapper } = getElements();
-        if (!messageContainer || !messageList || !inputWrapper) {
+        const { messageContainer, messageList } = getElements();
+        if (!messageContainer || !messageList) {
             console.warn("Required elements not found for observers");
             return;
         }
@@ -45,35 +44,17 @@
                             messageContainer.scrollTop = messageContainer.scrollHeight;
                         }
                     }
-                    else if (mutation.target === inputWrapper) {
-                        const messageInput = document.querySelector(".message-input");
-                        if (!messageInput) {
-                            console.log("Cannot find message input");
-                            return;
-                        }
-                        messageInput.onkeydown = async e => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                console.log("Enter pressed")
-                                let message = messageInput.value;
-                                messageInput.value = "";
-                                e.preventDefault();
-                                await window.dotnetHelper?.invokeMethodAsync('HandleEnterKey', message);
-                            }
-                        };
-                    }
+
                 }
             }
         });
 
         observer.observe(messageContainer, { childList: true, subtree: true });
-        observer.observe(inputWrapper, { childList: true, subtree: true });
+
     }
 
     function initializeEventListeners() {
         const { messageContainer, arrowDownBtn, messages, copyBtns } = getElements();
-
-        console.log(messages);
-        console.log(copyBtns);
 
 
         // Click handler for focusing message input
@@ -188,12 +169,6 @@
     initializeObservers();
     initializeEventListeners();
 
-    // Public API
-    window.registerEnterHandler = (ref) => {
-
-        window.dotnetHelper = ref;
-    };
-
     window.handleNewMessage = () => {
         const { messageContainer, arrowDownBtn } = getElements();
 
@@ -222,22 +197,11 @@
         arrowDownBtn.classList.remove("active");
     };
 
-
     function showMenu(menu) {
         if (currentMenu && currentMenu !== menu) {
             currentMenu.classList.remove('show');
         }
         menu.classList.add('show');
         currentMenu = menu;
-    }
-
-    // Toast notification
-    function showToast(message) {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2000);
     }
 })();

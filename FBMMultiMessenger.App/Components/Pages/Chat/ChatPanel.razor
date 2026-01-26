@@ -1,0 +1,17 @@
+﻿@{
+    var mobileClass = PlatformHelper.IsMobilePlatform ? "mobile" : "";
+    var avatarMargin = PlatformHelper.IsMobilePlatform ? "0px" : "12px";
+}
+
+<div class="main-chat @mobileClass" style="z-index:@MainChatZIndex">
+
+    <!-- Header: Chat header displaying conversation details.  -->
+    <ChatHeader></ChatHeader>
+
+    <!-- Body: Scrollable messages  -->
+    <MessagesThread></MessagesThread>
+
+    <!-- Footer: message input and attachments -->
+    <ChatComposer></ChatComposer>
+
+</div>

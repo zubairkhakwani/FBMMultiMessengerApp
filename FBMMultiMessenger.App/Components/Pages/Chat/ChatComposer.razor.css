@@ -316,7 +316,7 @@ body {
     background: white;
     display: flex;
     align-items: center;
-    cursor:pointer;
+    cursor: pointer;
 }
 
     .chat-header .avatar {
@@ -337,7 +337,6 @@ body {
 .header-info p {
     color: #65676b;
     font-size: 12px;
- 
 }
 
 .messages-container {

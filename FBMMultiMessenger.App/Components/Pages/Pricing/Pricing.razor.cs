@@ -35,12 +35,12 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         [SupplyParameterFromQuery]
         public string RedirectReason { get; set; } = string.Empty;
 
-        public List<GetAllPricingHttpResponse> Pricings { get; set; } = new List<GetAllPricingHttpResponse>();
+        public List<PricingList> DisplayedPricings { get; set; } = new List<PricingList>();
+        public List<GetAllPricingHttpResponse> PricingsSoruce { get; set; } = new List<GetAllPricingHttpResponse>();
 
         public List<string> PreviewSelectedImages { get; set; } = new List<string>();
 
         public int _accountsInput = 1;
-
         public int AccountsInput
         {
             get => _accountsInput;
@@ -52,6 +52,8 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         }
         public decimal PricePerAccount { get; set; }
         public decimal TotalCost { get; set; }
+
+        public BillingCylce CurrentBillingCycle = BillingCylce.Monthly;
 
         public decimal BasePrice { get; set; }
 
@@ -85,12 +87,12 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
                 await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
             }
 
-
             var pricingResponse = await PricingService.GetAll();
-            Pricings = pricingResponse.Data ?? new List<GetAllPricingHttpResponse>();
-            BasePrice = Pricings.FirstOrDefault()?.PricePerAccount ?? 0;
-            CalculatePricing();
+            PricingsSoruce = pricingResponse.Data ?? new List<GetAllPricingHttpResponse>();
+            GetBillingCyclePrice();
         }
+
+
 
         private async Task ShowNotificationFromQueryAsync()
         {
@@ -164,30 +166,69 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             RequestModel.PaymentImages = files.ToList();
         }
 
-
-        #region Helper Methods
-
-        private void CalculatePricing()
+        public void CalculatePricing()
         {
-            var priceObj = Pricings
-                                  .FirstOrDefault(x => AccountsInput >= x.MinAccounts
-                                                  &&
-                                                  AccountsInput <= x.MaxAccounts)  ?? new GetAllPricingHttpResponse();
+            var pricingSource = PricingsSoruce
+                                            .FirstOrDefault(p => AccountsInput >= p.MinAccounts
+                                                            &&
+                                                            AccountsInput <= p.MaxAccounts);
 
-            PricePerAccount = priceObj.PricePerAccount;
-            TotalCost  = AccountsInput * PricePerAccount;
+            var displayedPricing = DisplayedPricings
+                                            .FirstOrDefault(p => AccountsInput >= p.MinAccounts
+                                                            &&
+                                                            AccountsInput <= p.MaxAccounts);
 
-            Pricings.ForEach(p => p.IsActive = false);
+            if (pricingSource is null || displayedPricing is null)
+            {
+                PricePerAccount = 0;
+                TotalCost = 0;
+                return;
+            }
 
-            priceObj.IsActive = true;
+            PricePerAccount = CurrentBillingCycle switch
+            {
+                BillingCylce.Monthly => pricingSource.MonthlyPricePerAccount,
+                BillingCylce.SemiAnnual => pricingSource.SemiAnnualPricePerAccount,
+                BillingCylce.Annual => pricingSource.AnnualPricePerAccount,
+                _ => 0
+            };
+
+            TotalCost = PricePerAccount * AccountsInput;
+
+            DisplayedPricings.ForEach(p => p.IsActive = false);
+
+            displayedPricing.IsActive = true;
         }
 
-        private decimal GetDiscount(decimal price)
+        private void HandleBillingCyleChanged(BillingCylce selectedBillingCycle)
         {
-            var discountedPrice = ((BasePrice - price) / BasePrice) * 100;
+            if (CurrentBillingCycle == selectedBillingCycle) return;
 
-            return Math.Round(discountedPrice, 0); // Rounds to nearest whole number
+            GetBillingCyclePrice(selectedBillingCycle);
         }
+
+        private void GetBillingCyclePrice(BillingCylce billingCylce = BillingCylce.Monthly)
+        {
+            DisplayedPricings = PricingsSoruce
+                .Select(p => new PricingList
+                {
+                    MinAccounts = p.MinAccounts,
+                    MaxAccounts = p.MaxAccounts,
+                    PricePerAccount = billingCylce switch
+                    {
+                        BillingCylce.Monthly => p.MonthlyPricePerAccount,
+                        BillingCylce.SemiAnnual => p.SemiAnnualPricePerAccount,
+                        BillingCylce.Annual => p.AnnualPricePerAccount,
+                        _ => p.MonthlyPricePerAccount
+                    },
+                })
+                .ToList();
+
+            CurrentBillingCycle = billingCylce;
+
+            CalculatePricing();
+        }
+
 
         private async Task HandleCopyToClipboardAsync(bool isCopyIBAN = false)
         {
@@ -258,6 +299,22 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             return true;
         }
 
-        #endregion
     }
+
+    public class PricingList
+    {
+        public int MinAccounts { get; set; }
+        public int MaxAccounts { get; set; }
+        public decimal PricePerAccount { get; set; }
+        public bool IsActive { get; set; }
+    }
+
+    public enum BillingCylce
+    {
+        Monthly,
+        SemiAnnual,
+        Annual
+    }
+
+
 }

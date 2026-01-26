@@ -1,0 +1,51 @@
+﻿@{
+    var accountStatus = Context.IsAccountConnected ? "active" : "inactive";
+    var avatarMargin = PlatformHelper.IsMobilePlatform ? "0px" : "12px";
+}
+
+@if (SelectedFbChatId is not null)
+{
+    <div class="chat-header" @onclick="HandleChatMenuOpen">
+    @* Pending *@
+    @if (PlatformHelper.IsMobilePlatform)
+    {
+            <div style="cursor:pointer; padding: 33px 12px 32px 20px;" @onclick="ShowSideBarView">
+            @*  Pending *@
+            <i class="fa-sharp fa-solid fa-arrow-left"></i>
+        </div>
+    }
+
+    <div class="avatar" style="margin-left:@avatarMargin">
+        <span class="status-indicator @accountStatus"></span>
+        @if (Context.ListingImage is not null)
+        {
+            <img src="@Context.ListingImage" />
+        } 
+         else
+        {
+            <span>Loading</span>
+        }
+
+    </div>
+    <div class="header-info">
+
+        @if (Context.ListingTitle is not null)
+        {
+            <h3>@Context.ListingTitle</h3>
+        }
+        @if (!string.IsNullOrWhiteSpace(Context.AccountName))
+        {
+            <p>Account: @Context.AccountName</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Context.RecipientName))
+        {
+            <p>Chatting With: @Context.RecipientName</p>
+        }
+        @if (Context.ListingLocation is not null && Context.ListingPrice is not null)
+        {
+            <p>@Context.ListingLocation - @Context.ListingPrice</p>
+        }
+    </div>
+</div>
+}
+

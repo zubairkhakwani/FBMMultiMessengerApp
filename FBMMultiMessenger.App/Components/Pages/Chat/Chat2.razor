@@ -1,0 +1,64 @@
+﻿@page "/"
+@page "/Chat"
+
+@layout EmptyLayout
+
+
+@attribute [Authorize(Policy = "ValidSubscription")]
+
+@{
+    var mobileView = PlatformHelper.IsMobilePlatform ? "" : "messenger-container";
+}
+
+
+<div class="@mobileView">
+    <!-- Sidebar -->
+    <ChatSidebar></ChatSidebar>
+
+    @* Main Chat *@
+    <ChatPanel></ChatPanel>
+
+</div>
+
+
+
+<!-- Mobile NavBar -->
+@if (PlatformHelper.IsMobilePlatform)
+{
+    <MobileNav></MobileNav>
+}
+
+
+
+@* <div class="arrow-down pulse-animation">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+</div> *@
+
+
+
+<script src="/Components/Pages/Chat/Chat.razor.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
