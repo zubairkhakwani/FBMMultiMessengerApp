@@ -7,6 +7,11 @@ namespace FBMMultiMessenger.Contracts.Enums
         Pending = 2,
         Rejected = 3
     }
-
+    public enum BillingCylce
+    {
+        Monthly,
+        SemiAnnual,
+        Annual
+    }
 
 }

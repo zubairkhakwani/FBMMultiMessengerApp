@@ -1,23 +1,22 @@
 ﻿@page "/Pricing"
+@using FBMMultiMessenger.Contracts.Enums
 <div class="parent-pricing-container">
     <div class="pricing-container">
         <a class="back-button" href="/account">
             ← Back to Dashboard
         </a>
         <div class="header">
-
             <h1>Our Packages</h1>
             <p>Choose your plan and get started today</p>
             <p class="punchline">"Growth isn't expensive, staying small is"</p>
         </div>
 
         <!-- Discount Section START -->
-        <div class="card">
-            <h2>💰 Pricing Calculator</h2>
+        <div class="custom-pricing-card">
+            <h2 class="custom-card-title">💰 Pricing Calculator</h2>
 
             <!-- Billing Period Section -->
             <div class="billing-section">
-                <h3>📅 Select Billing Period</h3>
                 <div class="billing-tabs">
                     <button class="billing-tab @(CurrentBillingCycle == BillingCylce.Monthly ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Monthly)'>
                         Monthly
@@ -32,7 +31,7 @@
                     </button>
                 </div>
             </div>
-         
+
 
             <!-- Volume Discounts Section -->
             <div class="pricing-tiers">
@@ -59,13 +58,6 @@
                 <label for="accounts">Number of Accounts</label>
                 <input type="number" @bind-value="AccountsInput" @bind-value:event="oninput" placeholder="Enter number of accounts" min="1">
             </div>
-
-            <!-- Combined Discount Banner -->
-            @* <div class="discount-banner" id="banner1">
-                💰 Current Monthly Price
-                <div class="big-savings">Total: PKR 1,200</div>
-            </div> *@
-
             <!-- Price Display -->
             <div class="pricing-display">
                 <div class="price-item">
@@ -82,12 +74,12 @@
                 </div>
             </div>
 
-            <button class="purchase-btn">Proceed to Purchase</button>
+            <button class="purchase-btn" id="purchaseBtn">Proceed to Purchase</button>
         </div>
         <!-- Discount Section END -->
         <!-- Banking Details Section -->
-        <div class="card hidden scroll-to-section" id="bankingSection">
-            <h2><span class="icon">🏦</span> Banking Details</h2>
+        <div class="custom-pricing-card hidden scroll-to-section" id="bankingSection">
+            <h2 class="custom-card-title"><span class="icon">🏦</span> Banking Details</h2>
             <p style="margin-bottom: 20px; color: #666;">Please use the following details to complete your payment</p>
             <div class="banking-details">
                 <div class="bank-info">
@@ -118,8 +110,8 @@
         </div>
 
         <!-- Upload Payment Proof Section -->
-        <div class="card hidden scroll-to-section" id="uploadSection">
-            <h2><span class="icon">📤</span> Submit Payment Proof</h2>
+        <div class="custom-pricing-card hidden scroll-to-section" id="uploadSection">
+            <h2 class="custom-card-title"><span class="icon">📤</span> Submit Payment Proof</h2>
             <p style="margin-bottom: 20px; color: #666;">Upload your payment receipt for verification</p>
             <EditForm Model="@RequestModel" class="upload-form" id="uploadForm" OnValidSubmit="HandlePaymentProofSubmitAsync">
                 <DataAnnotationsValidator />

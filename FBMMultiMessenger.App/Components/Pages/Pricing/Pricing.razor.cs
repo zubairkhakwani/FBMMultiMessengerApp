@@ -132,6 +132,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             IsSubmitting = true;
             RequestModel.PurchasedPrice = TotalCost;
             RequestModel.AccountsPurchased = AccountsInput;
+            RequestModel.BillingCylce = CurrentBillingCycle;
 
             var response = await PaymentService.SubmitProof(RequestModel);
 
@@ -308,13 +309,4 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         public decimal PricePerAccount { get; set; }
         public bool IsActive { get; set; }
     }
-
-    public enum BillingCylce
-    {
-        Monthly,
-        SemiAnnual,
-        Annual
-    }
-
-
 }

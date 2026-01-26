@@ -1,6 +1,6 @@
 ﻿.parent-pricing-container {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%) !important;
+    background: var(--primary-bg-clr) !important;
     min-height: 100vh;
     padding: 1rem;
     color: #333;
@@ -63,14 +63,14 @@
 
 /*Discount section START*/
 
-.card {
+.custom-pricing-card {
     background: white;
     border-radius: 20px;
     padding: clamp(1rem, 3vw, 2.5rem);
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     animation: slideUp 0.6s ease-out;
     max-width: 850px;
-    margin:0 auto;
+    margin: 1rem auto;
 }
 
 @keyframes slideUp {
@@ -85,10 +85,11 @@
     }
 }
 
-.card h2 {
+.custom-card-title {
     margin-bottom: 25px;
     color: #1f2937;
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
+    font-weight: 700;
 }
 
 .tier-range {
@@ -223,7 +224,7 @@
         width: 100%;
         padding: 12px;
         border: 2px solid #e5e7eb;
-        border-radius: 8px;
+        border-radius: 8px !important;
         font-size: 1rem;
         transition: all 0.3s ease;
     }
@@ -281,25 +282,24 @@
     }
 
 .purchase-btn {
+    display: flex;
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     padding: clamp(0.8rem, 3vw, 1.1rem);
     border: none;
     border-radius: 12px;
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-size: clamp(0.7rem, 2vw, 1.2rem);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-    margin-top: 20px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    width: 100%;
+    margin: 20px auto 0 auto;
 }
 
     .purchase-btn:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.5);
     }
 
     .purchase-btn:active {
@@ -438,7 +438,7 @@
 }
 
 .submit-btn {
-    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     padding: clamp(0.8rem, 3vw, 1.1rem);
     border: none;
@@ -447,11 +447,9 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(8, 102, 255, 0.3);
-    width: auto;
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+    margin: 0 auto;
     display: flex;
-    margin-left: auto;
-    margin-right: auto;
 }
 
     .submit-btn:hover {
