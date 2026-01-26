@@ -1,0 +1,40 @@
+﻿.skeleton-item {
+    background: #f0f2f5;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.skeleton-line {
+    display: block;
+    height: 14px;
+    background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 37%, #e0e0e0 63%);
+    background-size: 400% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+    border-radius: 6px;
+}
+
+    .skeleton-line.short {
+        width: 40%;
+        margin-bottom: 8px;
+    }
+
+    .skeleton-line.long {
+        width: 70%;
+    }
+
+@keyframes shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+
+    50% {
+        background-position: -100% 0;
+    }
+
+    100% {
+        background-position: 100% 0;
+    }
+}

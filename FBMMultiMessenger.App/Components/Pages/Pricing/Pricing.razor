@@ -36,21 +36,29 @@
             <!-- Volume Discounts Section -->
             <div class="pricing-tiers">
                 <h3>💡 Volume Discounts Available</h3>
-                <div class="tier-list" id="tierList">
+                @if (IsPricingLoading)
+                {
+                    <PricingLoadingSkelton></PricingLoadingSkelton>
+                }
 
-                    @for (int i = 0; i < DisplayedPricings.Count; i++)
-                    {
-                        var pricing = DisplayedPricings[i];
-                        var minAccounts = pricing.MinAccounts;
-                        var maxAccounts = pricing.MaxAccounts;
-                        var perAccountPrice = pricing.PricePerAccount;
-                        var active = pricing.IsActive ? "active" : "";
-                        <div class="tier-item @active">
-                            <span class="tier-range">@minAccounts-@maxAccounts accounts</span>
-                            <span class="tier-price">PKR @perAccountPrice / account</span>
-                        </div>
-                    }
-                </div>
+                else
+                {
+                    <div class="tier-list" id="tierList">
+                        @for (int i = 0; i < DisplayedPricings.Count; i++)
+                        {
+                            var pricing = DisplayedPricings[i];
+                            var minAccounts = pricing.MinAccounts;
+                            var maxAccounts = pricing.MaxAccounts;
+                            var perAccountPrice = pricing.PricePerAccount;
+                            var active = pricing.IsActive ? "active" : "";
+                            <div class="tier-item @active">
+                                <span class="tier-range">@minAccounts-@maxAccounts accounts</span>
+                                <span class="tier-price">PKR @perAccountPrice / account</span>
+                            </div>
+                        }
+                    </div>
+                }
+              
             </div>
 
             <!-- Account Input -->

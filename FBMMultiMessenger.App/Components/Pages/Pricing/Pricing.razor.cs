@@ -64,8 +64,13 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         public string ResponseMessage { get; set; } = string.Empty;
         public bool IsSuccess { get; set; }
         public bool IsSubmitting { get; set; }
+
+        public bool IsPricingLoading { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
+            IsPricingLoading = true;
+
             await ShowNotificationFromQueryAsync();
 
             var response = await PaymentService.GetMyStatus();
@@ -89,6 +94,9 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
             var pricingResponse = await PricingService.GetAll();
             PricingsSoruce = pricingResponse.Data ?? new List<GetAllPricingHttpResponse>();
+
+            IsPricingLoading = false;
+
             GetBillingCyclePrice();
         }
 
