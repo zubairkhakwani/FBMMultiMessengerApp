@@ -60,12 +60,12 @@
                                 <div class="tier-pricing">
                                     @if (orignalPrice == discountedPrice)
                                     {
-                                        <span class="tier-price">PKR @discountedPrice.ToString("N0") /month</span>
+                                        <span class="tier-price">PKR @discountedPrice.ToString("N0")</span>
                                     }
                                     else
                                     {
-                                        <span class="tier-original-price">PKR @orignalPrice.ToString("N0") /month</span>
-                                        <span class="tier-price">PKR @discountedPrice.ToString("N0") /month</span>
+                                        <span class="tier-original-price">PKR @orignalPrice.ToString("N0")</span>
+                                        <span class="tier-price">PKR @discountedPrice.ToString("N0")</span>
                                     }
 
                                 </div>
@@ -83,8 +83,8 @@
                     <div class="savings-badge">You save PKR @Savings.ToString("N0")! </div>
                 </div>
             </div>
-           
-            <button class="purchase-btn" id="purchaseBtn" disabled="@(!CanSubmitPayment())">
+            @* disabled="@(!CanSubmitPayment())" *@
+            <button class="purchase-btn" id="purchaseBtn" >
                 Proceed to Purchase
             </button>
 

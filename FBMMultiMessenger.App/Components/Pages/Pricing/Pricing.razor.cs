@@ -240,7 +240,14 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         {
             if (SelectedTier == null) return;
 
-            var months = CurrentBillingCycle switch
+            TotalCost = SelectedTier.DiscountedPrice;
+
+            Savings = SelectedTier.OrignalPrice - SelectedTier.DiscountedPrice;
+        }
+
+        private void GetBillingCyclePrice(BillingCylce billingCylce = BillingCylce.Monthly)
+        {
+            var month = billingCylce switch
             {
                 BillingCylce.Monthly => 1,
                 BillingCylce.SemiAnnual => 6,
@@ -248,33 +255,18 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
                 _ => 1
             };
 
-            var pricingSource = PricingsSoruce.FirstOrDefault(x => x.Id == SelectedTier.Id);
-            if (pricingSource is null) return;
-
-            var discountedMonthlyPrice = SelectedTier.DiscountedPrice;
-            var baseMonthlyPrice = pricingSource.MonthlyPrice;
-
-            TotalCost = discountedMonthlyPrice * months;
-
-            var normalCost = baseMonthlyPrice * months;
-
-            Savings = normalCost - TotalCost;
-        }
-
-        private void GetBillingCyclePrice(BillingCylce billingCylce = BillingCylce.Monthly)
-        {
             DisplayedPricings = PricingsSoruce
                 .Select(p => new PricingList
                 {
                     Id = p.Id,
                     UptoAccounts = p.UptoAccounts,
-                    OrignalPrice = p.MonthlyPrice,
+                    OrignalPrice = p.MonthlyPrice * month,
                     DiscountedPrice = billingCylce switch
                     {
-                        BillingCylce.Monthly => p.MonthlyPrice,
-                        BillingCylce.SemiAnnual => p.SemiAnnualPrice,
-                        BillingCylce.Annual => p.AnnualPrice,
-                        _ => p.MonthlyPrice
+                        BillingCylce.Monthly => p.MonthlyPrice * month,
+                        BillingCylce.SemiAnnual => p.SemiAnnualPrice * month,
+                        BillingCylce.Annual => p.AnnualPrice * month,
+                        _ => p.MonthlyPrice * month
                     },
 
                     IsActive = SelectedTier is not null ? p.Id == SelectedTier.Id : false,
