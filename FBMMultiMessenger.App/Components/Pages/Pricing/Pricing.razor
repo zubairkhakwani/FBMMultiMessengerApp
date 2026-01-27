@@ -83,8 +83,8 @@
                     <div class="savings-badge">You save PKR @Savings.ToString("N0")! </div>
                 </div>
             </div>
-            @* disabled="@(!CanSubmitPayment())" *@
-            <button class="purchase-btn" id="purchaseBtn" >
+          
+            <button class="purchase-btn" id="purchaseBtn" disabled="@(!CanSubmitPayment())">
                 Proceed to Purchase
             </button>
 
