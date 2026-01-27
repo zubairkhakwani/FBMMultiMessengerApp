@@ -51,8 +51,16 @@
                             var maxAccounts = pricing.MaxAccounts;
                             var perAccountPrice = pricing.PricePerAccount;
                             var active = pricing.IsActive ? "active" : "";
+                          
+
+
                             <div class="tier-item @active">
-                                <span class="tier-range">@minAccounts-@maxAccounts accounts</span>
+                                <span class="tier-range">
+                                    @(minAccounts > 100
+                                                  ? "100+ accounts"
+                                                  : $"{minAccounts}-{maxAccounts} accounts")
+                                </span>
+
                                 <span class="tier-price">PKR @perAccountPrice / account</span>
                             </div>
                         }
@@ -69,7 +77,7 @@
             <!-- Price Display -->
             <div class="pricing-display">
                 <div class="price-item">
-                    <div class="label">Price Per Account</div>
+                    <div class="label">Price Per Account / @CurrentBillingCycle.ToString()</div>
                     <div class="value" id="pricePerAccount1">PKR @PricePerAccount</div>
                 </div>
                 <div class="price-item">
@@ -82,7 +90,9 @@
                 </div>
             </div>
 
-            <button class="purchase-btn" id="purchaseBtn">Proceed to Purchase</button>
+            <button class="purchase-btn" id="purchaseBtn" disabled="@(!CanSubmitPaymentProof)">
+                Proceed to Purchase
+            </button>
         </div>
         <!-- Discount Section END -->
         <!-- Banking Details Section -->

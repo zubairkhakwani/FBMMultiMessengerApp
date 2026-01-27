@@ -1,12 +1,14 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Payment;
 using FBMMultiMessenger.Contracts.Contracts.Pricing;
 using FBMMultiMessenger.Contracts.Enums;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
+using OneSignalSDK.DotNet;
 
 namespace FBMMultiMessenger.Components.Pages.Pricing
 {
@@ -64,40 +66,72 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         public string ResponseMessage { get; set; } = string.Empty;
         public bool IsSuccess { get; set; }
         public bool IsSubmitting { get; set; }
-
         public bool IsPricingLoading { get; set; }
-
+        public bool CanSubmitPaymentProof = true;
         protected override async Task OnInitializedAsync()
         {
             IsPricingLoading = true;
 
-            await ShowNotificationFromQueryAsync();
-
-            var response = await PaymentService.GetMyStatus();
-
-            if (response.IsSuccess && response.Data is not null && response.Data.Status == PaymentStatus.Rejected)
-            {
-                var options = new SweetAlertOptions
-                {
-                    Title = "Attention",
-                    Message = response.Data.Description,
-                    Icon = "error",
-                    ConfirmButtonText = "Okay",
-                    Footer = new SweetAlertFooter()
-                    {
-                        Text = "Check your email further assistance.",
-                    }
-                };
-
-                await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
-            }
-
-            var pricingResponse = await PricingService.GetAll();
-            PricingsSoruce = pricingResponse.Data ?? new List<GetAllPricingHttpResponse>();
+            await HandlePaymentStatusAsync();
+            await LoadPricingDataAsync();
 
             IsPricingLoading = false;
-
             GetBillingCyclePrice();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (PlatformHelper.IsMobilePlatform)
+            {
+                await OneSignal.Notifications.RequestPermissionAsync(true);
+            }
+        }
+
+        private async Task HandlePaymentStatusAsync()
+        {
+            var paymentStatusResponse = await PaymentService.GetMyStatus();
+            var paymentStatus = paymentStatusResponse.Data;
+
+            if (paymentStatus == null)
+                return;
+
+            CanSubmitPaymentProof = paymentStatus.Status != PaymentStatus.Pending;
+
+            if (ShouldShowPaymentAlert(paymentStatus.Status))
+            {
+                await ShowPaymentAlertAsync(paymentStatus);
+            }
+            else
+            {
+                await ShowNotificationFromQueryAsync();
+            }
+        }
+
+        private static bool ShouldShowPaymentAlert(PaymentStatus status)
+        {
+            return status == PaymentStatus.Rejected || status == PaymentStatus.Pending;
+        }
+
+        private async Task ShowPaymentAlertAsync(GetMyVerificationStatusHttpResponse paymentStatus)
+        {
+            var options = new SweetAlertOptions
+            {
+                Title = "Attention",
+                Message = paymentStatus.Description ?? "Please contact administrator",
+                Icon =  paymentStatus.Status == PaymentStatus.Rejected ? "error" : "info",
+                ConfirmButtonText = "Okay",
+                Footer = paymentStatus.Status == PaymentStatus.Rejected
+                    ? new SweetAlertFooter { Text = "Check your email for further assistance." }
+                    : null
+            };
+
+            await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
+        }
+
+        private async Task LoadPricingDataAsync()
+        {
+            var pricingResponse = await PricingService.GetAll();
+            PricingsSoruce = pricingResponse.Data ?? new List<GetAllPricingHttpResponse>();
         }
 
         private async Task ShowNotificationFromQueryAsync()
@@ -195,12 +229,20 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             PricePerAccount = CurrentBillingCycle switch
             {
                 BillingCylce.Monthly => pricingSource.MonthlyPricePerAccount,
-                BillingCylce.SemiAnnual => pricingSource.SemiAnnualPricePerAccount * 6,
-                BillingCylce.Annual => pricingSource.AnnualPricePerAccount * 12,
+                BillingCylce.SemiAnnual => pricingSource.SemiAnnualPricePerAccount,
+                BillingCylce.Annual => pricingSource.AnnualPricePerAccount,
                 _ => 0
             };
 
-            TotalCost = PricePerAccount * AccountsInput;
+            var multiplier = CurrentBillingCycle switch
+            {
+                BillingCylce.Monthly => 1,
+                BillingCylce.SemiAnnual => 6,
+                BillingCylce.Annual => 12,
+                _ => 0
+            };
+
+            TotalCost = (PricePerAccount * AccountsInput) * multiplier;
 
             DisplayedPricings.ForEach(p => p.IsActive = false);
 
