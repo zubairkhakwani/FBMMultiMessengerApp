@@ -121,7 +121,7 @@
 
 .billing-tab {
     flex: 1;
-    padding: 12px;
+    padding: 5px;
     border: none;
     background: transparent;
     border-radius: 8px;
@@ -130,6 +130,10 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
 }
 
     .billing-tab:hover:not(.active) {
@@ -155,6 +159,44 @@
     .billing-tab.active .save-tag {
         color: #059669;
     }
+    .billing-tab .save-tag {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.25rem 0.6rem;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+        .billing-tab .save-tag.hot {
+            animation: pulse 2s infinite;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+        }
+
+    .billing-tab.active .save-tag {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: #78350f;
+    }
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+
+
+
+
 
 /* Volume Discounts Section */
 .pricing-tiers {
@@ -190,6 +232,7 @@
     align-items: center;
     border: 2px solid #e5e7eb;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor:pointer;
 }
 
     .tier-item::before {
@@ -229,6 +272,25 @@
     color: #1f2937;
     font-size: clamp(0.7rem, 2.1vw, 1rem);
 }
+
+.tier-pricing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.tier-original-price {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    font-weight: 600;
+    text-decoration: line-through;
+    text-decoration-color: #ff4d4f;
+    text-decoration-thickness: 2px;
+    text-decoration-style: solid; 
+    position: relative;
+}
+
 
 .tier-price {
     font-weight: 700;
@@ -329,6 +391,18 @@
         background-clip: text;
     }
 
+.savings-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #059669;
+    margin-top: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    background: white;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
 .purchase-btn {
     display: flex;
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -382,6 +456,7 @@
     padding: 20px;
     border-radius: 10px;
     border-left: 4px solid #0866FF;
+    margin-bottom:1rem;
 }
 
     .bank-info .info-row {
@@ -420,6 +495,88 @@
     color: #0866FF;
     font-size: clamp(0.8rem, 2.2vw, 1.05rem);
     transition: all 0.3s ease;
+}
+
+/* Payment Amount Banner */
+.payment-amount-banner {
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 24px rgba(8, 102, 255, 0.3);
+}
+
+.amount-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.amount-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.amount-note {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    font-style: italic;
+}
+
+/* Payment Instructions */
+.payment-instructions {
+    background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%);
+    border-left: 4px solid #fbbf24;
+    padding: 1.25rem 0.8rem;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+}
+
+    .payment-instructions h4 {
+        color: #92400e;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .payment-instructions ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .payment-instructions li {
+        padding: 0.5rem 0;
+        color: #78350f;
+        font-size: 0.95rem;
+    }
+
+        .payment-instructions li::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 0.3rem;
+            font-size: 1.2rem;
+        }
+
+    .payment-instructions strong {
+        color: #042B5C;
+        font-weight: 700;
+    }
+
+@media (max-width: 768px) {
+    .amount-value {
+        font-size: 2rem;
+    }
 }
 
 .upload-form {

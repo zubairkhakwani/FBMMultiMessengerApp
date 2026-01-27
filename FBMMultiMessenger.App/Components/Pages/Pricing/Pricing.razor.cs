@@ -38,36 +38,29 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         public string RedirectReason { get; set; } = string.Empty;
 
         public List<PricingList> DisplayedPricings { get; set; } = new List<PricingList>();
-        public List<GetAllPricingHttpResponse> PricingsSoruce { get; set; } = new List<GetAllPricingHttpResponse>();
+        public List<PricingTierHttpResponse> PricingsSoruce { get; set; } = new List<PricingTierHttpResponse>();
+        public List<AccountDetailsHttpResponse> AccountDetails { get; set; } = new List<AccountDetailsHttpResponse>();
+
 
         public List<string> PreviewSelectedImages { get; set; } = new List<string>();
 
-        public int _accountsInput = 1;
-        public int AccountsInput
-        {
-            get => _accountsInput;
-            set
-            {
-                _accountsInput = value;
-                CalculatePricing();
-            }
-        }
-        public decimal PricePerAccount { get; set; }
+        public decimal Savings { get; set; }
         public decimal TotalCost { get; set; }
 
         public BillingCylce CurrentBillingCycle = BillingCylce.Monthly;
 
-        public decimal BasePrice { get; set; }
 
-        public string AccountNo = "1234567890";
-        public string IBAN = "PK12 ABCD 0000 1234 5678 90";
         public const int MaxMediaSize = 5 * 1024 * 1024; // 1024 * 1024 == 1mb hence total 5mb.
 
         public string ResponseMessage { get; set; } = string.Empty;
         public bool IsSuccess { get; set; }
         public bool IsSubmitting { get; set; }
         public bool IsPricingLoading { get; set; }
+
         public bool CanSubmitPaymentProof = true;
+
+        public PaymentStatus PaymentStatus;
+        public PricingList? SelectedTier;
         protected override async Task OnInitializedAsync()
         {
             IsPricingLoading = true;
@@ -76,6 +69,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             await LoadPricingDataAsync();
 
             IsPricingLoading = false;
+
             GetBillingCyclePrice();
         }
 
@@ -95,7 +89,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             if (paymentStatus == null)
                 return;
 
-            CanSubmitPaymentProof = paymentStatus.Status != PaymentStatus.Pending;
+            PaymentStatus =  paymentStatus.Status;
 
             if (ShouldShowPaymentAlert(paymentStatus.Status))
             {
@@ -107,9 +101,14 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             }
         }
 
-        private static bool ShouldShowPaymentAlert(PaymentStatus status)
+        private bool ShouldShowPaymentAlert(PaymentStatus status)
         {
             return status == PaymentStatus.Rejected || status == PaymentStatus.Pending;
+        }
+
+        private bool CanSubmitPayment()
+        {
+            return PaymentStatus != PaymentStatus.Pending && SelectedTier is not null;
         }
 
         private async Task ShowPaymentAlertAsync(GetMyVerificationStatusHttpResponse paymentStatus)
@@ -131,7 +130,8 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         private async Task LoadPricingDataAsync()
         {
             var pricingResponse = await PricingService.GetAll();
-            PricingsSoruce = pricingResponse.Data ?? new List<GetAllPricingHttpResponse>();
+            PricingsSoruce = pricingResponse.Data?.PricingTiers ?? new List<PricingTierHttpResponse>();
+            AccountDetails = pricingResponse.Data?.AccountDetails ?? new List<AccountDetailsHttpResponse>();
         }
 
         private async Task ShowNotificationFromQueryAsync()
@@ -171,7 +171,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
             IsSubmitting = true;
             RequestModel.PurchasedPrice = TotalCost;
-            RequestModel.AccountsPurchased = AccountsInput;
+            RequestModel.PricingTierId = SelectedTier!.Id;
             RequestModel.BillingCylce = CurrentBillingCycle;
 
             var response = await PaymentService.SubmitProof(RequestModel);
@@ -207,48 +207,6 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             RequestModel.PaymentImages = files.ToList();
         }
 
-        public void CalculatePricing()
-        {
-            var pricingSource = PricingsSoruce
-                                            .FirstOrDefault(p => AccountsInput >= p.MinAccounts
-                                                            &&
-                                                            AccountsInput <= p.MaxAccounts);
-
-            var displayedPricing = DisplayedPricings
-                                            .FirstOrDefault(p => AccountsInput >= p.MinAccounts
-                                                            &&
-                                                            AccountsInput <= p.MaxAccounts);
-
-            if (pricingSource is null || displayedPricing is null)
-            {
-                PricePerAccount = 0;
-                TotalCost = 0;
-                return;
-            }
-
-            PricePerAccount = CurrentBillingCycle switch
-            {
-                BillingCylce.Monthly => pricingSource.MonthlyPricePerAccount,
-                BillingCylce.SemiAnnual => pricingSource.SemiAnnualPricePerAccount,
-                BillingCylce.Annual => pricingSource.AnnualPricePerAccount,
-                _ => 0
-            };
-
-            var multiplier = CurrentBillingCycle switch
-            {
-                BillingCylce.Monthly => 1,
-                BillingCylce.SemiAnnual => 6,
-                BillingCylce.Annual => 12,
-                _ => 0
-            };
-
-            TotalCost = (PricePerAccount * AccountsInput) * multiplier;
-
-            DisplayedPricings.ForEach(p => p.IsActive = false);
-
-            displayedPricing.IsActive = true;
-        }
-
         private void HandleBillingCyleChanged(BillingCylce selectedBillingCycle)
         {
             if (CurrentBillingCycle == selectedBillingCycle) return;
@@ -256,32 +214,86 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             GetBillingCyclePrice(selectedBillingCycle);
         }
 
+        public void HandleTierSelection(int selectedTierId)
+        {
+            DisplayedPricings.ForEach(p => p.IsActive = false);
+
+            var pricingSource = PricingsSoruce.FirstOrDefault(p => p.Id == selectedTierId);
+
+            var selectedTier = DisplayedPricings.FirstOrDefault(p => p.Id == selectedTierId);
+
+            if (pricingSource is null || selectedTier is null)
+            {
+                Savings = 0;
+                TotalCost = 0;
+                return;
+            }
+
+            selectedTier.IsActive = true;
+
+            SelectedTier = selectedTier;
+
+            CalculatePricing();
+        }
+
+        public void CalculatePricing()
+        {
+            if (SelectedTier == null) return;
+
+            var months = CurrentBillingCycle switch
+            {
+                BillingCylce.Monthly => 1,
+                BillingCylce.SemiAnnual => 6,
+                BillingCylce.Annual => 12,
+                _ => 1
+            };
+
+            var pricingSource = PricingsSoruce.FirstOrDefault(x => x.Id == SelectedTier.Id);
+            if (pricingSource is null) return;
+
+            var discountedMonthlyPrice = SelectedTier.DiscountedPrice;
+            var baseMonthlyPrice = pricingSource.MonthlyPrice;
+
+            TotalCost = discountedMonthlyPrice * months;
+
+            var normalCost = baseMonthlyPrice * months;
+
+            Savings = normalCost - TotalCost;
+        }
+
         private void GetBillingCyclePrice(BillingCylce billingCylce = BillingCylce.Monthly)
         {
             DisplayedPricings = PricingsSoruce
                 .Select(p => new PricingList
                 {
-                    MinAccounts = p.MinAccounts,
-                    MaxAccounts = p.MaxAccounts,
-                    PricePerAccount = billingCylce switch
+                    Id = p.Id,
+                    UptoAccounts = p.UptoAccounts,
+                    OrignalPrice = p.MonthlyPrice,
+                    DiscountedPrice = billingCylce switch
                     {
-                        BillingCylce.Monthly => p.MonthlyPricePerAccount,
-                        BillingCylce.SemiAnnual => p.SemiAnnualPricePerAccount,
-                        BillingCylce.Annual => p.AnnualPricePerAccount,
-                        _ => p.MonthlyPricePerAccount
+                        BillingCylce.Monthly => p.MonthlyPrice,
+                        BillingCylce.SemiAnnual => p.SemiAnnualPrice,
+                        BillingCylce.Annual => p.AnnualPrice,
+                        _ => p.MonthlyPrice
                     },
+
+                    IsActive = SelectedTier is not null ? p.Id == SelectedTier.Id : false,
                 })
                 .ToList();
+
+            if (SelectedTier is not null)
+            {
+                SelectedTier = DisplayedPricings.FirstOrDefault(x => x.Id == SelectedTier.Id);
+            }
+
 
             CurrentBillingCycle = billingCylce;
 
             CalculatePricing();
         }
 
-
-        private async Task HandleCopyToClipboardAsync(bool isCopyIBAN = false)
+        private async Task HandleCopyToClipboardAsync(string text, bool isCopyIBAN = false)
         {
-            var text = isCopyIBAN ? IBAN : AccountNo;
             var copiedType = isCopyIBAN ? "IBAN" : "Account Number";
 
             bool isCopied = await JS.InvokeAsync<bool>("myInterop.copyToClipboard", text);
@@ -295,7 +307,6 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
                 Snackbar.Add($"Failed to copy {copiedType}", Severity.Error);
             }
         }
-
 
         public async Task<bool> ValidatePaymentProofFile(IReadOnlyList<IBrowserFile> files)
         {
@@ -347,14 +358,14 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             }
             return true;
         }
-
     }
 
     public class PricingList
     {
-        public int MinAccounts { get; set; }
-        public int MaxAccounts { get; set; }
-        public decimal PricePerAccount { get; set; }
+        public int Id { get; set; }
+        public int UptoAccounts { get; set; }
+        public decimal OrignalPrice { get; set; }
+        public decimal DiscountedPrice { get; set; }
         public bool IsActive { get; set; }
     }
 }

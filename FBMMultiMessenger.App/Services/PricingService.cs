@@ -14,7 +14,7 @@ namespace FBMMultiMessenger.Services
         {
             this._baseService=baseService;
         }
-        public async Task<BaseResponse<List<GetAllPricingHttpResponse>>> GetAll()
+        public async Task<BaseResponse<GetAllPricingHttpResponse>> GetAll()
         {
 
             var apiRequest = new ApiRequest<object>()
@@ -24,7 +24,7 @@ namespace FBMMultiMessenger.Services
                 Data = null
             };
 
-            return await _baseService.SendAsync<object, BaseResponse<List<GetAllPricingHttpResponse>>>(apiRequest);
+            return await _baseService.SendAsync<object, BaseResponse<GetAllPricingHttpResponse>>(apiRequest);
         }
     }
 }

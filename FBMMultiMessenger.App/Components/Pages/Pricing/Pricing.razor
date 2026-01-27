@@ -23,11 +23,11 @@
                     </button>
                     <button class="billing-tab @(CurrentBillingCycle == BillingCylce.SemiAnnual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.SemiAnnual)'>
                         Semi-Annual
-                        @*  <span class="save-tag">⚡ Save 10%</span> *@
+                        <span class="save-tag">💰 Discount</span>
                     </button>
                     <button class="billing-tab @(CurrentBillingCycle == BillingCylce.Annual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Annual)'>
                         Annual
-                        @*   <span class="save-tag">🔥 Save 20%</span> *@
+                        <span class="save-tag hot">🔥 Discount</span>
                     </button>
                 </div>
             </div>
@@ -43,87 +43,104 @@
 
                 else
                 {
-                    <div class="tier-list" id="tierList">
+                    <div class="tier-list">
                         @for (int i = 0; i < DisplayedPricings.Count; i++)
                         {
                             var pricing = DisplayedPricings[i];
-                            var minAccounts = pricing.MinAccounts;
-                            var maxAccounts = pricing.MaxAccounts;
-                            var perAccountPrice = pricing.PricePerAccount;
+                            var id = pricing.Id;
+                            var uptoAccounts = pricing.UptoAccounts;
+                            var orignalPrice = pricing.OrignalPrice;
+                            var discountedPrice = pricing.DiscountedPrice;
                             var active = pricing.IsActive ? "active" : "";
-                          
 
-
-                            <div class="tier-item @active">
+                            <div class="tier-item @active" @onclick="() => HandleTierSelection(id)">
                                 <span class="tier-range">
-                                    @(minAccounts > 100
-                                                  ? "100+ accounts"
-                                                  : $"{minAccounts}-{maxAccounts} accounts")
+                                    Upto @uptoAccounts Accounts
                                 </span>
+                                <div class="tier-pricing">
+                                    @if (orignalPrice == discountedPrice)
+                                    {
+                                        <span class="tier-price">PKR @discountedPrice.ToString("N0") /month</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="tier-original-price">PKR @orignalPrice.ToString("N0") /month</span>
+                                        <span class="tier-price">PKR @discountedPrice.ToString("N0") /month</span>
+                                    }
 
-                                <span class="tier-price">PKR @perAccountPrice / account</span>
+                                </div>
                             </div>
                         }
                     </div>
                 }
-              
             </div>
 
-            <!-- Account Input -->
-            <div class="input-group">
-                <label for="accounts">Number of Accounts</label>
-                <input type="number" @bind-value="AccountsInput" @bind-value:event="oninput" placeholder="Enter number of accounts" min="1">
-            </div>
             <!-- Price Display -->
             <div class="pricing-display">
                 <div class="price-item">
-                    <div class="label">Price Per Account / @CurrentBillingCycle.ToString()</div>
-                    <div class="value" id="pricePerAccount1">PKR @PricePerAccount</div>
-                </div>
-                <div class="price-item">
-                    <div class="label">Total Accounts</div>
-                    <div class="value" id="totalAccounts1">@AccountsInput</div>
-                </div>
-                <div class="price-item">
-                    <div class="label" id="costLabel1">Total Cost</div>
-                    <div class="value" id="totalCost1">PKR @TotalCost</div>
+                    <div class="label">Total Cost @CurrentBillingCycle.ToString()</div>
+                    <div class="value">PKR @TotalCost.ToString("N0")</div>
+                    <div class="savings-badge">You save PKR @Savings.ToString("N0")! </div>
                 </div>
             </div>
-
-            <button class="purchase-btn" id="purchaseBtn" disabled="@(!CanSubmitPaymentProof)">
+           
+            <button class="purchase-btn" id="purchaseBtn" disabled="@(!CanSubmitPayment())">
                 Proceed to Purchase
             </button>
+
         </div>
         <!-- Discount Section END -->
         <!-- Banking Details Section -->
         <div class="custom-pricing-card hidden scroll-to-section" id="bankingSection">
             <h2 class="custom-card-title"><span class="icon">🏦</span> Banking Details</h2>
-            <p style="margin-bottom: 20px; color: #666;">Please use the following details to complete your payment</p>
+            <p style="margin-bottom: 20px; color: #666;">Please use <strong>ONE</strong> of the following details to complete your payment</p>
+
+            <!-- Payment Amount Banner -->
+            <div class="payment-amount-banner">
+                <div class="amount-label">Amount to Pay</div>
+                <div class="amount-value">PKR @TotalCost.ToString("N0")</div>
+                <div class="amount-note">For @SelectedTier?.UptoAccounts account(s) • @CurrentBillingCycle.ToString() billing</div>
+            </div>
+
             <div class="banking-details">
-                <div class="bank-info">
-                    <div class="info-row">
-                        <span class="info-label">Bank Name:</span>
-                        <span class="info-value">ABC Bank</span>
+                    @foreach (var account in AccountDetails)
+                    {
+                    <div class="bank-info">
+                        <div class="info-row">
+                            <span class="info-label">Bank Name:</span>
+                            <span class="info-value">@account.BankName</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Account Title:</span>
+                            <span class="info-value">@account.Title</span>
+                        </div>
+                        <div @onclick="() => HandleCopyToClipboardAsync(account.IBAN)" class="info-row">
+                            <span class="info-label">Account No:</span>
+                            <span class="info-value">
+                                @account.AccountNo
+                                <span class="copy-icon" title="Copy to clipboard">📋</span>
+                            </span>
+                        </div>
+                        <div @onclick="() => HandleCopyToClipboardAsync(account.IBAN, isCopyIBAN: true)" class="info-row">
+                            <span class="info-label">IBAN:</span>
+                            <span class="info-value">
+                                @account.IBAN
+                                <span class="copy-icon" title="Copy to clipboard">📋</span>
+                            </span>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Account Title:</span>
-                        <span class="info-value">Your Company Name</span>
-                    </div>
-                    <div @onclick="() => HandleCopyToClipboardAsync()" class="info-row">
-                        <span class="info-label">Account No:</span>
-                        <span class="info-value">
-                            @AccountNo
-                            <span class="copy-icon" title="Copy to clipboard">📋</span>
-                        </span>
-                    </div>
-                    <div @onclick="() => HandleCopyToClipboardAsync(isCopyIBAN: true)" class="info-row">
-                        <span class="info-label">IBAN:</span>
-                        <span class="info-value">
-                            @IBAN
-                            <span class="copy-icon" title="Copy to clipboard">📋</span>
-                        </span>
-                    </div>
-                </div>
+                    }
+            </div>
+
+            <!-- Important Instructions -->
+            <div class="payment-instructions">
+                <h4>⚠️ Important Instructions</h4>
+                <ul>
+                    <li>Transfer exactly <strong>PKR @TotalCost.ToString("N0")</strong> to avoid rejection</li>
+                    <li>Use the account number or IBAN provided above</li>
+                    <li>Keep your payment receipt/screenshot for verification</li>
+                    <li>Upload your payment proof in the section below</li>
+                </ul>
             </div>
         </div>
 
@@ -155,15 +172,6 @@
                             </div>
                         </div>
                     }
-                </div>
-
-                <div class="form-group">
-                    <label for="accountsPurchased">Accounts Purchased</label>
-                    <input type="number" id="accountsPurchased" @bind-value="AccountsInput" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="accountsPurchased">Purchased Price</label>
-                    <input type="number" id="purchasedPrice" @bind-value="TotalCost" disabled>
                 </div>
 
                 <div class="form-group">
