@@ -100,8 +100,6 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             GetBillingCyclePrice();
         }
 
-
-
         private async Task ShowNotificationFromQueryAsync()
         {
             if (IsNewUser)
@@ -197,8 +195,8 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             PricePerAccount = CurrentBillingCycle switch
             {
                 BillingCylce.Monthly => pricingSource.MonthlyPricePerAccount,
-                BillingCylce.SemiAnnual => pricingSource.SemiAnnualPricePerAccount,
-                BillingCylce.Annual => pricingSource.AnnualPricePerAccount,
+                BillingCylce.SemiAnnual => pricingSource.SemiAnnualPricePerAccount * 6,
+                BillingCylce.Annual => pricingSource.AnnualPricePerAccount * 12,
                 _ => 0
             };
 

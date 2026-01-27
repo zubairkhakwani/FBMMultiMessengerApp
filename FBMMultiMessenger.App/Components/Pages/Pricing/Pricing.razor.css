@@ -67,7 +67,7 @@
     background: white;
     border-radius: 20px;
     padding: clamp(1rem, 3vw, 2.5rem);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     animation: slideUp 0.6s ease-out;
     max-width: 850px;
     margin: 1rem auto;
@@ -104,8 +104,8 @@
 
     .billing-section h3 {
         color: #1f2937;
-        font-size: 1rem;
-        margin-bottom: 12px;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
         font-weight: 600;
     }
 
@@ -113,6 +113,8 @@
     display: flex;
     background: #f3f4f6;
     border-radius: 12px;
+    background: linear-gradient(135deg, #f0f7ff 0%, #e0f0ff 100%);
+    border: 2px solid rgba(8, 102, 255, 0.1);   
     padding: 6px;
     gap: 6px;
 }
@@ -125,19 +127,21 @@
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     color: #6b7280;
 }
 
-    .billing-tab:hover {
-        background: rgba(255, 255, 255, 0.5);
+    .billing-tab:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.6);
+        transform: translateY(-2px);
     }
 
     .billing-tab.active {
-        background: white;
-        color: #1f2937;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+        color: white;
+        box-shadow: 0 8px 20px rgba(8, 102, 255, 0.4);
+        transform: translateY(-2px);
     }
 
     .billing-tab .save-tag {
@@ -154,14 +158,15 @@
 
 /* Volume Discounts Section */
 .pricing-tiers {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 25px;
+    border: 2px solid rgba(8, 102, 255, 0.15);
 }
 
     .pricing-tiers h3 {
-        color: #92400e;
+        color: #042B5C;
         font-size: 1.1rem;
         margin-bottom: 15px;
         display: flex;
@@ -175,26 +180,50 @@
 }
 
 .tier-item {
+    position: relative;
+    overflow: hidden;
     background: white;
     border-radius: 8px;
     padding: 12px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-left: 4px solid #e5e7eb;
-    transition: all 0.3s ease;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-    .tier-item:hover {
-        transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    .tier-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #e5e7eb;
+        transition: all 0.3s ease;
     }
 
-    .tier-item.active {
-        border-left-color: #3b82f6;
-        background: linear-gradient(90deg, #dbeafe 0%, white 100%);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    .tier-item:hover:not(.active) {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(8, 102, 255, 0.15);
+        border-color: #93c5fd;
     }
+
+        .tier-item:hover:not(.active)::before {
+            background: #60a5fa;
+        }
+
+    .tier-item.active {
+        background: linear-gradient(90deg, rgba(8, 102, 255, 0.08) 0%, white 100%);
+        border-color: #0866FF;
+        box-shadow: 0 6px 20px rgba(8, 102, 255, 0.25);
+        transform: translateX(4px);
+    }
+
+        .tier-item.active::before {
+            width: 5px;
+            background: linear-gradient(180deg, #0866FF 0%, #042B5C 100%);
+        }
 
 .tier-range {
     font-weight: 600;
@@ -204,8 +233,12 @@
 
 .tier-price {
     font-weight: 700;
-    color: #3b82f6;
+    color: #6b7280;
     font-size: 1rem;
+}
+.tier-item.active .tier-price {
+    color: #0866FF;
+    font-size: 1.15rem;
 }
 
 
@@ -234,39 +267,50 @@
             border-color: #667eea;
         }
 
-/* Discount Info Banner */
-.discount-banner {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    padding: 15px 20px;
-    border-radius: 12px;
-    margin: 20px 0;
-    text-align: center;
-    font-weight: 600;
-    font-size: 1rem;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-    .discount-banner .big-savings {
-        font-size: 1.3rem;
-        font-weight: bold;
-        margin-top: 5px;
-    }
-
 /* Price Display */
 .pricing-display {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    border: 2px solid rgba(8, 102, 255, 0.1);
 }
 
 .price-item {
-    background: #f9fafb;
-    padding: 15px;
+    background: white;
+    padding: 1.25rem;
     border-radius: 12px;
     text-align: center;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
+
+    .price-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #0866FF 0%, #042B5C 100%);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .price-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(8, 102, 255, 0.2);
+        border-color: #0866FF;
+    }
+
+        .price-item:hover::before {
+            transform: scaleX(1);
+        }
 
     .price-item .label {
         font-size: 0.85rem;
@@ -277,8 +321,11 @@
 
     .price-item .value {
         font-size: 1.5rem;
-        font-weight: bold;
-        color: #1f2937;
+        font-weight: 800;
+        background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
 .purchase-btn {
