@@ -1,14 +1,15 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Auth;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 
 namespace FBMMultiMessenger.Components.Pages.Auth
 {
     public partial class Register
     {
-        //[SupplyParameterFromForm]
         public RegisterHttpRequest RequestModel { get; set; } = new();
 
         [Inject]
@@ -18,13 +19,15 @@ namespace FBMMultiMessenger.Components.Pages.Auth
         public NavigationManager navManager { get; set; }
 
         [Inject]
-        public ISnackbar Snackbar { get; set; }
+        AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
-        public string? ResponseError { get; set; }
+        [Inject]
+        public ISnackbar Snackbar { get; set; }
 
         [Inject]
         public ITokenProvider TokenProvider { get; set; }
 
+        public string? ResponseError { get; set; }
 
         private bool ShowLoader = false;
 
@@ -36,8 +39,6 @@ namespace FBMMultiMessenger.Components.Pages.Auth
         private string PasswordType = "password";
         private string PasswordConfirmType = "password";
         private string ConfirmPasswordErrorMessage = string.Empty;
-        private bool DoesPasswordMatch = false;
-
 
         public async Task OnValidSubmit()
         {
@@ -67,6 +68,7 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                 if (!loginResponse.IsSuccess && loginResponse.RedirectToPackages && loginResponse.Data is not null && loginResponse.Data.Token is not null)
                 {
                     await TokenProvider.SetTokenAsync(loginResponse.Data.Token);
+                    ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyStateChanged();
                     navManager.NavigateTo($"/Pricing?isNewUser=true&newUserName={RequestModel.Name}");
                     return;
                 }
