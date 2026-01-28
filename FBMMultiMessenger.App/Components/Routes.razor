@@ -63,7 +63,7 @@
     {
         BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
 
-       _ = AppService.CheckForUpdateAsync();
+        _ = AppService.CheckForUpdateAsync();
     }
 
     private async Task OnNotificaitonClickedHandler(NotificationAdditionalData data)
@@ -79,7 +79,7 @@
         }
         else if (!isOnChatPage)
         {
-            Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={data.FbChatId}");
+            Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={data.FbChatId ?? string.Empty}");
         }
     }
 }

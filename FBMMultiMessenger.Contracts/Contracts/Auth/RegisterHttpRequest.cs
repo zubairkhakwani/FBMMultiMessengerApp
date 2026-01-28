@@ -14,8 +14,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Auth
 
 
         [Required(ErrorMessage = "Please enter password")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
-         ErrorMessage = "Password must match all the requirements")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$", ErrorMessage = "Password must match all the requirements")]
         public string Password { get; set; } = string.Empty;
 
         public string ConfirmPassword { get; set; } = string.Empty;

@@ -47,8 +47,9 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                 return;
             }
 
-            if (!DoesPasswordMatch)
+            if (!string.Equals(RequestModel.ConfirmPassword, RequestModel.Password, StringComparison.Ordinal))
             {
+                ConfirmPasswordErrorMessage = "Password do not match";
                 return;
             }
             ShowLoader = true;
@@ -75,6 +76,7 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
             ShowLoader = false;
             ResponseError =  registerResponse.Message;
+            ConfirmPasswordErrorMessage = string.Empty;
         }
 
         private void IsStrongPassword(ChangeEventArgs input)
@@ -88,13 +90,11 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
             if (!string.Equals(RequestModel.ConfirmPassword, RequestModel.Password, StringComparison.Ordinal))
             {
-                DoesPasswordMatch = false;
                 ConfirmPasswordErrorMessage = "Password do not match";
             }
             else
             {
                 ConfirmPasswordErrorMessage = string.Empty;
-                DoesPasswordMatch = true;
             }
         }
 
