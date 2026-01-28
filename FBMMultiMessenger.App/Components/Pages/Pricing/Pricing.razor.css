@@ -140,6 +140,9 @@
         background: rgba(255, 255, 255, 0.6);
         transform: translateY(-2px);
     }
+    .billing-tab:not(.active) {
+        border: 1px solid rgba(8, 102, 255, 0.1);
+    }
 
     .billing-tab.active {
         background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
@@ -163,12 +166,11 @@
         display: inline-block;
         font-size: 0.6rem;
         font-weight: 700;
-        padding: 0.25rem 0.6rem;
+        padding: 0.25rem 0.4rem;
         border-radius: 8px;
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
         box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
 
@@ -439,7 +441,14 @@
 
 @media (max-width: 768px) {
     .billing-tabs {
-        /*flex-direction: column;*/
+        flex-direction: column;
+    }
+
+}
+
+@media (min-width: 768px) {
+    .billing-tab:not(.active) {
+        border: none;
     }
 }
 
