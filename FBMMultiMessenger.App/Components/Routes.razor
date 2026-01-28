@@ -75,11 +75,11 @@
 
         if (data.IsSubscriptionExpired)
         {
-            Navigation.NavigateTo($"/packages?isExpired=true&message={Uri.EscapeDataString(data.Message)}");
+            Navigation.NavigateTo($"/pricing?redirectReason={Uri.EscapeDataString(data.Message)}", true);
         }
         else if (!isOnChatPage)
         {
-            Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={data.FbChatId ?? string.Empty}");
+            Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={data.FbChatId}");
         }
     }
 }

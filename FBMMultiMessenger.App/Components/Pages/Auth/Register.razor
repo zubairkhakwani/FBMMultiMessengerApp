@@ -64,11 +64,11 @@
                     </div>
                 </div>
 
-                <PasswordRequirement Password="@Password"/>
-                
+                <PasswordRequirement Password="@Password" />
+
 
                 <!-- Password Field -->
-                <div class="form-group">
+                <div class="form-group password">
                     <div class="input-wrapper password-container">
                         <InputText type="@PasswordType"
                                    class="input"
@@ -81,27 +81,27 @@
 
                         @if (ShowPassword)
                         {
-                            <i @onclick="()=>HandlePasswordToggle(true)" class="fa-solid fa-eye-slash password-eye-icon"></i>
+                            <i @onclick="() => HandlePasswordToggle(true)" class="fa-solid fa-eye-slash password-eye-icon"></i>
                         }
                         else
                         {
-                            <i @onclick="()=>HandlePasswordToggle(true)" class="fa-solid fa-eye password-eye-icon"></i>
+                            <i @onclick="() => HandlePasswordToggle(true)" class="fa-solid fa-eye password-eye-icon"></i>
                         }
                         <ValidationMessage For="@(() => RequestModel.Password)"
                                            class="validation-message" />
                     </div>
 
                     <div class="input-wrapper password-container">
-                     <input type="@PasswordConfirmType"
-                                class="input"
-                                id="confirm-password"
-                                placeholder="Confirm Password"
-                                @oninput="(e) => HandleConfirmPassword(e)"  />
-                             
+                        <input type="@PasswordConfirmType"
+                               class="input"
+                               id="confirm-password"
+                               placeholder="Confirm Password"
+                               @oninput="(e) => HandleConfirmPassword(e)" />
+
                         <i class="fa-solid fa-lock input-icon"></i>
                         @if (ShowConfirmPassword)
                         {
-                            <i @onclick="()=>HandlePasswordToggle(false)" class="fa-solid fa-eye-slash password-eye-icon"></i>
+                            <i @onclick="() => HandlePasswordToggle(false)" class="fa-solid fa-eye-slash password-eye-icon"></i>
                         }
                         else
                         {

@@ -37,18 +37,32 @@ namespace FBMMultiMessenger.Platforms.Android
         {
             var data = e.Notification.AdditionalData;
 
-            data.TryGetValue("fbChatId", out var fbChatIdObj);
+            var isFbChatIdPresent = data.TryGetValue("fbChatId", out var fbChatIdObj);
             data.TryGetValue("isSubscriptionExpired", out var subscriptionExpiredObj);
+            data.TryGetValue("isSubscriptionApproved", out var subscriptionStatusObj);
+
             data.TryGetValue("message", out var message);
 
-            bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
+            var additionalData = new NotificationAdditionalData();
 
-            var additionalData = new NotificationAdditionalData()
+            // FbChatId is only included for seller–buyer chat notifications.
+            // It is not present for system notifications (e.g., subscription approval/rejection).
+            if (isFbChatIdPresent)
             {
-                FbChatId = fbChatIdObj?.ToString() ?? string.Empty,
-                IsSubscriptionExpired = isSubscriptionExpired,
-                Message = message?.ToString() ?? string.Empty
-            };
+                bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
+
+                additionalData.FbChatId = fbChatIdObj?.ToString() ?? string.Empty;
+                additionalData.IsSubscriptionExpired = isSubscriptionExpired;
+                additionalData.Message = message?.ToString() ?? string.Empty;
+            }
+
+            // If the subscription is rejected, we mark it as expired so the user is redirected to the pricing page.
+            var isParsed = bool.TryParse(subscriptionStatusObj!.ToString(), out bool isSubscriptionApproved);
+
+            if (isParsed)
+            {
+                additionalData.IsSubscriptionExpired = !isSubscriptionApproved;
+            }
 
             BlazorMauiCommunicator.NotificationArrived(additionalData);
         }
