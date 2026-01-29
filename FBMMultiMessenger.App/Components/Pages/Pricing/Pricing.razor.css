@@ -6,6 +6,48 @@
     color: #333;
 }
 
+.action-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.mobile-menu-icon {
+    width: 30px;
+    height: 30px;
+    background: #e4e6eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.mobile-logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: #0866FF;
+    border: 2px solid #0866FF;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+    .mobile-logout-btn:hover {
+        background: #ffe5e5;
+    }
+
+    .mobile-logout-btn .mobile-menu-icon {
+        background: #dc3545;
+        color: white;
+    }
+
 .pricing-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -140,6 +182,7 @@
         background: rgba(255, 255, 255, 0.6);
         transform: translateY(-2px);
     }
+
     .billing-tab:not(.active) {
         border: 1px solid rgba(8, 102, 255, 0.1);
     }
@@ -162,6 +205,7 @@
     .billing-tab.active .save-tag {
         color: #059669;
     }
+
     .billing-tab .save-tag {
         display: inline-block;
         font-size: 0.6rem;
@@ -234,7 +278,7 @@
     align-items: center;
     border: 2px solid #e5e7eb;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor:pointer;
+    cursor: pointer;
 }
 
     .tier-item::before {
@@ -289,7 +333,7 @@
     text-decoration: line-through;
     text-decoration-color: #ff4d4f;
     text-decoration-thickness: 2px;
-    text-decoration-style: solid; 
+    text-decoration-style: solid;
     position: relative;
 }
 
@@ -443,7 +487,6 @@
     .billing-tabs {
         flex-direction: column;
     }
-
 }
 
 @media (min-width: 768px) {
@@ -465,7 +508,7 @@
     padding: 20px;
     border-radius: 10px;
     border-left: 4px solid #0866FF;
-    margin-bottom:1rem;
+    margin-bottom: 1rem;
 }
 
     .bank-info .info-row {

@@ -2,9 +2,18 @@
 @using FBMMultiMessenger.Contracts.Enums
 <div class="parent-pricing-container">
     <div class="pricing-container">
-        <a class="back-button" href="/account">
-            ← Back to Dashboard
-        </a>
+
+        <div class="action-container">
+            <button class="back-button" @onclick="HandleBackToDasboard">
+                ← Back to Dashboard
+            </button>
+
+           <button class="mobile-logout-btn" @onclick="HandleLogout">
+        <div class="mobile-menu-icon"> <i class="fa fa-sign-out-alt"></i></div>
+        <span>Logout</span>
+    </button>
+        </div>
+       
         <div class="header">
             <h1>Our Packages</h1>
             <p>Choose your plan and get started today</p>

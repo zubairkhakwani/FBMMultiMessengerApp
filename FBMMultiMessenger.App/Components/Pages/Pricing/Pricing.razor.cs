@@ -3,6 +3,7 @@ using FBMMultiMessenger.Contracts.Contracts.Pricing;
 using FBMMultiMessenger.Contracts.Enums;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
+using FBMMultiMessenger.Services;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -27,6 +28,12 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
         [Inject]
         public ISnackbar Snackbar { get; set; }
+
+        [Inject]
+        public IAuthService AuthService { get; set; }
+
+        [Inject]
+        public NavigationManager Navigation { get; set; }
 
         [SupplyParameterFromQuery]
         public bool IsNewUser { get; set; }
@@ -349,6 +356,17 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
                 }
             }
             return true;
+        }
+
+        private void HandleBackToDasboard()
+        {
+            Navigation.NavigateTo("/account");
+        }
+
+        private async Task HandleLogout()
+        {
+            await AuthService.Logout();
+            Navigation.NavigateTo("/login");
         }
     }
 
