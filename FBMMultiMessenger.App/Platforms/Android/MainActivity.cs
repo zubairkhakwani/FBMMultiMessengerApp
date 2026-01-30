@@ -18,16 +18,32 @@ namespace FBMMultiMessenger.Platforms.Android
          LaunchMode = LaunchMode.SingleTop,
          Exported = true,
          ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+
+    // Standard CSV MIME type
     [IntentFilter(
     new[] { Intent.ActionSend },
     Categories = new[] { Intent.CategoryDefault },
-    DataMimeType = "text/csv"
-)]
+    DataMimeType = "text/csv")] //MUST
+
+    // Plain text (some apps use this for CSV)
     [IntentFilter(
-    new[] { Intent.ActionView },
-    Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-    DataMimeType = "text/csv"
-)]
+    new[] { Intent.ActionSend },
+    Categories = new[] { Intent.CategoryDefault },
+    DataMimeType = "text/plain")]
+
+    // Generic binary (WhatsApp often uses this)
+    [IntentFilter(
+    new[] { Intent.ActionSend },
+    Categories = new[] { Intent.CategoryDefault },
+    DataMimeType = "application/octet-stream")]
+
+    // Microsoft Excel CSV
+    [IntentFilter(
+    new[] { Intent.ActionSend },
+    Categories = new[] { Intent.CategoryDefault },
+    DataMimeType = "application/vnd.ms-excel")]
+
+
 
     public class MainActivity : MauiAppCompatActivity
     {
@@ -88,7 +104,7 @@ namespace FBMMultiMessenger.Platforms.Android
             }
 
             // Handle CSV file
-            if (intent.Action == Intent.ActionSend && intent.Type == "text/csv")
+            if (intent.Action == Intent.ActionSend)
             {
                 if (intent.GetParcelableExtra(Intent.ExtraStream) is Uri uri)
                 {
