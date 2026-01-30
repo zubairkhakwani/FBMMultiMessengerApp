@@ -64,6 +64,12 @@
         BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
 
         _ = AppService.CheckForUpdateAsync();
+
+        if (FileShareHelper.CsvBytes != null)
+        {
+            Navigation.NavigateTo("/Account");
+            return;
+        }
     }
 
     private async Task OnNotificaitonClickedHandler(NotificationAdditionalData data)

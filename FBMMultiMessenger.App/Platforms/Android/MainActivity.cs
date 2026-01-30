@@ -8,6 +8,7 @@ using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services;
 using OneSignalSDK.DotNet;
 using OneSignalSDK.DotNet.Core.Notifications;
+using Uri = Android.Net.Uri;
 
 namespace FBMMultiMessenger.Platforms.Android
 {
@@ -18,14 +19,22 @@ namespace FBMMultiMessenger.Platforms.Android
          Exported = true,
          ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
     [IntentFilter(
-        new[] { Intent.ActionView },
-        Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-        DataScheme = "myapp")]
+    new[] { Intent.ActionSend },
+    Categories = new[] { Intent.CategoryDefault },
+    DataMimeType = "text/csv"
+)]
+    [IntentFilter(
+    new[] { Intent.ActionView },
+    Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
+    DataMimeType = "text/csv"
+)]
+
     public class MainActivity : MauiAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
             WebViewSoftInputPatch.Initialize();
 
             HandleIntent(Intent);
@@ -67,14 +76,48 @@ namespace FBMMultiMessenger.Platforms.Android
             BlazorMauiCommunicator.NotificationArrived(additionalData);
         }
 
-        private void HandleIntent(Intent? intent)
+        private async void HandleIntent(Intent? intent)
         {
-            if (intent?.Data != null)
+            if (intent == null) return;
+
+            // Handle deep link 
+            if (intent.Data != null)
             {
                 var deepLink = intent.Data.ToString() ?? string.Empty;
                 Preferences.Set("PendingDeepLink", deepLink);
             }
+
+            // Handle CSV file
+            if (intent.Action == Intent.ActionSend && intent.Type == "text/csv")
+            {
+                if (intent.GetParcelableExtra(Intent.ExtraStream) is Uri uri)
+                {
+                    var csvBytes = await ReadCsvBytesFromUri(uri);
+                    FileShareHelper.CsvBytes = csvBytes;
+                }
+            }
         }
+
+
+        private async Task<byte[]> ReadCsvBytesFromUri(Uri uri)
+        {
+            try
+            {
+                using var stream = ContentResolver.OpenInputStream(uri);
+                if (stream == null)
+                    return Array.Empty<byte>();
+
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                return memoryStream.ToArray();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error reading CSV as bytes: " + ex);
+                return Array.Empty<byte>();
+            }
+        }
+
 
         public override bool DispatchKeyEvent(KeyEvent e)
         {
@@ -87,7 +130,6 @@ namespace FBMMultiMessenger.Platforms.Android
                     return true;
                 }
             }
-
 
             return base.DispatchKeyEvent(e);
         }

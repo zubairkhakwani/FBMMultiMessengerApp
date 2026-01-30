@@ -92,7 +92,6 @@ namespace FBMMultiMessenger.Services
                 return APIResponse ?? new TResponse();
             }
 
-
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);

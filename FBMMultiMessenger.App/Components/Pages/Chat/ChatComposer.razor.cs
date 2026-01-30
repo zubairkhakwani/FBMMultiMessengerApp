@@ -235,7 +235,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
             catch (Exception ex)
             {
-                //Snackbar.Add("Failed to select your file", Severity.Error);
                 SentrySdk.CaptureException(ex);
             }
             finally

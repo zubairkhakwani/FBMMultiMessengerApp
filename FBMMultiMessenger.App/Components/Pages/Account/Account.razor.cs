@@ -74,6 +74,20 @@ namespace FBMMultiMessenger.Components.Pages.Account
             SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            var csvBytes = FileShareHelper.CsvBytes;
+
+            if (csvBytes is not null)
+            {
+                IBrowserFile browserFile = new CompressedBrowserFile("accounts_import.csv", csvBytes, "text/csv");
+
+                FileShareHelper.CsvBytes = null;
+
+                await HandleImportFile(new InputFileChangeEventArgs(new List<IBrowserFile>() { browserFile }));
+            }
+        }
+
         private async Task<TableData<UserAccountsHttpResponse>> ServerReload(TableState state, CancellationToken token)
         {
             int totalItems = 0;
@@ -145,7 +159,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             await InvokeAsync(StateHasChanged);
         }
-
 
         public async Task AddNewAccountAsync()
         {
@@ -384,6 +397,12 @@ namespace FBMMultiMessenger.Components.Pages.Account
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
         }
 
+        public class InteropResult
+        {
+            public bool Success { get; set; }
+            public string Message { get; set; } = string.Empty;
+        }
+
 
         #region Helper Methods
 
@@ -529,29 +548,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 result.Success = false;
                 result.Message = "The CSV file is either empty or not in the expected format. Please check the file and try again.";
                 return result;
-            }
-        }
-
-        private (bool isValid, string? userId) ValidateCookie(string cookieString)
-        {
-            try
-            {
-                // Parse cookies into dictionary
-                var cookies = cookieString
-                    .Split(';')
-                    .Select(x => x.Trim().Split('=', 2))
-                    .Where(x => x.Length == 2)
-                    .ToDictionary(x => x[0], x => x[1]);
-
-
-                if (!cookies.ContainsKey("c_user") || !cookies.ContainsKey("xs"))
-                    return (false, null);
-
-                return (true, cookies["c_user"]);
-            }
-            catch
-            {
-                return (false, null);
             }
         }
 
