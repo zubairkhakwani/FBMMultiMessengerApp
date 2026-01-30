@@ -23,25 +23,14 @@ namespace FBMMultiMessenger.Platforms.Android
     [IntentFilter(
     new[] { Intent.ActionSend },
     Categories = new[] { Intent.CategoryDefault },
-    DataMimeType = "text/csv")] //MUST
+    DataMimeType = "text/csv")]
 
-    // Plain text (some apps use this for CSV)
-    [IntentFilter(
-    new[] { Intent.ActionSend },
-    Categories = new[] { Intent.CategoryDefault },
-    DataMimeType = "text/plain")]
 
-    // Generic binary (WhatsApp often uses this)
-    [IntentFilter(
-    new[] { Intent.ActionSend },
-    Categories = new[] { Intent.CategoryDefault },
-    DataMimeType = "application/octet-stream")]
-
-    // Microsoft Excel CSV
-    [IntentFilter(
-    new[] { Intent.ActionSend },
-    Categories = new[] { Intent.CategoryDefault },
-    DataMimeType = "application/vnd.ms-excel")]
+    //Comma-separated values alternative
+   [IntentFilter(
+   new[] { Intent.ActionSend },
+   Categories = new[] { Intent.CategoryDefault },
+   DataMimeType = "text/comma-separated-values")]
 
 
 
