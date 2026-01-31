@@ -19,6 +19,13 @@ namespace FBMMultiMessenger.Platforms.Android
          Exported = true,
          ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
 
+    // Deep link intent filter - this will tell that our app handles "myapp" deep links
+    [IntentFilter(
+    new[] { Intent.ActionView },
+    Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
+    DataScheme = "myapp")]
+
+
     // Standard CSV MIME type
     [IntentFilter(
     new[] { Intent.ActionSend },
@@ -26,13 +33,12 @@ namespace FBMMultiMessenger.Platforms.Android
     DataMimeType = "text/csv")]
 
 
+
     //Comma-separated values alternative
-   [IntentFilter(
+    [IntentFilter(
    new[] { Intent.ActionSend },
    Categories = new[] { Intent.CategoryDefault },
    DataMimeType = "text/comma-separated-values")]
-
-
 
     public class MainActivity : MauiAppCompatActivity
     {
@@ -40,9 +46,9 @@ namespace FBMMultiMessenger.Platforms.Android
         {
             base.OnCreate(savedInstanceState);
 
-            WebViewSoftInputPatch.Initialize();
-
             HandleIntent(Intent);
+
+            WebViewSoftInputPatch.Initialize();
 
             OneSignal.Notifications.Clicked += HandleNotificationClicked;
         }
@@ -71,7 +77,7 @@ namespace FBMMultiMessenger.Platforms.Android
             }
 
             // If the subscription is rejected, we mark it as expired so the user is redirected to the pricing page.
-            var isParsed = bool.TryParse(subscriptionStatusObj!.ToString(), out bool isSubscriptionApproved);
+            var isParsed = bool.TryParse(subscriptionStatusObj?.ToString(), out bool isSubscriptionApproved);
 
             if (isParsed)
             {

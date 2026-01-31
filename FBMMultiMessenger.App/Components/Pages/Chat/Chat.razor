@@ -1,5 +1,5 @@
 ﻿@page "/"
-@page "/Chat" 
+@page "/Chat"
 
 @layout EmptyLayout
 
@@ -130,46 +130,48 @@
         {
             var accountStatus = IsSelectedChatsAccountConnected ? "active" : "inactive";
 
-            <div class="chat-header" @onclick="HandleChatMenuOpen">
+            <div class="chat-header-container">
                 @if (PlatformHelper.IsMobilePlatform)
                 {
                     <div style="cursor:pointer; padding: 33px 12px 32px 20px;" @onclick="ShowSidebarView">
                         <i class="fa-sharp fa-solid fa-arrow-left"></i>
                     </div>
                 }
+                <div class="chat-header" @onclick="HandleChatMenuOpen">
+                    <div class="avatar" style="margin-left:@avatarMargin">
+                        <span class="status-indicator @accountStatus"></span>
+                        @if (SelectedChatListingImage is not null)
+                        {
+                            <img src="@SelectedChatListingImage" />
+                        }
+                        else
+                        {
+                            <span>Loading</span>
+                        }
 
-                <div class="avatar" style="margin-left:@avatarMargin">
-                    <span class="status-indicator @accountStatus"></span>
-                    @if (SelectedChatListingImage is not null)
-                    {
-                        <img src="@SelectedChatListingImage" />
-                    }
-                    else
-                    {
-                        <span>Loading</span>
-                    }
+                    </div>
+                    <div class="header-info">
 
-                </div>
-                <div class="header-info">
-
-                    @if (SelectedChatListingTitle is not null)
-                    {
-                        <h3>@SelectedChatListingTitle</h3>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(SelectedAccountName))
-                    {
-                        <p>Account: @SelectedAccountName</p>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(ChattingWithName))
-                    {
-                        <p>Chatting With: @ChattingWithName</p>
-                    }
-                    @if (SelectedChatListingLocation is not null && SelectedChatListingPrice is not null)
-                    {
-                        <p>@SelectedChatListingLocation - @SelectedChatListingPrice</p>
-                    }
+                        @if (SelectedChatListingTitle is not null)
+                        {
+                            <h3>@SelectedChatListingTitle</h3>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(SelectedAccountName))
+                        {
+                            <p>Account: @SelectedAccountName</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ChattingWithName))
+                        {
+                            <p>Chatting With: @ChattingWithName</p>
+                        }
+                        @if (SelectedChatListingLocation is not null && SelectedChatListingPrice is not null)
+                        {
+                            <p>@SelectedChatListingLocation - @SelectedChatListingPrice</p>
+                        }
+                    </div>
                 </div>
             </div>
+
         }
 
 
@@ -424,9 +426,9 @@
                              Color="@Color.Error"
                              Size="@Size.Large"
                              Style="background-color: rgba(0, 0, 0, 0.45);
-                                                                                            padding: 5px;
-                                                                                            border-radius:100px;
-                                                                                            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
+                                                                                                            padding: 5px;
+                                                                                                            border-radius:100px;
+                                                                                                            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 

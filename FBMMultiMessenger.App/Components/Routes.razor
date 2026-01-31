@@ -61,20 +61,28 @@
 
     protected async override Task OnInitializedAsync()
     {
-        BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
+        AddEventListeners();
 
         _ = AppService.CheckForUpdateAsync();
 
-        if (FileShareHelper.CsvBytes != null)
+        if (FileShareHelper.CsvBytes is not null)
         {
-            Navigation.NavigateTo("/Account");
-            return;
+            var currentRoute = GetCurrentRoute();
+
+            bool isOnAccountPage = currentRoute.Equals("/Account", StringComparison.OrdinalIgnoreCase);
+
+            if (!isOnAccountPage)
+            {
+                Navigation.NavigateTo("/Account");
+                return;
+            }
         }
     }
 
     private async Task OnNotificaitonClickedHandler(NotificationAdditionalData data)
     {
-        string currentRoute = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0];
+        string currentRoute = GetCurrentRoute();
+
         bool isOnChatPage = currentRoute.Equals("/Chat", StringComparison.OrdinalIgnoreCase)
                             ||
                             currentRoute.Equals("/", StringComparison.OrdinalIgnoreCase);
@@ -87,5 +95,31 @@
         {
             Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={data.FbChatId}");
         }
+    }
+
+
+    // private async Task OnFileSharedHandler()
+    // {
+    //     string currentRoute = GetCurrentRoute();
+    //     bool isOnAccountPage = currentRoute.Equals("/Account", StringComparison.OrdinalIgnoreCase);
+
+    //     if (!isOnAccountPage)
+    //     {
+    //         Navigation.NavigateTo("/Account");
+    //     }
+    // }
+
+
+    private string GetCurrentRoute()
+    {
+        return "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0];
+    }
+
+
+    private void AddEventListeners()
+    {
+        BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
+        //BlazorMauiCommunicator.OnFileShared += OnFileSharedHandler;
+
     }
 }

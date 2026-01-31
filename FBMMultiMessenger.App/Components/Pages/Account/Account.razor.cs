@@ -76,15 +76,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            var csvBytes = FileShareHelper.CsvBytes;
-
-            if (csvBytes is not null)
+            if (firstRender)
             {
-                IBrowserFile browserFile = new CompressedBrowserFile("accounts_import.csv", csvBytes, "text/csv");
-
-                FileShareHelper.CsvBytes = null;
-
-                await HandleImportFile(new InputFileChangeEventArgs(new List<IBrowserFile>() { browserFile }));
+                await ProcessCsvFile();
             }
         }
 
@@ -158,6 +152,23 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task HandleFileShared()
+        {
+            await ProcessCsvFile();
+        }
+
+        private async Task ProcessCsvFile()
+        {
+            if (FileShareHelper.CsvBytes is not null)
+            {
+                IBrowserFile browserFile = new CompressedBrowserFile("accounts_import.csv", FileShareHelper.CsvBytes, "text/csv");
+
+                FileShareHelper.CsvBytes = null;
+
+                await HandleImportFile(new InputFileChangeEventArgs(new List<IBrowserFile>() { browserFile }));
+            }
         }
 
         public async Task AddNewAccountAsync()
@@ -397,14 +408,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
         }
 
-        public class InteropResult
-        {
-            public bool Success { get; set; }
-            public string Message { get; set; } = string.Empty;
-        }
-
 
         #region Helper Methods
+
 
         public async Task<bool> ValidateImportFile(IBrowserFile file)
         {
@@ -574,6 +580,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 _ => "account-status-badge"
             };
         }
+
+
+
 
         //Helper class for CSV 
         public class CsvParseResult
