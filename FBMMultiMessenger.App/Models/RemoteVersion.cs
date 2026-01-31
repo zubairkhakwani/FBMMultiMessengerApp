@@ -15,6 +15,8 @@
     {
         public Platform Android { get; set; } = new Platform();
         public Platform Desktop { get; set; } = new Platform();
+        public Platform LocalServer { get; set; } = new Platform();
+
     }
 
     public class Platform
