@@ -72,6 +72,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
             SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
+            BlazorMauiCommunicator.OnFileShared += OnFileSharedHandler;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -151,6 +152,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 }
             }
             await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task OnFileSharedHandler()
+        {
+            await ProcessCsvFile();
         }
 
         private async Task ProcessCsvFile()
@@ -400,6 +406,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             _cts.Dispose();
 
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
+            BlazorMauiCommunicator.OnFileShared -= OnFileSharedHandler;
         }
 
 

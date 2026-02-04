@@ -171,7 +171,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             var response = await ChatMessagesService.GetChatMessages(chatId, _cts.Token);
 
-
             if (response is null || !response.IsSuccess)
             {
                 Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);

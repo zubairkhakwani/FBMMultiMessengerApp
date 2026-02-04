@@ -53,6 +53,13 @@ namespace FBMMultiMessenger.Platforms.Android
             OneSignal.Notifications.Clicked += HandleNotificationClicked;
         }
 
+        protected override void OnNewIntent(Intent? intent)
+        {
+            base.OnNewIntent(intent);
+            HandleIntent(intent);
+            IntentDataHelper.IsFromNewIntent = true;
+        }
+
         private void HandleNotificationClicked(object sender, NotificationClickedEventArgs e)
         {
             var data = e.Notification.AdditionalData;
@@ -91,7 +98,7 @@ namespace FBMMultiMessenger.Platforms.Android
         {
             if (intent == null) return;
 
-            // Handle deep link 
+            // Handle notification deep link 
             if (intent.Data != null)
             {
                 var deepLink = intent.Data.ToString() ?? string.Empty;
@@ -105,6 +112,7 @@ namespace FBMMultiMessenger.Platforms.Android
                 {
                     var csvBytes = await ReadCsvBytesFromUri(uri);
                     IntentDataHelper.CsvBytes = csvBytes;
+                    BlazorMauiCommunicator.FileShared();
                 }
             }
         }

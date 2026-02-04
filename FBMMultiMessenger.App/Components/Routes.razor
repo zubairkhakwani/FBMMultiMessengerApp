@@ -58,6 +58,7 @@
 {
     [Inject] private NavigationManager Navigation { get; set; }
     [Inject] private IAppService AppService { get; set; }
+    [Inject] private ISnackbar Snackbar { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -67,15 +68,8 @@
 
         if (IntentDataHelper.CsvBytes is not null)
         {
-            var currentRoute = GetCurrentRoute();
-
-            bool isOnAccountPage = currentRoute.Equals("/Account", StringComparison.OrdinalIgnoreCase);
-
-            if (!isOnAccountPage)
-            {
-                Navigation.NavigateTo("/Account");
-                return;
-            }
+            //When the app is closed and the user share a file, we have to navigate to account page as the default page is chat
+            Navigation.NavigateTo("/Account");
         }
     }
 
@@ -98,6 +92,23 @@
     }
 
 
+    private async Task OnFileSharedHandler()
+    {
+        //When the app is open and the user share a file.
+
+        var currentRoute = GetCurrentRoute();
+
+        bool isOnAccountPage = currentRoute.Equals("/Account", StringComparison.OrdinalIgnoreCase);
+
+        if (!isOnAccountPage)
+        {
+            Navigation.NavigateTo("/Account");
+            return;
+        }
+    }
+
+
+
     private string GetCurrentRoute()
     {
         return "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0];
@@ -107,5 +118,6 @@
     private void AddEventListeners()
     {
         BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
+        BlazorMauiCommunicator.OnFileShared += OnFileSharedHandler;
     }
 }
