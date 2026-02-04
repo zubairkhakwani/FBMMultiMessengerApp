@@ -73,6 +73,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private bool IsChatsLoading = true;
 
         private int? SelectedChatId = null;
+        private int? SelectedMessageId = null;
+
         private CurrentUser CurrentUser = new();
 
         private string _filterKeyword = string.Empty;
@@ -103,6 +105,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Chat Menu Action
         private bool ShowChatMenuAction;
 
+        private bool ShowMessageReply;
+        private string MessageReply = string.Empty;
+
         //Carousel
         private bool ShowCarousel;
         public List<FileData> _carouselItems { get; set; } = new List<FileData>();
@@ -116,7 +121,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Main Chat Messages
         public List<GeChatMessagesHttpResponse> ChatMessages = new List<GeChatMessagesHttpResponse>();
 
-        private CancellationTokenSource _cts = new();
+        private CancellationTokenSource _apiCts = new();
+        private CancellationTokenSource _holdCts = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -158,8 +164,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             UpdateChatHeader(chatId);
+            CloseMessageActionMenu();
+            ShowMessageReply = false;
 
-            var myAccountChats = FilteredAccountChats.FirstOrDefault(x => x.Id == chatId);
+            var myAccountChats = FilteredAccountChats.FirstOrDefault(x => x.ChatId == chatId);
 
             if (myAccountChats is not null)
             {
@@ -169,7 +177,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 UserProfileImage = myAccountChats.UserProfileImage;
             }
 
-            var response = await ChatMessagesService.GetChatMessages(chatId, _cts.Token);
+            var response = await ChatMessagesService.GetChatMessages(chatId, _apiCts.Token);
 
             if (response is null || !response.IsSuccess)
             {
@@ -320,7 +328,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task GetAccountChats()
         {
-            var response = await AccountService.GetMyChatsAsync(_cts.Token);
+            var response = await AccountService.GetMyChatsAsync(_apiCts.Token);
 
             IsChatsLoading = false;
 
@@ -353,7 +361,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Handles chat messages
         private async Task HandleMessageReceivedAsync(HandleChatHttpResponse receivedChat)
         {
-            var chatExistInSidebar = FilteredAccountChats.Any(x => x.Id == receivedChat.ChatId);
+            var chatExistInSidebar = FilteredAccountChats.Any(x => x.ChatId == receivedChat.ChatId);
 
             var notificationSound = true;
 
@@ -371,6 +379,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     var receivedMessage = new GeChatMessagesHttpResponse()
                     {
+                        MessageReply = receivedChat.MessageReply,
                         IsReceived = receivedChat.IsReceived,
                         IsTextMessage = receivedChat.IsTextMessage,
                         IsImageMessage = receivedChat.IsImageMessage,
@@ -398,7 +407,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
                 var newChat = new GetMyChatsHttpResponse()
                 {
-                    Id = receivedChat.ChatId,
+                    ChatId = receivedChat.ChatId,
                     FbListingTitle = receivedChat.FbListingTitle ?? string.Empty,
                     FbListingImage = receivedChat.FbListingImage,
                     UserProfileImage = receivedChat.UserProfileImage,
@@ -420,7 +429,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 await JS.InvokeVoidAsync("myInterop.playNotificationSound", 1);
             }
 
-            var chat = FilteredAccountChats.FirstOrDefault(x => x.Id == receivedChat.ChatId) ?? new GetMyChatsHttpResponse();
+            var chat = FilteredAccountChats.FirstOrDefault(x => x.ChatId == receivedChat.ChatId) ?? new GetMyChatsHttpResponse();
 
             chat.MessagePreview = receivedChat.MessagPreview;
             chat.SenderName = receivedChat.MessagePreviewFrom;
@@ -454,7 +463,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 if (chat.Account is not null && accountStatusMap.TryGetValue(chat.Account.Id, out var status))
                 {
-                    if (SelectedChatId == chat.Id)
+                    if (SelectedChatId == chat.ChatId)
                     {
                         IsSelectedChatsAccountConnected = status.IsConnected;
                     }
@@ -605,11 +614,67 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         }
 
 
+
+
         [JSInvokable]
         public async Task HandleEnterKey(string message)
         {
             await NotifyLocalServer(message);
             await InvokeAsync(StateHasChanged);
+        }
+
+
+        public async Task HandleCopyToClipboardAsync(string message)
+        {
+            bool isCopied = await JS.InvokeAsync<bool>("myInterop.copyToClipboard", message);
+
+            if (isCopied)
+            {
+                Snackbar.Add($"Copied to clipboard", Severity.Info);
+            }
+            else
+            {
+                Snackbar.Add($"Failed to copy", Severity.Error);
+            }
+
+            CloseMessageActionMenu();
+        }
+
+        private void HandleMessageReply(GeChatMessagesHttpResponse chatMessage)
+        {
+            ShowMessageReply = true;
+
+            if (chatMessage.IsImageMessage)
+            {
+                MessageReply = "Image";
+            }
+            else if (chatMessage.IsVideoMessage)
+            {
+                MessageReply = "Video";
+            }
+            else
+            {
+                MessageReply = chatMessage.Message;
+            }
+
+            CloseMessageActionMenu();
+        }
+
+        private void HandleCancelMessageReply()
+        {
+            ShowMessageReply = false;
+            MessageReply = string.Empty;
+        }
+
+
+        private async Task ScrollToRepliedMessageAsync(string? messageId)
+        {
+            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.FbMessageId == messageId);
+
+            if (chatMessage is not null)
+            {
+                await JS.InvokeVoidAsync("ScrollToRepliedMessage", chatMessage.ChatMessageId);
+            }
         }
 
         #endregion
@@ -640,7 +705,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             // Updates the main chat header with the listing details (title,image, location, and price)
             // of the chat selected by the user.
 
-            var chat = FilteredAccountChats.FirstOrDefault(x => x.Id == chatId);
+            var chat = FilteredAccountChats.FirstOrDefault(x => x.ChatId == chatId);
             if (chat is not null)
             {
                 IsSelectedChatsAccountConnected = chat.IsAccountConnected;
@@ -756,6 +821,42 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         }
 
 
+        private async Task StartHold(int messageId)
+        {
+            if (SelectedMessageId == messageId) return;
+
+            _holdCts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(500, _holdCts.Token);
+
+                TriggerMessageActionMenu(messageId);
+
+            }
+            catch
+            {
+                // Hold was cancelled - expected behavior
+            }
+        }
+
+        private void CancelHold()
+        {
+            _holdCts?.Cancel();
+        }
+
+
+        private void CloseMessageActionMenu()
+        {
+            SelectedMessageId = null;
+        }
+
+        private void TriggerMessageActionMenu(int messageId)
+        {
+            SelectedMessageId = messageId;
+        }
+
+
         private void CloseCarousel()
         {
             ShowCarousel = false;
@@ -833,8 +934,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public void Dispose()
         {
-            _cts.Cancel();
-            _cts.Dispose();
+            _apiCts.Cancel();
+            _apiCts.Dispose();
 
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;

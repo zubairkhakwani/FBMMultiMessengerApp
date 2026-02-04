@@ -7,7 +7,7 @@
 
     public class GetMyChatsHttpResponse
     {
-        public int Id { get; set; }
+        public int ChatId { get; set; } //Primary key of this chat table
         public string FbChatId { get; set; } = null!;
         public string? FbListingTitle { get; set; }
         public string? FbListingImage { get; set; }
@@ -32,11 +32,10 @@
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-       
         public DateTime CreatedAt { get; set; }
     }
 
-    public class GetMyChatMessagesHttpResonse
+    public class GetMyChatMessagesHttpResonse   
     {
 
     }

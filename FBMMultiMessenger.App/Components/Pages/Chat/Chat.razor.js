@@ -1,7 +1,4 @@
 ﻿(function () {
-    let pressTimer;
-    let currentMenu = null;
-
     // get fresh DOM references
     function getElements() {
         return {
@@ -9,8 +6,6 @@
             messageList: document.querySelector("#messagesList"),
             inputWrapper: document.querySelector(".input-wrapper"),
             arrowDownBtn: document.querySelector(".arrow-down"),
-            messages: document.querySelectorAll('.message'),
-            copyBtns: document.querySelectorAll('.copy-btn')
         };
     }
 
@@ -70,11 +65,7 @@
     }
 
     function initializeEventListeners() {
-        const { messageContainer, arrowDownBtn, messages, copyBtns } = getElements();
-
-        console.log(messages);
-        console.log(copyBtns);
-
+        const { messageContainer, arrowDownBtn } = getElements();
 
         // Click handler for focusing message input
         document.addEventListener('click', function (e) {
@@ -82,14 +73,6 @@
             const searchInput = document.querySelector('.search-input');
             const { arrowDownBtn } = getElements();
 
-
-            // Close menu when clicking outside
-            if (!e.target.closest('.message') && !e.target.closest('.copy-menu')) {
-                if (currentMenu) {
-                    currentMenu.classList.remove('show');
-                    currentMenu = null;
-                }
-            }
 
             if (e.target === searchInput || searchInput?.contains(e.target) ||
                 e.target === arrowDownBtn || arrowDownBtn?.contains(e.target)) {
@@ -131,57 +114,6 @@
                 });
             });
         }
-
-        messages.forEach(message => {
-            const menu = message.nextElementSibling;
-            console.log(messages);
-            // Mouse events (desktop)
-            message.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                pressTimer = setTimeout(() => {
-                    showMenu(menu);
-                }, 500);
-            });
-
-            message.addEventListener('mouseup', () => {
-                clearTimeout(pressTimer);
-            });
-
-            message.addEventListener('mouseleave', () => {
-                clearTimeout(pressTimer);
-            });
-
-            // Touch events (mobile)
-            message.addEventListener('touchstart', (e) => {
-                pressTimer = setTimeout(() => {
-                    showMenu(menu);
-                }, 500);
-            });
-
-            message.addEventListener('touchend', () => {
-                clearTimeout(pressTimer);
-            });
-
-            message.addEventListener('touchcancel', () => {
-                clearTimeout(pressTimer);
-            });
-        });
-
-        // Handle copy button
-        copyBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const messageText = btn.closest('.message-wrapper').querySelector('.message-text').textContent;
-                navigator.clipboard.writeText(messageText).then(() => {
-                    showToast('Message copied! ✓');
-                });
-                if (currentMenu) {
-                    currentMenu.classList.remove('show');
-                    currentMenu = null;
-                }
-            });
-        });
-
     }
 
     // Initialize on load
@@ -189,6 +121,7 @@
     initializeEventListeners();
 
     // Public API
+
     window.registerEnterHandler = (ref) => {
 
         window.dotnetHelper = ref;
@@ -219,25 +152,33 @@
         if (!arrowDownBtn) return;
 
         arrowDownBtn.classList.remove("visible");
+
         arrowDownBtn.classList.remove("active");
     };
 
+    window.ScrollToRepliedMessage = (messageId) => {
+        let replyMessage = document.getElementById(messageId);
 
-    function showMenu(menu) {
-        if (currentMenu && currentMenu !== menu) {
-            currentMenu.classList.remove('show');
+        if (!replyMessage) {
+            console.warn(`Message reply not found`);
+            return;
         }
-        menu.classList.add('show');
-        currentMenu = menu;
-    }
+        // Scroll to the message smoothly
+        replyMessage.scrollIntoView({
+            behavior: 'smooth',
+            block: "center"
+        });
 
-    // Toast notification
-    function showToast(message) {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.classList.add('show');
+        // Remove previous highlight if any
+        replyMessage.classList.remove("message-highlight");
+
+        // Add highlight class
+        replyMessage.classList.add('message-highlight');
+
+
+        // Remove all classes after animation completes
         setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2000);
-    }
+            replyMessage.classList.remove('message-highlight');
+        }, 1200);
+    };
 })();

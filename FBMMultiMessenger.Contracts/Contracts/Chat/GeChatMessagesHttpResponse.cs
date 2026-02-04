@@ -4,9 +4,12 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
 {
     public class GeChatMessagesHttpResponse
     {
-        public int ChatId { get; set; }  // our primary chat key
+        public int ChatMessageId { get; set; }
+        public int ChatId { get; set; }
         public string? FbMessageId { get; set; } // Facebook Message id
+        public string? FbMessageReplyId { get; set; }
         public string Message { get; set; } = string.Empty;
+        public string? MessageReply { get; set; } // Created on the client side
         public bool IsReceived { get; set; }
         public bool IsTextMessage { get; set; }
         public bool IsVideoMessage { get; set; }

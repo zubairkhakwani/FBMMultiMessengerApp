@@ -51,7 +51,7 @@
                 @for (int i = 0; i < FilteredAccountChats.Count; i++)
                 {
                     var chat = FilteredAccountChats[i];
-                    var chatId = chat.Id; // our chat primary key (before it was fbChatId that was causing issue)
+                    var chatId = chat.ChatId;
                     var fbListingImage = chat.FbListingImage;
                     var fbListingTitle = chat.FbListingTitle;
                     var fbListingLocation = chat.FbListingLocation;
@@ -122,7 +122,7 @@
 
 
     <!-- Main Chat Area -->
-    <div class="main-chat  @mobileClass" style="z-index:@MainChatZIndex" id="mainChat">
+    <div class="main-chat  @mobileClass" style="z-index:@MainChatZIndex" id="mainChat" @onclick="CloseMessageActionMenu">
 
 
         <!--  Chat header for the active conversation. Shows listing image,title,location/price and a back button on mobile for navigation.  -->
@@ -195,7 +195,9 @@
                 @for (int i = 0; i < ChatMessages.Count; i++)
                 {
                     var chatMessage = ChatMessages[i];
-
+                    var messageId = chatMessage.ChatMessageId;
+                    var fbMessageReplyId = chatMessage.FbMessageReplyId;
+                    var messageReply = chatMessage.MessageReply;
                     var isReceived = chatMessage.IsReceived;
                     var messageClass = isReceived ? "received" : "sent";
                     var isSent = !isReceived;
@@ -203,9 +205,15 @@
                     var failedMessageClass = isMessageFailedToSend ? "failed" : "";
                     var scrollToBottom = chatMessage.ScrollToBottom.ToString();
 
-                    @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
-                    {
-                        <div class="message @messageClass @failedMessageClass" data-scroll-to-bottom="@scrollToBottom">
+
+                    <div class="message
+                                   @messageClass
+                                   @failedMessageClass"
+                                   data-scroll-to-bottom="@scrollToBottom"
+                                   id="@messageId">
+
+                        @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
+                        {
                             @if (isReceived)
                             {
                                 <div class="message-row">
@@ -216,7 +224,21 @@
                                         </div>
                                     }
 
-                                    <div class="message-bubble">
+                                    <div class="message-bubble"
+                                         @onpointerdown="() => StartHold(messageId)"
+                                         @onpointerup="CancelHold"
+                                         @onpointercancel="CancelHold"
+                                         @onclick:stopPropagation="true">
+
+                                        @if (!string.IsNullOrWhiteSpace(messageReply))
+                                        {
+                                            <div class="replied-message" @onclick="() => ScrollToRepliedMessageAsync(fbMessageReplyId)">
+                                                <div class="replied-sender">You</div>
+                                                <div class="replied-text">@messageReply</div>
+                                            </div>
+                                        }
+                                       
+
                                         @if (chatMessage.IsAudioMessage)
                                         {
                                             <audio controls>
@@ -226,19 +248,29 @@
                                         }
                                         else
                                         {
-                                            <span>@chatMessage.Message</span>
+                                            <span class="message-text">@chatMessage.Message</span>
                                         }
                                     </div>
                                 </div>
                             }
                             else
                             {
-                                <div class="message-bubble">
-                                    <span>@chatMessage.Message</span>
+                                <div class="message-bubble"
+                                     @onpointerdown="() => StartHold(messageId)"
+                                     @onpointerup="CancelHold"
+                                     @onpointercancel="CancelHold"
+                                     @onclick:stopPropagation="true">
+
+                                    @if (!string.IsNullOrWhiteSpace(messageReply))
+                                    {
+                                        <div class="replied-message">
+                                            <div class="replied-sender">@ChattingWithName</div>
+                                            <div class="replied-text">@messageReply</div>
+                                        </div>
+                                    }
+                                    <span class="message-text">@chatMessage.Message</span>
                                 </div>
                             }
-
-
                             <div class="message-footer">
                                 <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
                                 @if (isSent)
@@ -263,24 +295,14 @@
                                         </span>
                                     }
                                 }
-
                             </div>
+                        }
 
-                            @* <div class="copy-menu">
-                                <button class="copy-btn">
-                                    <span>📋</span>
-                                    <span>Copy</span>
-                                </button>
-                            </div> *@
-                        </div>
-                    }
+                        @if (chatMessage.FileData.Any())
+                        {
+                            var filesCount = chatMessage.FileData.Count;
+                            var imageWidthStyle = "width: " + (filesCount == 1 ? 429 : filesCount == 2 ? 190 : 125) +"px";
 
-                    @if (chatMessage.FileData.Any())
-                    {
-                        var filesCount = chatMessage.FileData.Count;
-                        var imageWidthStyle = "width: " + (filesCount == 1 ? 429 : filesCount == 2 ? 190 : 125) +"px";
-
-                        <div class="message @messageClass @failedMessageClass">
                             <div class="message-row @messageClass">
                                 @for (int j = 0; j < chatMessage.FileData.Count; j++)
                                 {
@@ -341,9 +363,26 @@
                                 }
 
                             </div>
+                        }
 
+                        @* Message Actions *@
+                        <div class="actions-menu @(SelectedMessageId == messageId ? "show" : "")">
+                            <span class="action-btn" data-tooltip="Reply" @onclick="() => HandleMessageReply(chatMessage)">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+                                </svg>
+                            </span>
+
+                            @if (chatMessage.IsTextMessage)
+                            {
+                                <span class="action-btn" data-tooltip="Copy" @onclick="() => HandleCopyToClipboardAsync(chatMessage.Message)">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                                    </svg>
+                                </span>
+                            }
                         </div>
-                    }
+                    </div>
                 }
             </div>
         </div>
@@ -375,6 +414,17 @@
                             </div>
                         }
                     </div>
+                </div>
+            }
+
+            @if (ShowMessageReply)
+            {
+                <div class="replying-to-banner">
+                    <div class="replying-to-content">
+                        <div class="replying-to-label">Replying to @ChattingWithName</div>
+                        <div class="replying-to-text">@MessageReply</div>
+                    </div>
+                    <button class="cancel-reply-btn" @onclick="HandleCancelMessageReply">X</button>
                 </div>
             }
 
@@ -426,9 +476,9 @@
                              Color="@Color.Error"
                              Size="@Size.Large"
                              Style="background-color: rgba(0, 0, 0, 0.45);
-                                                                                                                        padding: 5px;
-                                                                                                                        border-radius:100px;
-                                                                                                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
+                                                                                                                                                    padding: 5px;
+                                                                                                                                                    border-radius:100px;
+                                                                                                                                                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 
