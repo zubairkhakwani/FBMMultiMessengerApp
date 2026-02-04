@@ -150,22 +150,16 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     }
                 }
             }
-
             await InvokeAsync(StateHasChanged);
-        }
-
-        private async Task HandleFileShared()
-        {
-            await ProcessCsvFile();
         }
 
         private async Task ProcessCsvFile()
         {
-            if (FileShareHelper.CsvBytes is not null)
+            if (IntentDataHelper.CsvBytes is not null)
             {
-                IBrowserFile browserFile = new CompressedBrowserFile("accounts_import.csv", FileShareHelper.CsvBytes, "text/csv");
+                IBrowserFile browserFile = new CompressedBrowserFile("accounts_import.csv", IntentDataHelper.CsvBytes, "text/csv");
 
-                FileShareHelper.CsvBytes = null;
+                IntentDataHelper.CsvBytes = null;
 
                 await HandleImportFile(new InputFileChangeEventArgs(new List<IBrowserFile>() { browserFile }));
             }

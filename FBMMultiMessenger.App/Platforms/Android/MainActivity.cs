@@ -57,7 +57,7 @@ namespace FBMMultiMessenger.Platforms.Android
         {
             var data = e.Notification.AdditionalData;
 
-            var isFbChatIdPresent = data.TryGetValue("fbChatId", out var fbChatIdObj);
+            var isChatIdPresent = data.TryGetValue("chatId", out var chatId);
             data.TryGetValue("isSubscriptionExpired", out var subscriptionExpiredObj);
             data.TryGetValue("isSubscriptionApproved", out var subscriptionStatusObj);
 
@@ -65,13 +65,13 @@ namespace FBMMultiMessenger.Platforms.Android
 
             var additionalData = new NotificationAdditionalData();
 
-            // FbChatId is only included for seller–buyer chat notifications.
+            // ChatId is only included for seller–buyer chat notifications.
             // It is not present for system notifications (e.g., subscription approval/rejection).
-            if (isFbChatIdPresent)
+            if (isChatIdPresent)
             {
                 bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
 
-                additionalData.FbChatId = fbChatIdObj?.ToString() ?? string.Empty;
+                additionalData.ChatId = Convert.ToInt32(chatId);
                 additionalData.IsSubscriptionExpired = isSubscriptionExpired;
                 additionalData.Message = message?.ToString() ?? string.Empty;
             }
@@ -95,7 +95,7 @@ namespace FBMMultiMessenger.Platforms.Android
             if (intent.Data != null)
             {
                 var deepLink = intent.Data.ToString() ?? string.Empty;
-                Preferences.Set("PendingDeepLink", deepLink);
+                IntentDataHelper.DeepLink = deepLink;
             }
 
             // Handle CSV file
@@ -104,7 +104,7 @@ namespace FBMMultiMessenger.Platforms.Android
                 if (intent.GetParcelableExtra(Intent.ExtraStream) is Uri uri)
                 {
                     var csvBytes = await ReadCsvBytesFromUri(uri);
-                    FileShareHelper.CsvBytes = csvBytes;
+                    IntentDataHelper.CsvBytes = csvBytes;
                 }
             }
         }

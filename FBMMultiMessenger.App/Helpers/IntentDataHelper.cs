@@ -1,7 +1,8 @@
 ﻿namespace FBMMultiMessenger.Helpers
 {
-    public static class FileShareHelper
+    public static class IntentDataHelper
     {
         public static byte[]? CsvBytes { get; set; }
+        public static string? DeepLink { get; set; }
     }
 }

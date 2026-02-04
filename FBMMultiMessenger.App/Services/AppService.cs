@@ -21,7 +21,7 @@ namespace FBMMultiMessenger.Services
             {
                 var client = new HttpClient();
 
-                string jsonBase64 = await client.GetStringAsync("https://github.com/user-attachments/files/24979312/version.json");
+                string jsonBase64 = await client.GetStringAsync("https://github.com/ShaheerKhawajikzai/FBM-MultiMessenger-Resources/releases/download/v1.0.0/version.json");
 
                 var remoteVersion = JsonSerializer.Deserialize<RemoteVersion>(jsonBase64, new JsonSerializerOptions
                 {

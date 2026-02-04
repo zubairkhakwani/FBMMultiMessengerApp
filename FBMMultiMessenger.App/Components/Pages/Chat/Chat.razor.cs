@@ -57,7 +57,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         public string IsNotification { get; set; } = string.Empty; //tells if the user click on the notification
 
         [SupplyParameterFromQuery]
-        public string FbChatId { get; set; } = string.Empty;
+        public int? ChatId { get; set; }
 
 
         //For Media files
@@ -72,7 +72,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private bool isCompressingMedia = false;
         private bool IsChatsLoading = true;
 
-        private string? SelectedFbChatId = null;
+        private int? SelectedChatId = null;
         private CurrentUser CurrentUser = new();
 
         private string _filterKeyword = string.Empty;
@@ -142,12 +142,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         #region Domain Logic
 
-        private async Task LoadChatMessage(string fbChatId)
+        private async Task LoadChatMessage(int chatId)
         {
-            var previousSelectedChatId = SelectedFbChatId;
-            SelectedFbChatId = fbChatId;
+            var previousSelectedChatId = SelectedChatId;
+            SelectedChatId = chatId;
 
-            if (previousSelectedChatId != SelectedFbChatId)
+            if (previousSelectedChatId != SelectedChatId)
             {
                 ChatMessages.Clear();
             }
@@ -157,9 +157,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 ShowMainChatView();
             }
 
-            UpdateChatHeader(fbChatId);
+            UpdateChatHeader(chatId);
 
-            var myAccountChats = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
+            var myAccountChats = FilteredAccountChats.FirstOrDefault(x => x.Id == chatId);
+
             if (myAccountChats is not null)
             {
                 //Making the unread messages to read
@@ -168,13 +169,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 UserProfileImage = myAccountChats.UserProfileImage;
             }
 
-            var response = await ChatMessagesService.GetChatMessages(fbChatId, _cts.Token);
+            var response = await ChatMessagesService.GetChatMessages(chatId, _cts.Token);
 
 
             if (response is null || !response.IsSuccess)
             {
                 Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
-                SelectedFbChatId = previousSelectedChatId;
+                SelectedChatId = previousSelectedChatId;
                 return;
             }
 
@@ -196,7 +197,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task NotifyLocalServer(string msg)
         {
-            if (PreviewMediaFiles.Count == 0 && string.IsNullOrWhiteSpace(msg)) return;
+            if (SelectedChatId is null || (PreviewMediaFiles.Count == 0 && string.IsNullOrWhiteSpace(msg))) return;
 
             msg = msg.Trim();
 
@@ -206,7 +207,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 var textMessage = new GeChatMessagesHttpResponse
                 {
-                    FBChatId = SelectedFbChatId!,
+                    ChatId = SelectedChatId.Value,
                     Message = msg,
                     IsReceived = false,
                     IsSent = true,
@@ -232,7 +233,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 var FilesMessage = new GeChatMessagesHttpResponse()
                 {
-                    FBChatId = SelectedFbChatId!,
+                    ChatId = SelectedChatId.Value,
                     Message = string.Empty,
                     IsReceived = false,
                     IsSent = true,
@@ -257,7 +258,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 var FilesMessage = new GeChatMessagesHttpResponse()
                 {
-                    FBChatId = SelectedFbChatId!,
+                    ChatId = SelectedChatId!.Value,
                     Message = string.Empty,
                     IsReceived = false,
                     IsSent = true,
@@ -284,7 +285,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 //This is to call API 
                 var request = new NotifyLocalServerHttpRequest()
                 {
-                    FbChatId = SelectedFbChatId!,
+                    ChatId = SelectedChatId.Value,
                     Message = chat.Message,
                     Files = chat.FileData.Select(x => x.File).ToList(),
                     OfflineUniqueId = chat.UniqueId
@@ -353,10 +354,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Handles chat messages
         private async Task HandleMessageReceivedAsync(HandleChatHttpResponse receivedChat)
         {
-            var chatExistInSidebar = FilteredAccountChats.Any(x => x.FbChatId == receivedChat.FbChatId);
+            var chatExistInSidebar = FilteredAccountChats.Any(x => x.Id == receivedChat.ChatId);
+
             var notificationSound = true;
 
-            if (receivedChat.FbChatId == SelectedFbChatId)
+            if (receivedChat.ChatId == SelectedChatId)
             {
                 notificationSound = false;
 
@@ -419,14 +421,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 await JS.InvokeVoidAsync("myInterop.playNotificationSound", 1);
             }
 
-            var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == receivedChat.FbChatId) ?? new GetMyChatsHttpResponse();
+            var chat = FilteredAccountChats.FirstOrDefault(x => x.Id == receivedChat.ChatId) ?? new GetMyChatsHttpResponse();
 
             chat.MessagePreview = receivedChat.MessagPreview;
             chat.SenderName = receivedChat.MessagePreviewFrom;
             chat.FbListingImage = receivedChat.FbListingImage;
             chat.FbListingTitle = receivedChat.FbListingTitle ?? string.Empty;
             chat.IsAccountConnected = true;
-            chat.IsRead = receivedChat.FbChatId == SelectedFbChatId;
+            chat.IsRead = receivedChat.ChatId == SelectedChatId;
 
             FilteredAccountChats.Remove(chat);
             chat.UnReadCount += receivedChat.IsReceived ? 1 : 0;
@@ -435,7 +437,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             await InvokeAsync(StateHasChanged);
 
 
-            if (receivedChat.FbChatId == SelectedFbChatId)
+            if (receivedChat.ChatId == SelectedChatId)
             {
                 await JS.InvokeVoidAsync("handleNewMessage");
             }
@@ -453,7 +455,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 if (chat.Account is not null && accountStatusMap.TryGetValue(chat.Account.Id, out var status))
                 {
-                    if (SelectedFbChatId == chat.FbChatId)
+                    if (SelectedChatId == chat.Id)
                     {
                         IsSelectedChatsAccountConnected = status.IsConnected;
                     }
@@ -492,10 +494,10 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task OnNotificaitonClicked(NotificationAdditionalData notification)
         {
-            var notificaitonFbChatId = notification.FbChatId;
+            var notificaitonFbChatId = notification.ChatId;
 
             //If the user is on different chat or on sidebar, then load the chat messages
-            if (notificaitonFbChatId != SelectedFbChatId)
+            if (notificaitonFbChatId != SelectedChatId)
             {
                 await LoadChatMessage(notificaitonFbChatId);
             }
@@ -504,23 +506,23 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private async Task OpenNotificationChat()
         {
             // Executes when user taps a notification while the app is running
-            if (!string.IsNullOrWhiteSpace(IsNotification) && !string.IsNullOrWhiteSpace(FbChatId))
+            if (!string.IsNullOrWhiteSpace(IsNotification) && ChatId != null)
             {
-                await LoadChatMessage(FbChatId);
+                await LoadChatMessage(ChatId.Value);
                 return;
             }
 
-            //Exectutes when app is opened from a terminated state via a notification
-            var pendingLink = Preferences.Get("PendingDeepLink", string.Empty);
+            //Exectutes when app is opened from a terminated state via notification
+            var pendingLink = IntentDataHelper.DeepLink;
 
             if (!string.IsNullOrWhiteSpace(pendingLink))
             {
-                Preferences.Remove("PendingDeepLink");
+                IntentDataHelper.DeepLink = null;
 
                 var uri = new Uri(pendingLink);
                 var queryParams = HttpUtility.ParseQueryString(uri.Query);
 
-                var chatId = queryParams["fbChatId"];
+                var chatId = Convert.ToInt32(queryParams["chatId"]);
                 var messageText = queryParams["message"];
                 var isSubscriptionExpiredString = queryParams["isSubscriptionExpired"];
 
@@ -530,7 +532,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     Navigation.NavigateTo($"/packages?isExpired={isSubscriptionExpired}&message={messageText}");
                 }
-                else if (!string.IsNullOrEmpty(chatId))
+                else if (chatId != null)
                 {
                     await LoadChatMessage(chatId);
                 }
@@ -634,12 +636,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             JS.InvokeVoidAsync("myInterop.stopAllMedia");
         }
 
-        private void UpdateChatHeader(string fbChatId)
+        private void UpdateChatHeader(int chatId)
         {
             // Updates the main chat header with the listing details (title,image, location, and price)
             // of the chat selected by the user.
 
-            var chat = FilteredAccountChats.FirstOrDefault(x => x.FbChatId == fbChatId);
+            var chat = FilteredAccountChats.FirstOrDefault(x => x.Id == chatId);
             if (chat is not null)
             {
                 IsSelectedChatsAccountConnected = chat.IsAccountConnected;
@@ -657,7 +659,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             // Displays the sidebar view on mobile by resetting the selected chat
             // and bringing the sidebar to the front.
-            SelectedFbChatId = null;
+            SelectedChatId = null;
             SidebarZIndex = 100;
             MainChatZIndex = 0;
 

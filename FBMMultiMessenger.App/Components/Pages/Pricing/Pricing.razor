@@ -8,12 +8,12 @@
                 ← Back to Dashboard
             </button>
 
-           <button class="mobile-logout-btn" @onclick="HandleLogout">
-        <div class="mobile-menu-icon"> <i class="fa fa-sign-out-alt"></i></div>
-        <span>Logout</span>
-    </button>
+            <button class="mobile-logout-btn" @onclick="HandleLogout">
+                <div class="mobile-menu-icon"> <i class="fa fa-sign-out-alt"></i></div>
+                <span>Logout</span>
+            </button>
         </div>
-       
+
         <div class="header">
             <h1>Our Packages</h1>
             <p>Choose your plan and get started today</p>
@@ -92,7 +92,7 @@
                     <div class="savings-badge">You save PKR @Savings.ToString("N0")! </div>
                 </div>
             </div>
-          
+
             <button class="purchase-btn" id="purchaseBtn" disabled="@(!CanSubmitPayment())">
                 Proceed to Purchase
             </button>
@@ -112,33 +112,51 @@
             </div>
 
             <div class="banking-details">
-                    @foreach (var account in AccountDetails)
-                    {
+                @foreach (var account in AccountDetails)
+                {
+                    var bankName = account.BankName;
+                    var bankTitle = account.Title;
+                    var accountNo = account.AccountNo;
+                    var iban = account.IBAN;
+
                     <div class="bank-info">
-                        <div class="info-row">
-                            <span class="info-label">Bank Name:</span>
-                            <span class="info-value">@account.BankName</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Account Title:</span>
-                            <span class="info-value">@account.Title</span>
-                        </div>
-                        <div @onclick="() => HandleCopyToClipboardAsync(account.IBAN)" class="info-row">
-                            <span class="info-label">Account No:</span>
-                            <span class="info-value">
-                                @account.AccountNo
-                                <span class="copy-icon" title="Copy to clipboard">📋</span>
-                            </span>
-                        </div>
-                        <div @onclick="() => HandleCopyToClipboardAsync(account.IBAN, isCopyIBAN: true)" class="info-row">
-                            <span class="info-label">IBAN:</span>
-                            <span class="info-value">
-                                @account.IBAN
-                                <span class="copy-icon" title="Copy to clipboard">📋</span>
-                            </span>
-                        </div>
+                        @if (!string.IsNullOrWhiteSpace(bankName))
+                        {
+                            <div class="info-row">
+                                <span class="info-label">Bank Name:</span>
+                                <span class="info-value">@bankName</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(bankTitle))
+                        {
+                            <div class="info-row">
+                                <span class="info-label">Account Title:</span>
+                                <span class="info-value">@bankTitle</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(accountNo))
+                        {
+                            <div @onclick="() => HandleCopyToClipboardAsync(accountNo)" class="info-row">
+                                <span class="info-label">Account No:</span>
+                                <span class="info-value">
+                                    @accountNo
+                                    <span class="copy-icon" title="Copy to clipboard">📋</span>
+                                </span>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(iban))
+                        {
+                            <div @onclick="() => HandleCopyToClipboardAsync(iban, isCopyIBAN: true)" class="info-row">
+                                <span class="info-label">IBAN:</span>
+                                <span class="info-value">
+                                    @iban
+                                    <span class="copy-icon" title="Copy to clipboard">📋</span>
+                                </span>
+                            </div>
+                        }
                     </div>
-                    }
+                }
             </div>
 
             <!-- Important Instructions -->

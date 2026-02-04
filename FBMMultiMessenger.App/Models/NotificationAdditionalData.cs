@@ -2,7 +2,7 @@
 {
     internal class NotificationAdditionalData
     {
-        public string FbChatId { get; set; } = string.Empty;
+        public int ChatId { get; set; }
         public string Message { get; set; } = string.Empty;
         public bool IsSubscriptionExpired { get; set; }
     }

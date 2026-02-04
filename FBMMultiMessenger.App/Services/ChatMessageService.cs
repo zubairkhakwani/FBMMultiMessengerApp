@@ -14,12 +14,12 @@ namespace FBMMultiMessenger.Services
         {
             this._baseService=baseService;
         }
-        public async Task<BaseResponse<List<GeChatMessagesHttpResponse>>> GetChatMessages(string fbChatId, CancellationToken cancellationToken = default)
+        public async Task<BaseResponse<List<GeChatMessagesHttpResponse>>> GetChatMessages(int chatId, CancellationToken cancellationToken = default)
         {
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url = $"chat/{fbChatId}/chatmessages",
+                Url = $"chat/{chatId}/chatmessages",
                 Data = null
             };
 

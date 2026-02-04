@@ -65,7 +65,7 @@
 
         _ = AppService.CheckForUpdateAsync();
 
-        if (FileShareHelper.CsvBytes is not null)
+        if (IntentDataHelper.CsvBytes is not null)
         {
             var currentRoute = GetCurrentRoute();
 
@@ -93,21 +93,9 @@
         }
         else if (!isOnChatPage)
         {
-            Navigation.NavigateTo($"/chat?isNotification=true&fbChatId={data.FbChatId}");
+            Navigation.NavigateTo($"/chat?isNotification=true&chatId={data.ChatId}");
         }
     }
-
-
-    // private async Task OnFileSharedHandler()
-    // {
-    //     string currentRoute = GetCurrentRoute();
-    //     bool isOnAccountPage = currentRoute.Equals("/Account", StringComparison.OrdinalIgnoreCase);
-
-    //     if (!isOnAccountPage)
-    //     {
-    //         Navigation.NavigateTo("/Account");
-    //     }
-    // }
 
 
     private string GetCurrentRoute()
@@ -119,7 +107,5 @@
     private void AddEventListeners()
     {
         BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
-        //BlazorMauiCommunicator.OnFileShared += OnFileSharedHandler;
-
     }
 }
