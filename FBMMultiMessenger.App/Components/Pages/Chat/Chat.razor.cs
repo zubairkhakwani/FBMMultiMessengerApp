@@ -667,9 +667,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         }
 
 
-        private async Task ScrollToRepliedMessageAsync(string? messageId)
+        private async Task ScrollToRepliedMessageAsync(string? fbMessageId)
         {
-            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.FbMessageId == messageId);
+            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.FbMessageId == fbMessageId);
 
             if (chatMessage is not null)
             {
