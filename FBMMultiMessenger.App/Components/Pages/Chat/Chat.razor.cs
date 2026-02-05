@@ -76,7 +76,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private int? SelectedChatId = null;
         private string? ActionsMenuMessageKey = null; // for showing/hiding the menu
 
-        private int? ReplyToMessageId = null;      // for storing reply target
+        private string? ReplyToMessageKey = null; // for storing reply target
 
 
         private CurrentUser CurrentUser = new();
@@ -216,7 +216,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             var messages = new List<GeChatMessagesHttpResponse>();
 
-            var fbMessageReplyId = GetFbMessageReplyId(ReplyToMessageId);
+            var fbMessageReplyId = GetFbMessageReplyId(ReplyToMessageKey);
 
             if (!string.IsNullOrWhiteSpace(msg))
             {
@@ -225,7 +225,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     ChatId = SelectedChatId.Value,
                     Message = msg,
                     FbMessageReplyId = fbMessageReplyId,
-                    MessageReply = HandleMessageReply(ReplyToMessageId),
+                    MessageReply = HandleMessageReply(ReplyToMessageKey),
                     IsReceived = false,
                     IsSent = true,
                     IsTextMessage = true,
@@ -242,6 +242,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
 
             Message = string.Empty;
+            ReplyToMessageKey = null;
             ShowMessageReply = false;
 
             var videos = PreviewMediaFiles.Where(m => m.IsVideo).ToList();
@@ -254,7 +255,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     ChatId = SelectedChatId.Value,
                     Message = string.Empty,
                     FbMessageReplyId = fbMessageReplyId,
-                    MessageReply = HandleMessageReply(ReplyToMessageId),
+                    MessageReply = HandleMessageReply(ReplyToMessageKey),
                     IsReceived = false,
                     IsSent = true,
                     IsTextMessage = false,
@@ -280,7 +281,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     ChatId = SelectedChatId!.Value,
                     FbMessageReplyId = fbMessageReplyId,
-                    MessageReply = HandleMessageReply(ReplyToMessageId),
+                    MessageReply = HandleMessageReply(ReplyToMessageKey),
                     Message = string.Empty,
                     IsReceived = false,
                     IsSent = true,
@@ -395,6 +396,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     var receivedMessage = new GeChatMessagesHttpResponse()
                     {
+                        ChatMessageId = receivedChat.ChatMessageId,
                         MessageReply = receivedChat.MessageReply,
                         IsReceived = receivedChat.IsReceived,
                         IsTextMessage = receivedChat.IsTextMessage,
@@ -660,12 +662,18 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             ShowMessageReply = false;
             MessageReply = string.Empty;
-            ReplyToMessageId = null;
+            ReplyToMessageKey = null;
         }
 
-        private string? GetFbMessageReplyId(int? chatMessageId)
+        private string? GetFbMessageReplyId(string? chatMessageKey)
         {
-            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.ChatMessageId == chatMessageId);
+            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.OfflineUniqueId == chatMessageKey);
+
+            if (chatMessage is null)
+            {
+                chatMessage = ChatMessages.FirstOrDefault(cm => cm.ChatMessageId.ToString() == chatMessageKey);
+            }
+
 
             return chatMessage?.FbMessageId;
         }
@@ -822,13 +830,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 await Task.Delay(500, _holdCts.Token);
 
-                if (messageId == 0)
-                {
-                    ActionsMenuMessageKey = offlineUniqueId;
-                    return;
-                }
-
-                ActionsMenuMessageKey = messageId.ToString();
+                ActionsMenuMessageKey = messageId == 0 ? offlineUniqueId : messageId.ToString();
 
             }
             catch
@@ -920,13 +922,16 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
-
-        //This method is responsible for showing reply in the 
-        private string? HandleMessageReply(int? chatMessageId, bool showMessageReply = false)
+        private string? HandleMessageReply(string? messageKey, bool showMessageReply = false)
         {
             ShowMessageReply = showMessageReply;
 
-            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.ChatMessageId == chatMessageId);
+            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.OfflineUniqueId == messageKey);
+
+            if (chatMessage is null)
+            {
+                chatMessage = ChatMessages.FirstOrDefault(cm => cm.ChatMessageId.ToString() == messageKey);
+            }
 
             if (chatMessage is null) return null;
 
@@ -943,10 +948,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 MessageReply = chatMessage.Message;
             }
 
-
             MessageReplyTo = chatMessage.IsReceived ? ChattingWithName : "Yourself";
 
-            ReplyToMessageId = chatMessageId;
+            ReplyToMessageKey = messageKey;
 
             CloseMessageActionMenu();
 
