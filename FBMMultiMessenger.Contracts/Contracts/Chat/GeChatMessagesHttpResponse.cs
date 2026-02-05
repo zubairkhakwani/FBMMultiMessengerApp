@@ -18,7 +18,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
         public bool IsSent { get; set; } // message status
         public bool ScrollToBottom { get; set; } = true;
         public DateTime CreatedAt { get; set; }
-        public string UniqueId { get; set; } = string.Empty;
+        public string OfflineUniqueId { get; set; } = string.Empty; // this is being used for 2 cases 
         public bool Sending { get; set; }
         public List<FileData> FileData { get; set; } = new();
     }

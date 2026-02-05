@@ -197,6 +197,7 @@
                     var chatMessage = ChatMessages[i];
                     var messageId = chatMessage.ChatMessageId;
                     var fbMessageReplyId = chatMessage.FbMessageReplyId;
+                    var offlineUniqueId = chatMessage.OfflineUniqueId;
                     var messageReply = chatMessage.MessageReply;
                     var isReceived = chatMessage.IsReceived;
                     var messageClass = isReceived ? "received" : "sent";
@@ -204,13 +205,15 @@
                     var isMessageFailedToSend = !chatMessage.IsSent && isSent;
                     var failedMessageClass = isMessageFailedToSend ? "failed" : "";
                     var scrollToBottom = chatMessage.ScrollToBottom.ToString();
-
+                    var messageKey = !string.IsNullOrWhiteSpace(offlineUniqueId)
+                                     ? offlineUniqueId
+                                     : messageId.ToString();
 
                     <div class="message
-                                   @messageClass
-                                   @failedMessageClass"
-                                   data-scroll-to-bottom="@scrollToBottom"
-                                   id="@messageId">
+                                               @messageClass
+                                               @failedMessageClass"
+                         data-scroll-to-bottom="@scrollToBottom"
+                         id="@messageId">
 
                         @if (chatMessage.IsTextMessage || chatMessage.IsAudioMessage)
                         {
@@ -225,7 +228,7 @@
                                     }
 
                                     <div class="message-bubble"
-                                         @onpointerdown="() => StartHold(messageId)"
+                                         @onpointerdown="() => StartHold(messageId,offlineUniqueId)"
                                          @onpointerup="CancelHold"
                                          @onpointercancel="CancelHold"
                                          @onclick:stopPropagation="true">
@@ -237,7 +240,7 @@
                                                 <div class="replied-text">@messageReply</div>
                                             </div>
                                         }
-                                       
+
 
                                         @if (chatMessage.IsAudioMessage)
                                         {
@@ -256,14 +259,14 @@
                             else
                             {
                                 <div class="message-bubble"
-                                     @onpointerdown="() => StartHold(messageId)"
+                                     @onpointerdown="() => StartHold(messageId,offlineUniqueId)"
                                      @onpointerup="CancelHold"
                                      @onpointercancel="CancelHold"
                                      @onclick:stopPropagation="true">
 
                                     @if (!string.IsNullOrWhiteSpace(messageReply))
                                     {
-                                        <div class="replied-message">
+                                        <div class="replied-message" @onclick="() => ScrollToRepliedMessageAsync(fbMessageReplyId)">
                                             <div class="replied-sender">@ChattingWithName</div>
                                             <div class="replied-text">@messageReply</div>
                                         </div>
@@ -366,8 +369,8 @@
                         }
 
                         @* Message Actions *@
-                        <div class="actions-menu @(SelectedMessageId == messageId ? "show" : "")">
-                            <span class="action-btn" data-tooltip="Reply" @onclick="() => HandleMessageReply(chatMessage)">
+                        <div class="actions-menu @(ActionsMenuMessageKey == messageKey ? "show" : "")">
+                            <span class="action-btn" data-tooltip="Reply" @onclick="() => HandleMessageReply(messageId, showMessageReply: true)">
                                 <svg viewBox="0 0 24 24">
                                     <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
                                 </svg>
@@ -421,7 +424,7 @@
             {
                 <div class="replying-to-banner">
                     <div class="replying-to-content">
-                        <div class="replying-to-label">Replying to @ChattingWithName</div>
+                        <div class="replying-to-label">Replying to @MessageReplyTo</div>
                         <div class="replying-to-text">@MessageReply</div>
                     </div>
                     <button class="cancel-reply-btn" @onclick="HandleCancelMessageReply">X</button>
@@ -476,9 +479,9 @@
                              Color="@Color.Error"
                              Size="@Size.Large"
                              Style="background-color: rgba(0, 0, 0, 0.45);
-                                                                                                                                                    padding: 5px;
-                                                                                                                                                    border-radius:100px;
-                                                                                                                                                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
+                                                                                                                                                                padding: 5px;
+                                                                                                                                                                border-radius:100px;
+                                                                                                                                                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 
