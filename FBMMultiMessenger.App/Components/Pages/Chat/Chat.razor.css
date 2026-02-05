@@ -294,6 +294,7 @@ body {
     display: flex;
     flex-direction: column;
     background: white;
+    user-select: none;
 }
 
     .main-chat.mobile {
