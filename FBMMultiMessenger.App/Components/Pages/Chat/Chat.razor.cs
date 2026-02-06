@@ -143,7 +143,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             await OpenNotificationChat();
 
             //this function is okay here, as it needs to be called after a sec after rendering..
-            await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this));
+            await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this), PlatformHelper.IsMobilePlatform);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -218,6 +218,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             var fbMessageReplyId = GetFbMessageReplyId(ReplyToMessageKey);
 
+            var replyData = HandleMessageReply(ReplyToMessageKey);
+
+            var messageReply = replyData.messageReply;
+            var messageReplyTo = replyData.messageReplyTo;
+
+
             if (!string.IsNullOrWhiteSpace(msg))
             {
                 var textMessage = new GeChatMessagesHttpResponse
@@ -225,10 +231,12 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     ChatId = SelectedChatId.Value,
                     Message = msg,
                     FbMessageReplyId = fbMessageReplyId,
-                    MessageReply = HandleMessageReply(ReplyToMessageKey),
+                    MessageReply = messageReply,
+                    MessageReplyTo = messageReplyTo,
                     IsReceived = false,
                     IsSent = true,
                     IsTextMessage = true,
+
                     IsImageMessage = false,
                     IsVideoMessage = false,
                     IsAudioMessage = false,
@@ -255,7 +263,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     ChatId = SelectedChatId.Value,
                     Message = string.Empty,
                     FbMessageReplyId = fbMessageReplyId,
-                    MessageReply = HandleMessageReply(ReplyToMessageKey),
+                    MessageReply = messageReply,
+                    MessageReplyTo = messageReplyTo,
                     IsReceived = false,
                     IsSent = true,
                     IsTextMessage = false,
@@ -281,7 +290,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     ChatId = SelectedChatId!.Value,
                     FbMessageReplyId = fbMessageReplyId,
-                    MessageReply = HandleMessageReply(ReplyToMessageKey),
+                    MessageReply = messageReply,
+                    MessageReplyTo = messageReplyTo,
                     Message = string.Empty,
                     IsReceived = false,
                     IsSent = true,
@@ -391,13 +401,18 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 if (chatMessage is not null)
                 {
                     chatMessage.Sending = false;
+                    chatMessage.FbMessageId = receivedChat.FbMessageId;
+                    chatMessage.FbMessageReplyId = receivedChat.FbMessageReplyId;
                 }
                 else
                 {
                     var receivedMessage = new GeChatMessagesHttpResponse()
                     {
                         ChatMessageId = receivedChat.ChatMessageId,
+                        FbMessageId  = receivedChat.FbMessageId,
+                        FbMessageReplyId = receivedChat.FbMessageReplyId,
                         MessageReply = receivedChat.MessageReply,
+                        MessageReplyTo = receivedChat.MessageReplyTo,
                         IsReceived = receivedChat.IsReceived,
                         IsTextMessage = receivedChat.IsTextMessage,
                         IsImageMessage = receivedChat.IsImageMessage,
@@ -922,7 +937,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
-        private string? HandleMessageReply(string? messageKey, bool showMessageReply = false)
+        private (string? messageReply, string? messageReplyTo) HandleMessageReply(string? messageKey, bool showMessageReply = false)
         {
             ShowMessageReply = showMessageReply;
 
@@ -933,7 +948,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 chatMessage = ChatMessages.FirstOrDefault(cm => cm.ChatMessageId.ToString() == messageKey);
             }
 
-            if (chatMessage is null) return null;
+            if (chatMessage is null) return (null, null);
 
             if (chatMessage.IsImageMessage)
             {
@@ -954,18 +969,20 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             CloseMessageActionMenu();
 
-            return MessageReply;
+            return (MessageReply, MessageReplyTo);
         }
 
-        private async Task ScrollToRepliedMessageAsync(string? fbMessageId)
+        private async Task ScrollToRepliedMessageAsync(string? fbmMessageReplyId)
         {
-            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.FbMessageId == fbMessageId);
+            var chatMessage = ChatMessages.FirstOrDefault(cm => cm.FbMessageId == fbmMessageReplyId);
 
             if (chatMessage is not null)
             {
                 await JS.InvokeVoidAsync("ScrollToRepliedMessage", chatMessage.ChatMessageId);
             }
         }
+
+
 
         #endregion
 

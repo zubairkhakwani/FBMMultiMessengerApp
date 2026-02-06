@@ -47,13 +47,16 @@
                             return;
                         }
                         messageInput.onkeydown = async e => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                console.log("Enter pressed")
-                                let message = messageInput.value;
-                                messageInput.value = "";
-                                e.preventDefault();
-                                await window.dotnetHelper?.invokeMethodAsync('HandleEnterKey', message);
+                            if (!window.isMobilePlatform) {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    console.log("Enter pressed")
+                                    let message = messageInput.value;
+                                    messageInput.value = "";
+                                    e.preventDefault();
+                                    await window.dotnetHelper?.invokeMethodAsync('HandleEnterKey', message);
+                                }
                             }
+
                         };
                     }
                 }
@@ -122,9 +125,9 @@
 
     // Public API
 
-    window.registerEnterHandler = (ref) => {
-
+    window.registerEnterHandler = (ref, isMobilePlatform) => {
         window.dotnetHelper = ref;
+        window.isMobilePlatform = isMobilePlatform;
     };
 
     window.handleNewMessage = () => {

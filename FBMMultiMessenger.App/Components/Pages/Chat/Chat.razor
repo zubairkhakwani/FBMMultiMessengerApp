@@ -195,6 +195,7 @@
                 @for (int i = 0; i < ChatMessages.Count; i++)
                 {
                     var chatMessage = ChatMessages[i];
+                    var message = chatMessage.Message;
                     var messageId = chatMessage.ChatMessageId;
                     var fbMessageReplyId = chatMessage.FbMessageReplyId;
                     var offlineUniqueId = chatMessage.OfflineUniqueId;
@@ -206,10 +207,10 @@
                     var isMessageFailedToSend = !chatMessage.IsSent && isSent;
                     var failedMessageClass = isMessageFailedToSend ? "failed" : "";
                     var scrollToBottom = chatMessage.ScrollToBottom.ToString();
-                    var messageKey = !string.IsNullOrWhiteSpace(offlineUniqueId)
-                                     ? offlineUniqueId
-                                     : messageId.ToString();
-
+                    var actionMessageKey = !string.IsNullOrWhiteSpace(offlineUniqueId)
+                                           ? offlineUniqueId
+                                           : messageId.ToString();
+                                        
                     <div class="message
                                                @messageClass
                                                @failedMessageClass"
@@ -370,16 +371,19 @@
                         }
 
                         @* Message Actions *@
-                        <div class="actions-menu @(ActionsMenuMessageKey == messageKey ? "show" : "")">
-                            <span class="action-btn" data-tooltip="Reply" @onclick="() => HandleMessageReply(messageKey,showMessageReply: true)">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
-                                </svg>
-                            </span>
+                        <div class="actions-menu @(ActionsMenuMessageKey == actionMessageKey ? "show" : "")">
+                            @if (!string.IsNullOrWhiteSpace(chatMessage.FbMessageId))
+                            {
+                                <span class="action-btn" data-tooltip="Reply" @onclick="() => HandleMessageReply(actionMessageKey,showMessageReply: true)">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+                                    </svg>
+                                </span>                                
+                            }
 
                             @if (chatMessage.IsTextMessage)
                             {
-                                <span class="action-btn" data-tooltip="Copy" @onclick="() => HandleCopyToClipboardAsync(chatMessage.Message)">
+                                <span class="action-btn" data-tooltip="Copy" @onclick="() => HandleCopyToClipboardAsync(message)">
                                     <svg viewBox="0 0 24 24">
                                         <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
                                     </svg>

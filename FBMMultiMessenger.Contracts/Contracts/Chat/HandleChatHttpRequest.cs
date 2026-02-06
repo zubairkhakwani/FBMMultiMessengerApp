@@ -40,6 +40,7 @@
         public string FbChatId { get; set; } = null!;
         public string FbListingId { get; set; } = null!;
         public string FbAccountId { get; set; } = null!;
+        public string? FbMessageId { get; set; } = null!;
         public string? FbMessageReplyId { get; set; }
         public string? FbListingTitle { get; set; }
         public string? FbListingLocation { get; set; }
@@ -50,6 +51,7 @@
         public string? UserProfileImage { get; set; }
         public string Message { get; set; } = null!;
         public string? MessageReply { get; set; }
+        public string? MessageReplyTo { get; set; }
         public string? OfflineUniqueId { get; set; }
         public bool IsRead { get; set; }
 
