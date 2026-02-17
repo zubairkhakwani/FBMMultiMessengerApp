@@ -59,9 +59,25 @@
     [Inject] private NavigationManager Navigation { get; set; }
     [Inject] private IAppService AppService { get; set; }
     [Inject] private ISnackbar Snackbar { get; set; }
+    [Inject] public IProfileService ProfileService { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
+        var response = await ProfileService.GetMyProfileAsync();
+
+        if (response.IsSuccess && response.Data is not null)
+        {
+            var profile = response.Data;
+            UserHelper.Name = profile.Name;
+            UserHelper.Email = profile.Email;
+            UserHelper.ContactNumber = profile.ContactNumber;
+            UserHelper.StartedAt = profile.StartedAt;
+            UserHelper.ExpiredAt = profile.ExpiredAt;
+            UserHelper.RemainingDaysCount = profile.RemainingDaysCount;
+            UserHelper.RemainingTimeText = profile.RemainingTimeText;
+            UserHelper.IsCurrentTrialSubscription = profile.IsCurrentTrialSubscription;
+        }
+
         AddEventListeners();
 
         _ = AppService.CheckForUpdateAsync();
@@ -108,7 +124,6 @@
     }
 
 
-
     private string GetCurrentRoute()
     {
         return "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0];
@@ -119,5 +134,6 @@
     {
         BlazorMauiCommunicator.OnNotificationClicked += OnNotificaitonClickedHandler;
         BlazorMauiCommunicator.OnFileShared += OnFileSharedHandler;
+        //AppEventDispatcher.OnProfleChanged +=
     }
 }

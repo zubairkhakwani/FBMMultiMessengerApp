@@ -1,4 +1,5 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Profile;
+using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
@@ -124,13 +125,13 @@ namespace FBMMultiMessenger.Components.Pages.Profile
             }
             return true;
         }
+
         private void CaptureProfileSnapshot(string name, string email, string phoneNumber)
         {
-            OriginalName = name;
-            OriginalEmail = email;
-            OriginalPhoneNumber = phoneNumber;
+            UserHelper.Name = OriginalName = name;
+            UserHelper.Email =  OriginalEmail = email;
+            UserHelper.ContactNumber =  OriginalPhoneNumber = phoneNumber;
         }
-
 
         private string GetProgressClass()
         {

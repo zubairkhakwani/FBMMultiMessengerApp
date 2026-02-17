@@ -60,6 +60,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [SupplyParameterFromQuery]
         public int? ChatId { get; set; }
 
+        [SupplyParameterFromQuery]
+        public string? TrialAvailed { get; set; }
+
+        [SupplyParameterFromQuery]
+        public string? TrialDuration { get; set; }
+
+        [SupplyParameterFromQuery]
+        public string? TrialAccounts { get; set; }
 
         //For Media files
         private const int MaxMediaCount = 35;
@@ -140,7 +148,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             await GetAccountChats();
 
-            await OpenNotificationChat();
+            await HandleQueryParameters();
+
+            await HandleNotificationDeepLinkAsync();
 
             //this function is okay here, as it needs to be called after a sec after rendering..
             await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this), PlatformHelper.IsMobilePlatform);
@@ -544,7 +554,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             }
         }
 
-        private async Task OpenNotificationChat()
+        private async Task HandleQueryParameters()
         {
             // Executes when user taps a notification while the app is running
             if (!string.IsNullOrWhiteSpace(IsNotification) && ChatId != null)
@@ -553,6 +563,23 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 return;
             }
 
+            if (!string.IsNullOrWhiteSpace(TrialAvailed) && !string.IsNullOrWhiteSpace(TrialAccounts) && !string.IsNullOrWhiteSpace(TrialDuration))
+            {
+                var options = new SweetAlertOptions
+                {
+                    Title = "Trial Activated 🎉",
+                    Message = $"You have successfully availed your free trial. This is a gift from us!\n\nTrial Duration: {TrialDuration}\nAccounts Included: {TrialAccounts}",
+                    Icon = "success",
+                    ConfirmButtonText = "Great!",
+                    ShowCancelButton = false
+                };
+
+                await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
+            }
+        }
+
+        private async Task HandleNotificationDeepLinkAsync()
+        {
             //Exectutes when app is opened from a terminated state via notification
             var pendingLink = IntentDataHelper.DeepLink;
 

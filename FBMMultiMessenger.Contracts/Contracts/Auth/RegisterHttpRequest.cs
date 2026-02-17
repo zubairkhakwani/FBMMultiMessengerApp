@@ -28,6 +28,8 @@ namespace FBMMultiMessenger.Contracts.Contracts.Auth
 
     public class RegisterHttpResponse
     {
-
+        public bool HasAvailedTrial { get; set; }
+        public int TrialDays { get; set; }
+        public int TrialAccounts { get; set; }
     }
 }

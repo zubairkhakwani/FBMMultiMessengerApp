@@ -65,10 +65,26 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                 };
 
                 var loginResponse = await AuthService.LoginAsync<BaseResponse<LoginHttpResponse>>(loginRequest);
-                if (!loginResponse.IsSuccess && loginResponse.RedirectToPackages && loginResponse.Data is not null && loginResponse.Data.Token is not null)
+
+                if (loginResponse.IsSuccess && loginResponse.Data?.Token is not null)
                 {
                     await TokenProvider.SetTokenAsync(loginResponse.Data.Token);
                     ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyStateChanged();
+                }
+
+                if (registerResponse.Data?.HasAvailedTrial == true)
+                {
+                    var trialAccounts = registerResponse.Data.TrialAccounts;
+                    var trialDuration = registerResponse.Data.TrialDays;
+                    var trialAvailed = registerResponse.Data.HasAvailedTrial;
+
+                    navManager.NavigateTo($"/Chat?trialAvailed={trialAvailed}&trialAccounts={trialAccounts}&trialDuration={trialDuration}");
+                    return;
+                }
+
+
+                if (loginResponse.RedirectToPackages)
+                {
                     navManager.NavigateTo($"/Pricing?isNewUser=true&newUserName={RequestModel.Name}");
                     return;
                 }
