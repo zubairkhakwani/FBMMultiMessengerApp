@@ -69,6 +69,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         [SupplyParameterFromQuery]
         public string? TrialAccounts { get; set; }
 
+        [SupplyParameterFromQuery]
+        public string? NewUserName { get; set; }
+
         //For Media files
         private const int MaxMediaCount = 35;
         private const int MaxMediaSize = 25 * 1024 * 1024; // 1024 * 1024 == 1mb hence total 25mb.
@@ -567,12 +570,17 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             {
                 var options = new SweetAlertOptions
                 {
-                    Title = "Trial Activated 🎉",
-                    Message = $"You have successfully availed your free trial. This is a gift from us!\n\nTrial Duration: {TrialDuration}\nAccounts Included: {TrialAccounts}",
+                    Title = $"Welcome {NewUserName}!",
+                    Message =
+                             "Your account has been successfully created and your free trial has been activated!\n\n" +
+                             "This is a gift from us\n\n" +
+                             $"Trial Duration: {TrialDuration} days\n" +
+                             $"Accounts Included: {TrialAccounts}",
                     Icon = "success",
-                    ConfirmButtonText = "Great!",
+                    ConfirmButtonText = "Get Started",
                     ShowCancelButton = false
                 };
+
 
                 await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
             }

@@ -78,7 +78,7 @@
             showCancelButton = false,
             cancelButtonText = "No",
             footer = null,
-            importData = null // New parameter for import results
+            importData = null
         } = options;
 
         let htmlContent = message;

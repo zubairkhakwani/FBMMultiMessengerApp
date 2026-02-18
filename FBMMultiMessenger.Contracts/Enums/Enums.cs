@@ -13,5 +13,11 @@ namespace FBMMultiMessenger.Contracts.Enums
         SemiAnnual,
         Annual
     }
-
+    public enum AccountAuthStatus
+    {
+        All = 0,
+        Idle = 1,
+        LoggedIn = 2,
+        LoggedOut = 3,
+    }
 }

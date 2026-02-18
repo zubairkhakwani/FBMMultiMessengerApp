@@ -22,20 +22,6 @@ namespace FBMMultiMessenger.Components.Pages.Mobile
         public string FullName = string.Empty;
         public string ShortName { get; set; } = string.Empty;
 
-
-        protected override async Task OnInitializedAsync()
-        {
-            var currentUser = await CurrentUserService.GetCurrentUser();
-            var fullName = currentUser.Name;
-
-            var shortName = UserHelper.GetShortName(fullName);
-
-            FullName = fullName;
-            ShortName = shortName;
-
-        }
-
-
         private void HandleUpdateClick()
         {
             if (PlatformHelper.IsMobilePlatform)

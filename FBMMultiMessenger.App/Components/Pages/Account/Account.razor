@@ -29,6 +29,14 @@
                            class="search-input"
                            id="searchInput"
                            placeholder="Search accounts...">
+
+                    <MudSelect @bind-Value="SelectedAuthStatus" Label="Account status" Variant="Variant.Outlined">
+                        @foreach (var authStatus in AccountAuthStatuses)
+                        {
+                            var value = ((int)authStatus).ToString();
+                            <MudSelectItem Value="@value">@authStatus.ToString()</MudSelectItem>
+                        }
+                    </MudSelect>
                     <button @onclick="HandleFilterClickAsync" class="btn btn-primary btn-fullwidth">
                         🔍 Filter
                     </button>

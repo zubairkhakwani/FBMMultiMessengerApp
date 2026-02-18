@@ -41,7 +41,7 @@ namespace FBMMultiMessenger.Services
             var request = new ApiRequest<object>()
             {
                 ApiType = SD.ApiType.GET,
-                Url =$"account/me?pageNo={httpRequest.PageNo}&pageSize={httpRequest.PageSize}&keyword={httpRequest.Keyword}",
+                Url =$"account/me?pageNo={httpRequest.PageNo}&pageSize={httpRequest.PageSize}&keyword={httpRequest.Keyword}&selectedAuthStatus={httpRequest.SelectedAuthStatus}",
                 Data = null
             };
             return await _baseService.SendAsync<object, BaseResponse<UserAccountsOverviewHttpResponse>>(request, cancellationToken: cancellationToken);

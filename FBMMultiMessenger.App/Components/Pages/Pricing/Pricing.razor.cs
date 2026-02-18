@@ -3,7 +3,6 @@ using FBMMultiMessenger.Contracts.Contracts.Pricing;
 using FBMMultiMessenger.Contracts.Enums;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
-using FBMMultiMessenger.Services;
 using FBMMultiMessenger.Services.IServices;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -47,15 +46,14 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         public List<PricingList> DisplayedPricings { get; set; } = new List<PricingList>();
         public List<PricingTierHttpResponse> PricingsSoruce { get; set; } = new List<PricingTierHttpResponse>();
         public List<AccountDetailsHttpResponse> AccountDetails { get; set; } = new List<AccountDetailsHttpResponse>();
-
+        public PricingTierAvailabilityHttpResponse PricingTierAvailability { get; set; } = new PricingTierAvailabilityHttpResponse();
 
         public List<string> PreviewSelectedImages { get; set; } = new List<string>();
 
         public decimal Savings { get; set; }
         public decimal TotalCost { get; set; }
 
-        public BillingCylce CurrentBillingCycle = BillingCylce.Monthly;
-
+        public BillingCylce? CurrentBillingCycle;
 
         public const int MaxMediaSize = 5 * 1024 * 1024; // 1024 * 1024 == 1mb hence total 5mb.
 
@@ -73,11 +71,12 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             IsPricingLoading = true;
 
             await HandlePaymentStatusAsync();
+
             await LoadPricingDataAsync();
 
             IsPricingLoading = false;
 
-            GetBillingCyclePrice();
+            GetBillingCyclePrice(CurrentBillingCycle);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -139,31 +138,55 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             var pricingResponse = await PricingService.GetAll();
             PricingsSoruce = pricingResponse.Data?.PricingTiers ?? new List<PricingTierHttpResponse>();
             AccountDetails = pricingResponse.Data?.AccountDetails ?? new List<AccountDetailsHttpResponse>();
+            PricingTierAvailability = pricingResponse.Data?.PricingTierAvailability ?? new PricingTierAvailabilityHttpResponse();
+
+
+            if (PricingTierAvailability.IsMonthlyAvailable)
+            {
+                CurrentBillingCycle = BillingCylce.Monthly;
+            }
+            else if (PricingTierAvailability.IsSemiAnnualAvailable)
+            {
+                CurrentBillingCycle = BillingCylce.SemiAnnual;
+            }
+            else if (PricingTierAvailability.IsAnnualAvailable)
+            {
+                CurrentBillingCycle = BillingCylce.Annual;
+            }
+
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task ShowNotificationFromQueryAsync()
         {
-            if (IsNewUser)
+            try
             {
-                var options = new SweetAlertOptions
+                if (IsNewUser)
                 {
-                    Title = $"Welcome {NewUserName}!",
-                    Message = "Your account has been successfully created. To unlock all features and start your journey, please choose a subscription plan.",
-                    Icon = "success",
-                    ConfirmButtonText = "Get started"
-                };
-                await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
+                    var options = new SweetAlertOptions
+                    {
+                        Title = $"Welcome {NewUserName}!",
+                        Message = "Your account has been successfully created. To unlock all features and start your journey, please choose a subscription plan.",
+                        Icon = "success",
+                        ConfirmButtonText = "Get started"
+                    };
+                    await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
+                }
+                else if (!string.IsNullOrWhiteSpace(RedirectReason))
+                {
+                    var options = new SweetAlertOptions
+                    {
+                        Title = "Attention!",
+                        Message = RedirectReason,
+                        Icon = "info",
+                        ConfirmButtonText = "Get started"
+                    };
+                    await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
+                }
             }
-            else if (!string.IsNullOrWhiteSpace(RedirectReason))
+            catch (Exception ex)
             {
-                var options = new SweetAlertOptions
-                {
-                    Title = "Attention!",
-                    Message = RedirectReason,
-                    Icon = "info",
-                    ConfirmButtonText = "Get started"
-                };
-                await JS.InvokeAsync<bool>("myInterop.showSweetAlert", options);
+
             }
         }
 
@@ -179,7 +202,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             IsSubmitting = true;
             RequestModel.PurchasedPrice = TotalCost;
             RequestModel.PricingTierId = SelectedTier!.Id;
-            RequestModel.BillingCylce = CurrentBillingCycle;
+            RequestModel.BillingCylce = CurrentBillingCycle ?? BillingCylce.Monthly;
 
             var response = await PaymentService.SubmitProof(RequestModel);
 
@@ -252,8 +275,10 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             Savings = SelectedTier.OrignalPrice - SelectedTier.DiscountedPrice;
         }
 
-        private void GetBillingCyclePrice(BillingCylce billingCylce = BillingCylce.Monthly)
+        private void GetBillingCyclePrice(BillingCylce? billingCylce)
         {
+            if (billingCylce is null) return;
+
             var month = billingCylce switch
             {
                 BillingCylce.Monthly => 1,
@@ -360,7 +385,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
         private void HandleBackToDasboard()
         {
-            Navigation.NavigateTo("/account");
+            Navigation.NavigateTo("/");
         }
 
         private async Task HandleLogout()

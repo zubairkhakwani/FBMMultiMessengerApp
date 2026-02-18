@@ -66,7 +66,7 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
                 var loginResponse = await AuthService.LoginAsync<BaseResponse<LoginHttpResponse>>(loginRequest);
 
-                if (loginResponse.IsSuccess && loginResponse.Data?.Token is not null)
+                if (loginResponse.Data?.Token is not null)
                 {
                     await TokenProvider.SetTokenAsync(loginResponse.Data.Token);
                     ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyStateChanged();
@@ -78,7 +78,7 @@ namespace FBMMultiMessenger.Components.Pages.Auth
                     var trialDuration = registerResponse.Data.TrialDays;
                     var trialAvailed = registerResponse.Data.HasAvailedTrial;
 
-                    navManager.NavigateTo($"/Chat?trialAvailed={trialAvailed}&trialAccounts={trialAccounts}&trialDuration={trialDuration}");
+                    navManager.NavigateTo($"/Chat?trialAvailed={trialAvailed}&trialAccounts={trialAccounts}&trialDuration={trialDuration}&newUserName={RequestModel.Name}");
                     return;
                 }
 

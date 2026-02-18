@@ -26,18 +26,31 @@
 
             <!-- Billing Period Section -->
             <div class="billing-section">
+
                 <div class="billing-tabs">
-                    <button class="billing-tab @(CurrentBillingCycle == BillingCylce.Monthly ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Monthly)'>
-                        Monthly
-                    </button>
-                    <button class="billing-tab @(CurrentBillingCycle == BillingCylce.SemiAnnual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.SemiAnnual)'>
-                        Semi-Annual
-                        <span class="save-tag">💰 Discount</span>
-                    </button>
-                    <button class="billing-tab @(CurrentBillingCycle == BillingCylce.Annual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Annual)'>
-                        Annual
-                        <span class="save-tag hot">🔥 Discount</span>
-                    </button>
+
+                    @if (PricingTierAvailability.IsMonthlyAvailable)
+                    {
+                        <button class="billing-tab  @(CurrentBillingCycle == BillingCylce.Monthly ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Monthly)'>
+                            Monthly
+                        </button>
+                    }
+
+                    @if (PricingTierAvailability.IsSemiAnnualAvailable)
+                    {
+                        <button class="billing-tab @(CurrentBillingCycle == BillingCylce.SemiAnnual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.SemiAnnual)'>
+                            Semi-Annual
+                            <span class="save-tag">💰 Discount</span>
+                        </button>
+                    }
+
+                    @if (PricingTierAvailability.IsAnnualAvailable)
+                    {
+                        <button class="billing-tab @(CurrentBillingCycle == BillingCylce.Annual ? "active" : "")" @onclick='() => HandleBillingCyleChanged(BillingCylce.Annual)'>
+                            Annual
+                            <span class="save-tag hot">🔥 Discount</span>
+                        </button>
+                    }
                 </div>
             </div>
 

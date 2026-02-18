@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using FBMMultiMessenger.Components.Pages.Shared.CustomPopupform;
 using FBMMultiMessenger.Contracts.Contracts.Account;
+using FBMMultiMessenger.Contracts.Enums;
 using FBMMultiMessenger.Contracts.Response;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
@@ -50,14 +51,15 @@ namespace FBMMultiMessenger.Components.Pages.Account
         } = new();
 
         private List<UserAccountsHttpResponse> AccountsData = new List<UserAccountsHttpResponse>();
+        private List<AccountAuthStatus> AccountAuthStatuses = new List<AccountAuthStatus>();
+        private string? SelectedAuthStatus;
+
         private int TotalAccounts;
         private int ConnectedAccounts;
         private int NotConnectedAccounts;
 
         private string? Keyword { get; set; }
 
-        [SupplyParameterFromQuery]
-        public string? Message { get; set; }
 
         private MudTable<UserAccountsHttpResponse> table;
 
@@ -65,10 +67,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         protected override async Task OnInitializedAsync()
         {
-            if (!string.IsNullOrWhiteSpace(Message))
-            {
-                Snackbar.Add(Message, Severity.Success);
-            }
+            AccountAuthStatuses = Enum.GetValues<AccountAuthStatus>().ToList();
 
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
             SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
@@ -89,6 +88,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
             RequestModel.PageNo = state.Page > 0 ? state.Page + 1 : 1;
             RequestModel.PageSize = state.PageSize;
             RequestModel.Keyword = Keyword;
+            RequestModel.SelectedAuthStatus = SelectedAuthStatus;
 
             var response = await AccountService.GetMyAccountsAsync(RequestModel, _cts.Token);
 
