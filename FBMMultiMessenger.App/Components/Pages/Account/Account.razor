@@ -30,7 +30,7 @@
                            id="searchInput"
                            placeholder="Search accounts...">
 
-                    <MudSelect @bind-Value="SelectedAuthStatus" Label="Account status" Variant="Variant.Outlined">
+                    <MudSelect @bind-Value="SelectedAuthStatus" Label="Account status" FitContent="true"  Variant="Variant.Outlined">
                         @foreach (var authStatus in AccountAuthStatuses)
                         {
                             var value = ((int)authStatus).ToString();
@@ -81,6 +81,7 @@
             <MudTh>Ip Port</MudTh>
             <MudTh>Connection Status</MudTh>
             <MudTh>Account Status</MudTh>
+            <MudTh>Logout Reason</MudTh>
             <MudTh>Created At</MudTh>
             <MudTh>Actions</MudTh>
 
@@ -105,6 +106,9 @@
                     @context.AuthStatus
                 </span>
             </MudTd>
+
+            <MudTd title="@context.LogoutReason" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Logout reason">@context.LogoutReason</MudTd>
+
 
             <MudTd DataLabel="Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>
             <MudTd DataLabel="Actions" Title="Actions" Class="col-ignore stick-action-column">

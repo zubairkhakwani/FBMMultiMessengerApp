@@ -161,6 +161,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         {
             try
             {
+
                 if (IsNewUser)
                 {
                     var options = new SweetAlertOptions
@@ -385,7 +386,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
 
         private void HandleBackToDasboard()
         {
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/Account");
         }
 
         private async Task HandleLogout()

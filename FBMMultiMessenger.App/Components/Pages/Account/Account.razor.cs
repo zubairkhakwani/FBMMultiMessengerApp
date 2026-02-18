@@ -138,16 +138,23 @@ namespace FBMMultiMessenger.Components.Pages.Account
             foreach (var account in affectedAccounts)
             {
                 var accountStatusRequest = accountsStatusRequest.FirstOrDefault(x => x.AccountId == account.Id);
+                var authStatus = accountStatusRequest?.AuthStatusText;
+                var connectionStatus = accountStatusRequest?.ConnectionStatusText;
+                var logoutReason = accountStatusRequest?.LogoutReasonText;
 
                 if (accountStatusRequest is not null)
                 {
-                    if (accountStatusRequest.AuthStatus is not null)
+                    if (!string.IsNullOrWhiteSpace(authStatus))
                     {
-                        account.AuthStatus = accountStatusRequest.AuthStatus;
+                        account.AuthStatus = authStatus;
                     }
-                    if (accountStatusRequest.ConnectionStatus is not null)
+                    if (!string.IsNullOrWhiteSpace(connectionStatus))
                     {
-                        account.ConnectionStatus = accountStatusRequest.ConnectionStatus;
+                        account.ConnectionStatus = connectionStatus;
+                    }
+                    if (!string.IsNullOrWhiteSpace(logoutReason))
+                    {
+                        account.LogoutReason = logoutReason;
                     }
                 }
             }
