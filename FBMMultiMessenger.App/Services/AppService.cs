@@ -41,6 +41,7 @@ namespace FBMMultiMessenger.Services
 
                 string fileName = Path.GetFileName(downloadUrl);
 
+
                 var downloadPath = Path.Combine(_downloadFolder, fileName);
 
                 if (latestVer > currentVer)
