@@ -1,12 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="FBM_Multi_Messenger.FBM_Multi_Messenger" android:versionName="1.0.0" android:versionCode="1">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="FBM_Multi_Messenger.FBM_Multi_Messenger" android:versionName="1.0.1" android:versionCode="1">
 	<application android:allowBackup="true" android:icon="@mipmap/fbm1" android:supportsRtl="true" android:label="FBM Multi Messenger">
-
-
-		<meta-data
-    android:name="com.onesignal.messaging.default_notification_icon"
-    android:resource="@drawable/ic_stat_onesignal_default" />
-
+		<meta-data android:name="com.onesignal.messaging.default_notification_icon" android:resource="@drawable/ic_stat_onesignal_default" />
 		<provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
 		</provider>
