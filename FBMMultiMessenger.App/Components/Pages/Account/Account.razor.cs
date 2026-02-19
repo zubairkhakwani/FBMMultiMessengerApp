@@ -140,7 +140,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                 var accountStatusRequest = accountsStatusRequest.FirstOrDefault(x => x.AccountId == account.Id);
                 var authStatus = accountStatusRequest?.AuthStatusText;
                 var connectionStatus = accountStatusRequest?.ConnectionStatusText;
-                var logoutReason = accountStatusRequest?.LogoutReasonText;
+                var logoutReason = accountStatusRequest?.ReasonText;
 
                 if (accountStatusRequest is not null)
                 {
@@ -154,7 +154,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
                     }
                     if (!string.IsNullOrWhiteSpace(logoutReason))
                     {
-                        account.LogoutReason = logoutReason;
+                        account.Reason = logoutReason;
                     }
                 }
             }

@@ -14,6 +14,9 @@
                 <button @onclick="AddNewAccountAsync" class="btn btn-primary btn-hide-mobile">
                     ➕ Add Account
                 </button>
+                <button  class="btn btn-primary btn-hide-mobile">
+                    Download Format
+                </button>
                 <InputFile type="file" id="fileInput" style="display: none;" onchange="HandleImportFile" />
                 <label class="btn btn-secondary" for="fileInput" title="Attach files">📁 Import File</label>
             </div>
@@ -30,7 +33,7 @@
                            id="searchInput"
                            placeholder="Search accounts...">
 
-                    <MudSelect @bind-Value="SelectedAuthStatus" Label="Account status" FitContent="true"  Variant="Variant.Outlined">
+                    <MudSelect @bind-Value="SelectedAuthStatus" Label="Account status" FitContent="true" Variant="Variant.Outlined">
                         @foreach (var authStatus in AccountAuthStatuses)
                         {
                             var value = ((int)authStatus).ToString();
@@ -81,20 +84,20 @@
             <MudTh>Ip Port</MudTh>
             <MudTh>Connection Status</MudTh>
             <MudTh>Account Status</MudTh>
-            <MudTh>Logout Reason</MudTh>
+            <MudTh>Reason</MudTh>
             <MudTh>Created At</MudTh>
             <MudTh>Actions</MudTh>
 
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd title="@context.Cookie" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Cookie">@context.Cookie</MudTd>
+            <MudTd title="@context.Cookie" Style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Cookie">@context.Cookie</MudTd>
             @{
                 string ipPort = context.Proxy is null ? "-" : context.Proxy.Name;
                 int? proxyId = context.Proxy is null ? null : context.Proxy.Id;
             }
 
-            <MudTd title="@ipPort" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Ip Port">@ipPort</MudTd>
+            <MudTd title="@ipPort" Style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Ip Port">@ipPort</MudTd>
 
             <MudTd DataLabel="Connection Status">
                 <span class="@GetConnectionStatusBadgeClass(context.ConnectionStatus)">
@@ -107,7 +110,7 @@
                 </span>
             </MudTd>
 
-            <MudTd title="@context.LogoutReason" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" DataLabel="Logout reason">@context.LogoutReason</MudTd>
+            <MudTd title="@context.Reason" DataLabel="Logout reason">@context.Reason</MudTd>
 
 
             <MudTd DataLabel="Created At">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh: mm tt")</MudTd>

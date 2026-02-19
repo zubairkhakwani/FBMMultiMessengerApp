@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace FBMMultiMessenger.Helpers
+﻿namespace FBMMultiMessenger.Helpers
 {
     public class VersionHelper
     {
