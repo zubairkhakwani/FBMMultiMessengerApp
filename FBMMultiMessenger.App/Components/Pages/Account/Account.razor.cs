@@ -196,6 +196,10 @@ namespace FBMMultiMessenger.Components.Pages.Account
             }
         }
 
+        private async Task DownloadFileFormat()
+        {
+            await JS.InvokeVoidAsync("myInterop.downloadAccountsFormat");
+        }
         public async Task HandleImportFile(InputFileChangeEventArgs e)
         {
             var file = e.File;
@@ -235,7 +239,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
                     if (isDownloadformatRequest)
                     {
-                        await JS.InvokeVoidAsync("myInterop.downloadAccountsFormat");
+                        await DownloadFileFormat();
                     }
 
                     return;

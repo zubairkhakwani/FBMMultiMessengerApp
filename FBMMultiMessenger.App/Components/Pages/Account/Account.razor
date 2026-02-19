@@ -14,11 +14,13 @@
                 <button @onclick="AddNewAccountAsync" class="btn btn-primary btn-hide-mobile">
                     ➕ Add Account
                 </button>
-                <button  class="btn btn-primary btn-hide-mobile">
+               
+                <InputFile type="file" id="fileInput" style="display: none;" onchange="HandleImportFile" />
+                <label class="btn btn-primary" for="fileInput" title="Attach files">📁 Import File</label>
+
+                <button @onclick="DownloadFileFormat" class="btn btn-secondary">
                     Download Format
                 </button>
-                <InputFile type="file" id="fileInput" style="display: none;" onchange="HandleImportFile" />
-                <label class="btn btn-secondary" for="fileInput" title="Attach files">📁 Import File</label>
             </div>
         </div>
 
