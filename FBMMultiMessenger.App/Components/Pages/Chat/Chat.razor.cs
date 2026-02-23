@@ -551,7 +551,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             var notificaitonFbChatId = notification.ChatId;
 
             //If the user is on different chat or on sidebar, then load the chat messages
-            if (notificaitonFbChatId != SelectedChatId)
+            if (notificaitonFbChatId !=0 && notificaitonFbChatId != SelectedChatId)
             {
                 await LoadChatMessage(notificaitonFbChatId);
             }
@@ -560,7 +560,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private async Task HandleQueryParameters()
         {
             // Executes when user taps a notification while the app is running
-            if (!string.IsNullOrWhiteSpace(IsNotification) && ChatId != null)
+            if (!string.IsNullOrWhiteSpace(IsNotification) && ChatId != null && ChatId !=0)
             {
                 await LoadChatMessage(ChatId.Value);
                 return;

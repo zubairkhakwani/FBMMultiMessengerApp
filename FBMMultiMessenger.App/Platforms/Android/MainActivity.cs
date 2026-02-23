@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using FBMMultiMessenger.Contracts.Enums;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Services;
@@ -50,6 +51,8 @@ namespace FBMMultiMessenger.Platforms.Android
 
             WebViewSoftInputPatch.Initialize();
 
+            OneSignal.Notifications.Clicked -= HandleNotificationClicked;
+
             OneSignal.Notifications.Clicked += HandleNotificationClicked;
         }
 
@@ -64,34 +67,60 @@ namespace FBMMultiMessenger.Platforms.Android
         {
             var data = e.Notification.AdditionalData;
 
-            var isChatIdPresent = data.TryGetValue("chatId", out var chatId);
-            data.TryGetValue("isSubscriptionExpired", out var subscriptionExpiredObj);
-            data.TryGetValue("isSubscriptionApproved", out var subscriptionStatusObj);
+            var hasCategory = data.TryGetValue("category", out var categoryObj);
 
-            data.TryGetValue("message", out var message);
+            if (!hasCategory) return;
 
-            var additionalData = new NotificationAdditionalData();
+            var isCategoryParsed = Enum.TryParse<NotificationCategory>(categoryObj!.ToString(),
+                                   out NotificationCategory category);
 
-            // ChatId is only included for seller–buyer chat notifications.
-            // It is not present for system notifications (e.g., subscription approval/rejection).
-            if (isChatIdPresent)
+            if (isCategoryParsed)
             {
-                bool.TryParse(subscriptionExpiredObj!.ToString(), out bool isSubscriptionExpired);
+                var additionalData = new NotificationAdditionalData();
 
-                additionalData.ChatId = Convert.ToInt32(chatId);
-                additionalData.IsSubscriptionExpired = isSubscriptionExpired;
-                additionalData.Message = message?.ToString() ?? string.Empty;
+                additionalData.Category = category;
+
+                var hasMessage = data.TryGetValue("message", out var messageObj);
+
+                if (hasMessage)
+                {
+                    //we can use that , if we need it later. 
+                    additionalData.Message = messageObj?.ToString() ?? string.Empty;
+                }
+
+                if (additionalData.IsSubscriptionExpired)
+                {
+                    additionalData.Message = "Your subscription has expired. Please renew to continue.";
+                }
+
+                if (category == NotificationCategory.Chat)
+                {
+                    //end-to-end buyer/seller messages from marketplace
+
+                    var hasChatId = data.TryGetValue("chatId", out var chatId);
+
+                    if (!hasChatId) return;
+
+                    additionalData.ChatId = Convert.ToInt32(chatId);
+                }
+                else if (category == NotificationCategory.Subscription)
+                {
+                    // we can handle this scenario => subscription approval and rejection messages
+                }
+
+                else if (category == NotificationCategory.Account)
+                {
+                    //account logout messages and we can use that account id to show an animation of which account is being logged out.
+
+                    var hasAccountId = data.TryGetValue("accountId", out var accountId);
+
+                    if (!hasAccountId) return;
+
+                    additionalData.AccountId = Convert.ToInt32(accountId);
+                }
+
+                BlazorMauiCommunicator.NotificationArrived(additionalData);
             }
-
-            // If the subscription is rejected, we mark it as expired so the user is redirected to the pricing page.
-            var isParsed = bool.TryParse(subscriptionStatusObj?.ToString(), out bool isSubscriptionApproved);
-
-            if (isParsed)
-            {
-                additionalData.IsSubscriptionExpired = !isSubscriptionApproved;
-            }
-
-            BlazorMauiCommunicator.NotificationArrived(additionalData);
         }
 
         private async void HandleIntent(Intent? intent)

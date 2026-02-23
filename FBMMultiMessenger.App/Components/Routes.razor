@@ -1,4 +1,5 @@
-﻿@using FBMMultiMessenger.Helpers
+﻿@using FBMMultiMessenger.Contracts.Enums
+@using FBMMultiMessenger.Helpers
 @using FBMMultiMessenger.Services.IServices
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager navigationManager
@@ -99,17 +100,27 @@
     {
         string currentRoute = GetCurrentRoute();
 
-        bool isOnChatPage = currentRoute.Equals("/Chat", StringComparison.OrdinalIgnoreCase)
-                            ||
-                            currentRoute.Equals("/", StringComparison.OrdinalIgnoreCase);
+        var category = data.Category;
 
-        if (data.IsSubscriptionExpired)
+        if (category == NotificationCategory.Chat || category == NotificationCategory.Subscription)
         {
-            Navigation.NavigateTo($"/pricing?redirectReason={Uri.EscapeDataString(data.Message)}", true);
+            bool isOnChatPage = currentRoute.Equals("/Chat", StringComparison.OrdinalIgnoreCase)
+                                        ||
+                                        currentRoute.Equals("/", StringComparison.OrdinalIgnoreCase);
+
+            if (!isOnChatPage)
+            {
+                Navigation.NavigateTo($"/chat?isNotification=true&chatId={data.ChatId}");
+            }
         }
-        else if (!isOnChatPage)
+        else if (category == NotificationCategory.Account)
         {
-            Navigation.NavigateTo($"/chat?isNotification=true&chatId={data.ChatId}");
+            bool isOnAccountPage = currentRoute.Equals("/Account", StringComparison.OrdinalIgnoreCase);
+
+            if (!isOnAccountPage)
+            {
+                Navigation.NavigateTo($"/Account");
+            }
         }
     }
 

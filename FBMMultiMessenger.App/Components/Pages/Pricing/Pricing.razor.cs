@@ -70,7 +70,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         {
             IsPricingLoading = true;
 
-            await HandlePaymentStatusAsync();
+            await HandlePaymentAlertsAsync();
 
             await LoadPricingDataAsync();
 
@@ -87,7 +87,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             }
         }
 
-        private async Task HandlePaymentStatusAsync()
+        private async Task HandlePaymentAlertsAsync()
         {
             var paymentStatusResponse = await PaymentService.GetMyStatus();
             var paymentStatus = paymentStatusResponse.Data;
@@ -95,7 +95,7 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
             if (paymentStatus == null)
                 return;
 
-            PaymentStatus =  paymentStatus.Status;
+            PaymentStatus = paymentStatus.Status;
 
             if (ShouldShowPaymentAlert(paymentStatus.Status))
             {

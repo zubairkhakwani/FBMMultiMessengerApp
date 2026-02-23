@@ -20,4 +20,12 @@ namespace FBMMultiMessenger.Contracts.Enums
         LoggedIn = 2,
         LoggedOut = 3,
     }
+
+    public enum NotificationCategory
+    {
+        Chat = 1,
+        Subscription = 2,
+        Account = 3,
+        System = 4
+    }
 }
