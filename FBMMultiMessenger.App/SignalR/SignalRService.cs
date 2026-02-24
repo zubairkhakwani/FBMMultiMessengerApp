@@ -8,7 +8,7 @@ namespace FBMMultiMessenger.SignalR
 {
     public class SignalRService
     {
-        private HubConnection _hubConnection;
+        private HubConnection? _hubConnection;
         public event Func<HandleChatHttpResponse, Task> OnHandleMessage;
         public event Func<List<AccountStatusSignalRModel>, Task> OnAccountStatusChange;
         public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;

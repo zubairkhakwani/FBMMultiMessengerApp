@@ -41,6 +41,9 @@ namespace FBMMultiMessenger.Components.Pages.Account
         [Inject]
         private IJSRuntime JS { get; set; }
 
+        [Inject]
+        public ICurrentUserService CurrentUserService { get; set; }
+
         private GetMyAccountsHttpRequest RequestModel = new GetMyAccountsHttpRequest();
 
         private HashSet<UserAccountsHttpResponse> selectedAccounts
@@ -67,11 +70,11 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         protected override async Task OnInitializedAsync()
         {
-            AccountAuthStatuses = Enum.GetValues<AccountAuthStatus>().ToList();
+            _ = ConnectToSignalR();
 
-            SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
-            SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
-            BlazorMauiCommunicator.OnFileShared += OnFileSharedHandler;
+            AddEventListeners();
+
+            AccountAuthStatuses = Enum.GetValues<AccountAuthStatus>().ToList();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -200,6 +203,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
         {
             await JS.InvokeVoidAsync("myInterop.downloadAccountsFormat");
         }
+
         public async Task HandleImportFile(InputFileChangeEventArgs e)
         {
             var file = e.File;
@@ -409,6 +413,22 @@ namespace FBMMultiMessenger.Components.Pages.Account
         {
             var response = await AccountService.Connect<BaseResponse<object>>(accountId);
             Snackbar.Add($"{response.Message}", response.IsSuccess ? Severity.Success : Severity.Error);
+        }
+
+        private async Task ConnectToSignalR()
+        {
+            var currentUser = await CurrentUserService.GetCurrentUser();
+
+            var currentUserId = $"App_{currentUser.Id}";
+
+            await SignalRService.ConnectAsync(currentUserId);
+        }
+
+        private void AddEventListeners()
+        {
+            SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
+            SignalRService.OnAccountStatusChange += HandleAccountStatusChangedAsync;
+            BlazorMauiCommunicator.OnFileShared += OnFileSharedHandler;
         }
 
         public void Dispose()
