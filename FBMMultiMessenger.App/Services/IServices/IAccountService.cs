@@ -14,5 +14,7 @@ namespace FBMMultiMessenger.Services.IServices
         Task<BaseResponse<UserAccountsOverviewHttpResponse>> GetMyAccountsAsync(GetMyAccountsHttpRequest httpRequest, CancellationToken cancellationToken = default);
 
         Task<BaseResponse<GetAllMyAccountsChatsHttpResponse>> GetMyChatsAsync(CancellationToken cancellationToken = default);
+
+        Task<BaseResponse<GetAccountStatusHttpResponse>> GetAccountStatuses(CancellationToken cancellationToken = default);
     }
 }

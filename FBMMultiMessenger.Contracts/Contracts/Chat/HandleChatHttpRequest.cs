@@ -38,6 +38,8 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
     {
         public int ChatId { get; set; }
         public int ChatMessageId { get; set; }
+        public int AccountId { get; set; }
+        public string AccountName { get; set; }
         public string FbUserId { get; set; } = null!;
         public string FbChatId { get; set; } = null!;
         public string FbListingId { get; set; } = null!;

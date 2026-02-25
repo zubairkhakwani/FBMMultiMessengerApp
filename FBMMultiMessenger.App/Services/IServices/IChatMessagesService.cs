@@ -6,5 +6,6 @@ namespace FBMMultiMessenger.Services.IServices
     public interface IChatMessagesService
     {
         Task<BaseResponse<List<GeChatMessagesHttpResponse>>> GetChatMessages(int chatId, CancellationToken cancellationToken = default);
+        Task<BaseResponse<object>> MarkChatAsRead(int chatId, int lastLocalMessageId, CancellationToken cancellationToken = default);
     }
 }

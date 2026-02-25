@@ -19,6 +19,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
         public bool IsAudioMessage { get; set; }
 
         public bool IsSent { get; set; } // message status
+        public bool IsRead { get; set; }
         public bool ScrollToBottom { get; set; } = true;
         public DateTime CreatedAt { get; set; }
         public long? FbTimeStamp { get; set; }

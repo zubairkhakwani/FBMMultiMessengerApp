@@ -1,5 +1,6 @@
 ﻿using FBMMultiMessenger.Contracts.Contracts.Auth;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Database.Services;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Request;
 using FBMMultiMessenger.Services.IServices;
@@ -14,13 +15,14 @@ namespace FBMMultiMessenger.Services
         private readonly IBaseService _baseService;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ITokenProvider TokenProvider;
+        private readonly SyncMessagesDbService syncMessagesDbService;
 
-        public AuthService(IBaseService baseService, AuthenticationStateProvider authState, ITokenProvider tokenProvider)
+        public AuthService(IBaseService baseService, AuthenticationStateProvider authState, ITokenProvider tokenProvider, SyncMessagesDbService syncMessagesDbService)
         {
-            this._baseService=baseService;
+            this._baseService = baseService;
             this._authenticationStateProvider = authState;
-            this.TokenProvider =tokenProvider;
-
+            this.TokenProvider = tokenProvider;
+            this.syncMessagesDbService = syncMessagesDbService;
         }
 
         public async Task<BaseResponse<object>> ForgotPasswordAsync(ForgotPasswordHttpRequest httpRequest)
@@ -28,7 +30,7 @@ namespace FBMMultiMessenger.Services
             var apiRequest = new ApiRequest<ForgotPasswordHttpRequest>()
             {
                 ApiType = SD.ApiType.POST,
-                Url ="auth/forgot-password",
+                Url = "auth/forgot-password",
                 Data = httpRequest
             };
 
@@ -40,7 +42,7 @@ namespace FBMMultiMessenger.Services
             var apiRequest = new ApiRequest<LoginHttpRequest>()
             {
                 ApiType = SD.ApiType.POST,
-                Url ="auth/login",
+                Url = "auth/login",
                 Data = httpRequest
             };
 
@@ -49,6 +51,7 @@ namespace FBMMultiMessenger.Services
 
         public async Task Logout()
         {
+            await syncMessagesDbService.WipeLocalDb();
             await TokenProvider.RemoveTokenAsync();
             ((CustomAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
 
@@ -62,9 +65,9 @@ namespace FBMMultiMessenger.Services
         {
             var apiRequest = new ApiRequest<RegisterHttpRequest>()
             {
-                ApiType  = SD.ApiType.POST,
+                ApiType = SD.ApiType.POST,
                 Url = "auth/register",
-                Data  = httpRequest
+                Data = httpRequest
             };
 
             return await _baseService.SendAsync<RegisterHttpRequest, T>(apiRequest);
@@ -74,9 +77,9 @@ namespace FBMMultiMessenger.Services
         {
             var apiRequest = new ApiRequest<string>()
             {
-                ApiType  = SD.ApiType.POST,
+                ApiType = SD.ApiType.POST,
                 Url = $"auth/resend-otp?isEmailVerification={isEmailVerification}",
-                Data  = email
+                Data = email
             };
 
             return await _baseService.SendAsync<string, BaseResponse<object>>(apiRequest);
@@ -86,9 +89,9 @@ namespace FBMMultiMessenger.Services
         {
             var apiRequest = new ApiRequest<ResetPasswordHttpRequest>()
             {
-                ApiType  = SD.ApiType.POST,
+                ApiType = SD.ApiType.POST,
                 Url = "auth/reset-password",
-                Data  = httpRequest
+                Data = httpRequest
             };
 
             return await _baseService.SendAsync<ResetPasswordHttpRequest, BaseResponse<object>>(apiRequest);
@@ -98,9 +101,9 @@ namespace FBMMultiMessenger.Services
         {
             var apiRequest = new ApiRequest<string>()
             {
-                ApiType  = SD.ApiType.POST,
+                ApiType = SD.ApiType.POST,
                 Url = $"auth/verify-otp?isEmailVerification={isEmailVerification}",
-                Data  = otp
+                Data = otp
             };
 
             return await _baseService.SendAsync<string, BaseResponse<object>>(apiRequest);

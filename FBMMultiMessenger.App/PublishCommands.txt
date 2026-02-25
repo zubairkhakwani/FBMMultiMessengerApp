@@ -8,3 +8,8 @@ dotnet publish -c Release -f:net9.0-android36.0 -property:OutDir='C:\Users\Rizwa
 
 
 dotnet build -f net9.0-android
+
+
+
+migration command
+dotnet-ef migrations add Changes --framework net9.0-windows10.0.19041.0 --project .\FBMMultiMessenger.App
