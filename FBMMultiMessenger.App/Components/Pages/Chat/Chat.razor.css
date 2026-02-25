@@ -228,6 +228,10 @@ body {
         background-color: #ef4444;
     }
 
+    .status-indicator.loading {
+        background-color: orange;
+    }
+
 
 
 .chat-info {

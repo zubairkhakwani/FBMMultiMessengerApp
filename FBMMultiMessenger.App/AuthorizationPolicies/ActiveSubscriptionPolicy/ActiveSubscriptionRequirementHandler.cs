@@ -31,6 +31,7 @@ namespace FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy
             if (DateTime.Now - _lastChecked < _cacheDuration && _lastResult)
             {
                 context.Succeed(requirement);
+                return;
             }
 
             var response = await SubscriptionSerivce.GetMySubscription<BaseResponse<GetMySubscriptionHttpResponse>>();

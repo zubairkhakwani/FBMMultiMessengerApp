@@ -100,6 +100,18 @@ namespace FBMMultiMessenger.Services
 
             return await _baseService.SendAsync<List<UpsertAccountHttpRequest>, BaseResponse<UpsertAccountHttpResponse>>(request);
         }
+
+        public async Task<BaseResponse<GetAccountStatusHttpResponse>> GetAccountStatuses(CancellationToken cancellationToken = default)
+        {
+            var request = new ApiRequest<object>()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = $"account/statuses",
+                Data = null
+            };
+
+            return await _baseService.SendAsync<object, BaseResponse<GetAccountStatusHttpResponse>>(request);
+        }
     }
 }
 

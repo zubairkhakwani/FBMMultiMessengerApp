@@ -1,16 +1,20 @@
 ﻿using Blazored.LocalStorage;
 using FBMMultiMessenger.AuthorizationPolicies.ActiveSubscriptionPolicy;
+using FBMMultiMessenger.Database;
+using FBMMultiMessenger.Database.Services;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Services;
 using FBMMultiMessenger.Services.IServices;
 using FBMMultiMessenger.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using OneSignalSDK.DotNet;
+using System;
 using System.Reflection;
 
 
@@ -76,7 +80,10 @@ namespace FBMMultiMessenger
                 builder.Services.AddScoped<IAppService, AppService>();
                 builder.Services.AddScoped<IFacebookService, FacebookService>();
                 builder.Services.AddScoped<ChatEventDispatcherService, ChatEventDispatcherService>();
-
+                builder.Services.AddScoped<ISyncMessagesService, SyncMessagesService>();
+                
+                builder.Services.AddSingleton<MessageDbService>();
+                builder.Services.AddSingleton<SyncMessagesDbService>();
 
                 builder.Services.AddSingleton<BackButtonService>();
                 builder.Services.AddSingleton<SignalRService>();
@@ -115,7 +122,19 @@ namespace FBMMultiMessenger
                     var appId = builder.Configuration.GetValue<string>("OneSignal:AppId")!;
                     OneSignal.Initialize(appId);
                 }
-                return builder.Build();
+
+                builder.Services.AddDbContextFactory<MessengerDbContext>(options =>
+                    options.UseSqlite($"Data Source={DBPathHelper.GetDbPath()}"));
+
+                var app = builder.Build();
+
+                // Run migrations here
+                using var db = app.Services
+                                  .GetRequiredService<IDbContextFactory<MessengerDbContext>>()
+                                  .CreateDbContext();
+                db.Database.Migrate();
+
+                return app;
             }
             catch (Exception ex)
             {

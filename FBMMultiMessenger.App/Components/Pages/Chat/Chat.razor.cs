@@ -2,6 +2,7 @@
 using FBMMultiMessenger.Contracts.Contracts.Chat;
 using FBMMultiMessenger.Contracts.Contracts.Extension;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Database.Services;
 using FBMMultiMessenger.Helpers;
 using FBMMultiMessenger.Models;
 using FBMMultiMessenger.Models.SignalR;
@@ -27,6 +28,15 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         [Inject]
         public IAccountService AccountService { get; set; }
+
+        [Inject]
+        public MessageDbService MessageDbService { get; set; }
+
+        [Inject]
+        public SyncMessagesDbService SyncMessageDbService { get; set; }
+
+        [Inject]
+        public ISyncMessagesService SyncMessagesService { get; set; }
 
         [Inject]
         public IChatMessagesService ChatMessagesService { get; set; }
@@ -109,6 +119,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Chat Menu Action
         private bool ShowChatMenuAction;
 
+        private bool AccountStatusLoaded = false;
 
         private bool ShowMessageReply;
         private string MessageReply = string.Empty;
@@ -127,11 +138,17 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Main Chat Messages
         public List<GeChatMessagesHttpResponse> ChatMessages = new List<GeChatMessagesHttpResponse>();
 
+        //Account login statuses from api
+        private Dictionary<int, bool> AccountStatuses = new();
+
+
         private CancellationTokenSource _apiCts = new();
         private CancellationTokenSource _holdCts = new();
 
         protected override async Task OnInitializedAsync()
         {
+            _= SyncMessagesFromApi();
+
             AddEventListneres();
 
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
@@ -140,19 +157,83 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             await GetAccountChats();
 
+            StateHasChanged();
+
+            await GetAccountStatuses();
+
             await OpenNotificationChat();
 
-            //this function is okay here, as it needs to be called after a sec after rendering..
-            await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this), PlatformHelper.IsMobilePlatform);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await ConfigurePushNotifications();
+
+            while(true)
+            {
+                try
+                {
+                    await JS.InvokeVoidAsync("registerEnterHandler", DotNetObjectReference.Create(this), PlatformHelper.IsMobilePlatform);
+
+                    break;
+                }
+                catch(Exception ex)
+                {
+                    await Task.Delay(200);
+                }
+            }
         }
 
+        private async Task SyncMessagesFromApi(bool updateUI = true)
+        {
+            try
+            {
+                var date = await SyncMessageDbService.GetLastSyncDateTime();
 
+                var newChats = await SyncMessagesService.GetUnSyncedMessages(date);
+
+                if (newChats.IsSuccess && newChats.Data != null && (newChats.Data.Chats.Any() || newChats.Data.Accounts.Any()))
+                {
+                    var success = await SyncMessageDbService.UpdateDbMessagesFromAPI(newChats.Data);
+                    if(success)
+                    {
+                        await SyncMessageDbService.UpdateLastSyncDateTime(newChats.Data.LastSyncedAt);
+                    }
+
+                    if(updateUI)
+                    {
+                        await GetAccountChats();
+                        
+                        if(AccountStatusLoaded)
+                        {
+                            UpdateAccountStatuses();
+                        }
+
+                        if(SelectedChatId  != null && newChats.Data.Chats.Any(c => c.Id == SelectedChatId.Value))
+                        {
+                            await LoadChatMessage(SelectedChatId.Value);
+                        }
+
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+        }
+
+            
         #region Domain Logic
+
+        private async Task SyncAndLoadChatMessages(int chatId)
+        {
+            _ = SyncMessagesFromApi();
+            await LoadChatMessage(chatId);
+            StateHasChanged();
+            await MarkMessagesAsRead(chatId);
+        }
 
         private async Task LoadChatMessage(int chatId)
         {
@@ -183,16 +264,9 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 UserProfileImage = myAccountChats.UserProfileImage;
             }
 
-            var response = await ChatMessagesService.GetChatMessages(chatId, _apiCts.Token);
+            var response = await MessageDbService.GetChatMessages(chatId, CurrentUser.Id);
 
-            if (response is null || !response.IsSuccess)
-            {
-                Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
-                SelectedChatId = previousSelectedChatId;
-                return;
-            }
-
-            var responseChatMessages = response?.Data ?? new List<GeChatMessagesHttpResponse>();
+            var responseChatMessages = response?? new List<GeChatMessagesHttpResponse>();
 
             foreach (var chatMessage in responseChatMessages)
             {
@@ -202,9 +276,19 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 }
             }
 
-            ChatMessages = response?.Data ?? new List<GeChatMessagesHttpResponse>();
+            ChatMessages = response ?? new List<GeChatMessagesHttpResponse>();
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task MarkMessagesAsRead(int chatId)
+        {
+            if (ChatMessages.Any() && ChatMessages.Any(cm => !cm.IsRead))
+            {
+                var maxMessageId = ChatMessages.Max(cm => cm.ChatMessageId);
+                await ChatMessagesService.MarkChatAsRead(chatId, maxMessageId);
+                await MessageDbService.MarkChatAsRead(chatId, maxMessageId, CurrentUser.Id);
+            }
         }
 
 
@@ -355,18 +439,52 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task GetAccountChats()
         {
-            var response = await AccountService.GetMyChatsAsync(_apiCts.Token);
+            var response = await MessageDbService.GetAllChats(CurrentUser.Id);
 
             IsChatsLoading = false;
 
-            if (response is null ||  !response.IsSuccess)
-            {
-                Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
+            FilteredAccountChats = AccountChats = response?.Chats ?? new List<GetMyChatsHttpResponse>();
+        }
 
-                return;
+        private async Task GetAccountStatuses()
+        {
+            var accountsIds = AccountChats.Select(ac => ac.Account.Id).DistinctBy(id => id).ToList();
+
+            var statusesResponse = await AccountService.GetAccountStatuses();
+
+            if (statusesResponse is not null && statusesResponse.IsSuccess && statusesResponse.Data != null)
+            {
+                AccountStatuses = statusesResponse.Data.Statuses.ToDictionary(s => s.Id, s => s.IsConnected);
+
+                AccountStatusLoaded = true;
+
+                UpdateAccountStatuses();
+            }
+        }
+
+        private void UpdateAccountStatuses()
+        {
+            foreach (var chat in AccountChats)
+            {
+                if (AccountStatuses.TryGetValue(chat.Account.Id, out var isConnected))
+                {
+                    chat.IsAccountConnected = isConnected;
+                }
             }
 
-            FilteredAccountChats = AccountChats = response?.Data?.Chats ?? new List<GetMyChatsHttpResponse>();
+            if(SelectedChatId != null)
+            {
+                var selectedAccountId = AccountChats.FirstOrDefault(fa => fa.ChatId == SelectedChatId).Account.Id;
+
+                var result = AccountStatuses.TryGetValue(selectedAccountId, out bool isConnected);
+
+                if(result)
+                {
+                    IsSelectedChatsAccountConnected = isConnected;
+                }
+            }    
+
+            StateHasChanged();
         }
 
         #endregion
@@ -388,6 +506,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         //Handles chat messages
         private async Task HandleMessageReceivedAsync(HandleChatHttpResponse receivedChat)
         {
+            _ = SyncMessagesFromApi(false);
+
             var chatExistInSidebar = FilteredAccountChats.Any(x => x.ChatId == receivedChat.ChatId);
 
             var notificationSound = true;
@@ -408,6 +528,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     var receivedMessage = new GeChatMessagesHttpResponse()
                     {
+                        ChatId = receivedChat.ChatId,
                         ChatMessageId = receivedChat.ChatMessageId,
                         FbMessageId  = receivedChat.FbMessageId,
                         FbMessageReplyId = receivedChat.FbMessageReplyId,
@@ -433,6 +554,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     }
 
                     ChatMessages.Add(receivedMessage);
+                    _= MarkMessagesAsRead(receivedMessage.ChatId);
                 }
             }
             else if (!chatExistInSidebar)
@@ -452,6 +574,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     StartedAt = receivedChat.StartedAt,
                     IsAccountConnected = true,
                     IsRead = false,
+                    Account = new GetMyChatAccountHttpResponse
+                    {
+                        Id = receivedChat.AccountId,
+                        Name = receivedChat.AccountName
+                    }
                 };
 
                 FilteredAccountChats.Insert(0, newChat);
@@ -470,6 +597,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             chat.FbListingTitle = receivedChat.FbListingTitle ?? string.Empty;
             chat.IsAccountConnected = true;
             chat.IsRead = receivedChat.ChatId == SelectedChatId;
+
+            AccountStatuses.TryAdd(chat.Account.Id, true);
+
+            if (chat.ChatId == SelectedChatId)
+            {
+                IsSelectedChatsAccountConnected = true;
+            }
 
             FilteredAccountChats.Remove(chat);
             chat.UnReadCount += receivedChat.IsReceived ? 1 : 0;
@@ -540,7 +674,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             //If the user is on different chat or on sidebar, then load the chat messages
             if (notificaitonFbChatId != SelectedChatId)
             {
-                await LoadChatMessage(notificaitonFbChatId);
+                await SyncAndLoadChatMessages(notificaitonFbChatId);
             }
         }
 
@@ -549,7 +683,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             // Executes when user taps a notification while the app is running
             if (!string.IsNullOrWhiteSpace(IsNotification) && ChatId != null)
             {
-                await LoadChatMessage(ChatId.Value);
+                await SyncAndLoadChatMessages(ChatId.Value);
                 return;
             }
 
@@ -575,7 +709,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 }
                 else if (chatId != null)
                 {
-                    await LoadChatMessage(chatId);
+                    await SyncAndLoadChatMessages(chatId);
                 }
             }
         }
