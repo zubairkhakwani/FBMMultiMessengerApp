@@ -1,4 +1,6 @@
-﻿namespace FBMMultiMessenger.Contracts.Contracts.Chat
+﻿using FBMMultiMessenger.Contracts.Enums;
+
+namespace FBMMultiMessenger.Contracts.Contracts.Chat
 {
     public class HandleChatHttpRequest
     {
@@ -50,18 +52,19 @@
         public string MessagePreviewFrom { get; set; } = string.Empty;
         public string? UserProfileImage { get; set; }
         public string Message { get; set; } = null!;
-        public string? MessageReply { get; set; }
-        public string? MessageReplyTo { get; set; }
         public string? OfflineUniqueId { get; set; }
         public bool IsRead { get; set; }
 
+        //The actual message
         public bool IsTextMessage { get; set; }
         public bool IsVideoMessage { get; set; }
         public bool IsImageMessage { get; set; }
         public bool IsAudioMessage { get; set; }
-
         public bool IsReceived { get; set; }
 
-        public DateTime StartedAt { get; set; }
+        //The reply message
+        public MessageReplyHttpResponse? MessageReply { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public long? FbTimestamp { get; set; }
     }
 }

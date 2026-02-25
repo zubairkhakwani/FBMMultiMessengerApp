@@ -1,5 +1,7 @@
 ﻿@page "/"
 @page "/Chat"
+@using FBMMultiMessenger.Contracts.Contracts.Chat
+@using FBMMultiMessenger.Contracts.Enums
 
 @layout EmptyLayout
 
@@ -171,10 +173,7 @@
                     </div>
                 </div>
             </div>
-
         }
-
-
 
         <div class="messages-container" id="messagesContainer" style="height:@messageContainerHeight">
             <!-- Empty state shown on desktop when no conversation is selected -->
@@ -199,8 +198,21 @@
                     var messageId = chatMessage.ChatMessageId;
                     var fbMessageReplyId = chatMessage.FbMessageReplyId;
                     var offlineUniqueId = chatMessage.OfflineUniqueId;
-                    var messageReply = chatMessage.MessageReply;
-                    var messageReplyTo = chatMessage.MessageReplyTo;
+                    var fbTimeStamp = chatMessage.FbTimeStamp;
+                    var createdAt = chatMessage.CreatedAt;
+
+                    var messageTime = fbTimeStamp is not null
+                                      ? DateTimeOffset.FromUnixTimeMilliseconds(fbTimeStamp.Value)
+                                        .LocalDateTime
+                                        .ToString("hh:mm tt")
+                                      : createdAt.ToLocalTime().ToString("hh:mm tt");
+
+                    var messageReplyObj = chatMessage.MessageReply;
+                    var replyTo = messageReplyObj?.ReplyTo;
+                    var messageReply = messageReplyObj?.Reply;
+                    var messageReplyType = messageReplyObj?.Type;
+                    var attacments = messageReplyObj?.Attachments ?? new List<MessageReplyFileHttpResponse>();
+                    attacments = attacments.Take(1).ToList(); // Facebook displays only the first attachment in a reply, even if multiple exist
                     var isReceived = chatMessage.IsReceived;
                     var messageClass = isReceived ? "received" : "sent";
                     var isSent = !isReceived;
@@ -208,12 +220,12 @@
                     var failedMessageClass = isMessageFailedToSend ? "failed" : "";
                     var scrollToBottom = chatMessage.ScrollToBottom.ToString();
                     var actionMessageKey = !string.IsNullOrWhiteSpace(offlineUniqueId)
-                                           ? offlineUniqueId
-                                           : messageId.ToString();
-                                        
+                    ? offlineUniqueId
+                    : messageId.ToString();
+
                     <div class="message
-                                               @messageClass
-                                               @failedMessageClass"
+                                @messageClass
+                                @failedMessageClass"
                          data-scroll-to-bottom="@scrollToBottom"
                          id="@messageId">
 
@@ -229,21 +241,38 @@
                                         </div>
                                     }
 
-                                    <div class="message-bubble"
-                                         @onpointerdown="() => StartHold(messageId,offlineUniqueId)"
+                                    <div class="message-bubble highlight"
+                                         @onpointerdown="() => StartHold(messageId, offlineUniqueId)"
                                          @onpointerup="CancelHold"
                                          @onpointercancel="CancelHold"
                                          @onclick:stopPropagation="true">
 
-                                        @if (!string.IsNullOrWhiteSpace(messageReply))
+                                        @if (messageReplyObj is not null)
                                         {
                                             <div class="replied-message" @onclick="() => ScrollToRepliedMessageAsync(fbMessageReplyId)">
-                                                <div class="replied-sender">@messageReplyTo</div>
-                                                <div class="replied-text">@messageReply</div>
+                                                <div class="replied-sender">@replyTo</div>
+                                                @if(messageReplyType == MessageReplyType.Text)
+                                                {
+                                                    <div class="replied-text">@messageReply</div>
+                                                }
+                                                else if(messageReplyType == MessageReplyType.Image)
+                                                {
+                                                    @foreach (var item in attacments)
+                                                    {
+                                                        <img class="reply-image-message" src="@item.Url" />
+                                                    }
+                                                }
+                                                else if(messageReplyType == MessageReplyType.Video)
+                                                {
+                                                    <div class="replied-text">Replied to video</div>
+                                                }
+                                                else
+                                                { 
+                                                    <div class="replied-text">Replied to audio</div>
+                                                }
+
                                             </div>
                                         }
-
-
                                         @if (chatMessage.IsAudioMessage)
                                         {
                                             <audio controls>
@@ -260,24 +289,52 @@
                             }
                             else
                             {
-                                <div class="message-bubble"
-                                     @onpointerdown="() => StartHold(messageId,offlineUniqueId)"
+                                <div class="message-bubble highlight"
+                                     @onpointerdown="() => StartHold(messageId, offlineUniqueId)"
                                      @onpointerup="CancelHold"
                                      @onpointercancel="CancelHold"
                                      @onclick:stopPropagation="true">
 
-                                    @if (!string.IsNullOrWhiteSpace(messageReply))
+                                    @if (messageReplyObj is not null)
                                     {
                                         <div class="replied-message" @onclick="() => ScrollToRepliedMessageAsync(fbMessageReplyId)">
-                                            <div class="replied-sender">@messageReplyTo</div>
-                                            <div class="replied-text">@messageReply</div>
+                                            <div class="replied-sender">@replyTo</div>
+                                            @if (messageReplyType == MessageReplyType.Text)
+                                            {
+                                                <div class="replied-text">@messageReply</div>
+                                            }
+                                            else if (messageReplyType == MessageReplyType.Image)
+                                            {
+                                                @foreach (var item in attacments)
+                                                {
+                                                    <img class="reply-image-message" src="@item.Url" />
+                                                }
+                                            }
+                                            else if (messageReplyType == MessageReplyType.Video)
+                                            {
+                                                <div class="replied-text">Replied to video</div>
+                                            }
+                                            else
+                                            {
+                                                <div class="replied-text">Replied to audio</div>
+                                            }
+
                                         </div>
                                     }
-                                    <span class="message-text">@chatMessage.Message</span>
+                                    @if (chatMessage.IsAudioMessage)
+                                    {
+                                        <audio controls>
+                                            <source src="@chatMessage.Message" type="audio/mpeg">
+                                            Your browser does not support the audio tag.
+                                        </audio>
+                                    }else{
+                                        <span class="message-text">@chatMessage.Message</span>
+                                    }
+                                   
                                 </div>
                             }
                             <div class="message-footer">
-                                <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
+                                <span class="message-time">@messageTime</span>
                                 @if (isSent)
                                 {
                                     @if (chatMessage.Sending && !isMessageFailedToSend)
@@ -307,7 +364,6 @@
                         {
                             var filesCount = chatMessage.FileData.Count;
                             var imageWidthStyle = "width: " + (filesCount == 1 ? 429 : filesCount == 2 ? 190 : 125) +"px";
-
                             <div class="message-row @messageClass">
                                 @for (int j = 0; j < chatMessage.FileData.Count; j++)
                                 {
@@ -327,7 +383,36 @@
                                             <img class="profile-picture" src="@UserProfileImage" />
                                         </div>
                                     }
-                                    @if (file.IsVideo)
+                                    //here if we want to add the message bubble class we can
+                                    <div class="highlight">
+                                        @if (messageReplyObj is not null)
+                                        {
+                                            <div class="replied-message" @onclick="() => ScrollToRepliedMessageAsync(fbMessageReplyId)">
+                                                <div class="replied-sender">@replyTo</div>
+                                                @if (messageReplyType == MessageReplyType.Text)
+                                                {
+                                                    <div class="replied-text">@messageReply</div>
+                                                }
+                                                else if (messageReplyType == MessageReplyType.Image)
+                                                {
+                                                    @foreach (var item in attacments)
+                                                    {
+                                                        <img class="reply-image-message" src="@item.Url" />
+                                                    }
+                                                }
+                                                else if (messageReplyType == MessageReplyType.Video)
+                                                {
+                                                    <div class="replied-text">Replied to video</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="replied-text">Replied to audio</div>
+                                                }
+
+                                            </div>
+                                        }
+
+                                          @if (file.IsVideo)
                                     {
                                         <video width="320" height="240" controls>
                                             <source src="@(file.PreviewUrl + "#t=0.001")" type="video/mp4">
@@ -341,10 +426,13 @@
                                              src="@file.PreviewUrl"
                                              style="@imageWidthStyle" />
                                     }
+                                    </div>
+                                  
                                 }
                             </div>
+
                             <div class="message-footer">
-                                <span class="message-time">@chatMessage.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
+                                <span class="message-time">@messageTime</span>
                                 @if (isSent)
                                 {
                                     @if (chatMessage.Sending && !isMessageFailedToSend)
@@ -366,7 +454,6 @@
                                         </span>
                                     }
                                 }
-
                             </div>
                         }
 
@@ -374,11 +461,11 @@
                         <div class="actions-menu @(ActionsMenuMessageKey == actionMessageKey ? "show" : "")">
                             @if (!string.IsNullOrWhiteSpace(chatMessage.FbMessageId))
                             {
-                                <span class="action-btn" data-tooltip="Reply" @onclick="() => HandleMessageReply(actionMessageKey,showMessageReply: true)">
+                                @* <span class="action-btn" data-tooltip="Reply" @onclick="() => HandleMessageReply(actionMessageKey, showMessageReply: true)">
                                     <svg viewBox="0 0 24 24">
                                         <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
                                     </svg>
-                                </span>                                
+                                </span> *@
                             }
 
                             @if (chatMessage.IsTextMessage)
@@ -484,9 +571,9 @@
                              Color="@Color.Error"
                              Size="@Size.Large"
                              Style="background-color: rgba(0, 0, 0, 0.45);
-                                                                                                                                                                padding: 5px;
-                                                                                                                                                                border-radius:100px;
-                                                                                                                                                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
+                                                                                                                                                                                                                padding: 5px;
+                                                                                                                                                                                                                border-radius:100px;
+                                                                                                                                                                                                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 

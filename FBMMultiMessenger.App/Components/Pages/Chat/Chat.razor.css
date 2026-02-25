@@ -380,7 +380,7 @@ body {
     display: flex;
     margin-bottom: 8px;
     flex-direction: column;
-    max-width: 70%;
+    max-width: 48%;
     position: relative;
 }
 
@@ -389,12 +389,18 @@ body {
         max-width: 100%;
     }
 
+.reply-image-message {
+    display: block;
+    max-width: 100%;
+    width: 100px;
+}
 
 
-    .message.sent {
-        align-items: flex-end;
-        margin-left: auto;
-    }
+
+.message.sent {
+    align-items: flex-end;
+    margin-left: auto;
+}
 
 .not-clickable {
     pointer-events: none;
@@ -1083,6 +1089,8 @@ body {
     font-size: 12px;
     opacity: 0.8;
     cursor: pointer;
+    max-width: max-content;
+    width: 300px;
 }
 
     .replied-message:hover {
@@ -1106,11 +1114,13 @@ body {
 }
 
 .replied-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: inherit;
     opacity: 0.9;
 }
 
-.message-highlight .message-bubble {
+.message-highlight{
     background-color: rgba(0, 132, 255, 0.18) !important;
     box-shadow: 0 0 0 4px rgba(0, 132, 255, 0.15);
     animation: highlightPop 0.35s ease;

@@ -28,4 +28,12 @@ namespace FBMMultiMessenger.Contracts.Enums
         Account = 3,
         System = 4
     }
+
+    public enum MessageReplyType
+    {
+        Text = 1,
+        Image = 2,
+        Video = 3,
+        Audio = 4
+    }
 }

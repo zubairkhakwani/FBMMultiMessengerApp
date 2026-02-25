@@ -161,6 +161,7 @@
 
     window.ScrollToRepliedMessage = (messageId) => {
         let replyMessage = document.getElementById(messageId);
+        let messageBubble = replyMessage.querySelector(".highlight");
 
         if (!replyMessage) {
             console.warn(`Message reply not found`);
@@ -173,15 +174,15 @@
         });
 
         // Remove previous highlight if any
-        replyMessage.classList.remove("message-highlight");
+        messageBubble?.classList.remove("message-highlight");
 
         // Add highlight class
-        replyMessage.classList.add('message-highlight');
+        messageBubble?.classList.add('message-highlight');
 
 
         // Remove all classes after animation completes
         setTimeout(() => {
-            replyMessage.classList.remove('message-highlight');
+            messageBubble?.classList.remove('message-highlight');
         }, 1200);
     };
 })();
