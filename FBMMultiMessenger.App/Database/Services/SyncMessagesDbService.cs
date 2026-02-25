@@ -220,5 +220,14 @@ namespace FBMMultiMessenger.Database.Services
                 _syncLock.Release();
             }
         }
+
+        public async Task WipeLocalDb()
+        {
+            using var db = dbFactory.CreateDbContext();
+            await db.Chats.ExecuteDeleteAsync();
+            await db.Accounts.ExecuteDeleteAsync();   // reset sync point too
+            await db.ChatMessages.ExecuteDeleteAsync();
+            await db.SyncMeta.ExecuteDeleteAsync();   // reset sync point too
+        }
     }
 }

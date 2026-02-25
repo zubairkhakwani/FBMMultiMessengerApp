@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using OneSignalSDK.DotNet;
 using FBMMultiMessenger.Contracts.Response;
+using FBMMultiMessenger.Database.Services;
 
 namespace FBMMultiMessenger.Components.Pages.Auth
 {
@@ -22,6 +23,9 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
         [Inject]
         private ITokenProvider TokenProvider { get; set; }
+
+        [Inject]
+        private SyncMessagesDbService syncMessagesDbService { get; set; }
 
         [Inject]
         AuthenticationStateProvider AuthenticationStateProvider { get; set; }
@@ -61,6 +65,8 @@ namespace FBMMultiMessenger.Components.Pages.Auth
 
             if (response.IsSuccess)
             {
+                await syncMessagesDbService.WipeLocalDb();
+
                 Navigation.NavigateTo("/Chat", new NavigationOptions
                 {
                     ReplaceHistoryEntry = true
