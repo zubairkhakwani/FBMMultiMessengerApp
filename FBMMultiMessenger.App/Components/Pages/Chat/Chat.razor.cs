@@ -460,8 +460,6 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task GetAccountStatuses()
         {
-            var accountsIds = AccountChats.Select(ac => ac.Account.Id).DistinctBy(id => id).ToList();
-
             var statusesResponse = await AccountService.GetAccountStatuses();
 
             if (statusesResponse is not null && statusesResponse.IsSuccess && statusesResponse.Data != null)
