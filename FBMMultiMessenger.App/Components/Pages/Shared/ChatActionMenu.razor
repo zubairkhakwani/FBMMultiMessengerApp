@@ -24,6 +24,14 @@
             <div class="chat-menu-icon"><i class="fa fa-id-badge"></i></div>
             <span>View @(string.IsNullOrWhiteSpace(ProfileName) ? "Profile" : $"{ProfileName}'s Profile")</span>
         </div>
+
+        @if(!string.IsNullOrWhiteSpace(ListingId))
+        {
+            <div class="chat-menu-item" @onclick="ViewListing">
+                <div class="chat-menu-icon"><i class="fa fa-id-badge"></i></div>
+                <span>View Listing</span>
+            </div>
+        }
     </div>
 
 </div>

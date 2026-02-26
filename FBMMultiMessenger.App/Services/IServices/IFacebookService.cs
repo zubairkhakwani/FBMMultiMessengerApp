@@ -2,6 +2,6 @@
 {
     internal interface IFacebookService
     {
-        Task OpenProfile(string profileId);
+        Task OpenLink(string profileId);
     }
 }

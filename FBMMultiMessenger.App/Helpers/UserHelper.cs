@@ -13,6 +13,7 @@
         public static int RemainingDaysCount { get; set; }
 
         public static bool IsCurrentTrialSubscription { get; set; }
+        public static bool HasActiveSubscription { get; set; }
         public static DateTime JoinedAt { get; set; }
 
         public static string Avatar => GetShortName(Name);
