@@ -130,7 +130,7 @@
         <!--  Chat header for the active conversation. Shows listing image,title,location/price and a back button on mobile for navigation.  -->
         @if (SelectedChatId is not null)
         {
-            var accountStatus = IsSelectedChatsAccountConnected ? "active" : "inactive";
+            var accountStatus = AccountStatusLoaded ? IsSelectedChatsAccountConnected ? "active" : "inactive" : "loading";
 
             <div class="chat-header-container">
                 @if (PlatformHelper.IsMobilePlatform)
@@ -202,10 +202,10 @@
                     var createdAt = chatMessage.CreatedAt;
 
                     var messageTime = fbTimeStamp is not null
-                                      ? DateTimeOffset.FromUnixTimeMilliseconds(fbTimeStamp.Value)
-                                        .LocalDateTime
-                                        .ToString("hh:mm tt")
-                                      : createdAt.ToLocalTime().ToString("hh:mm tt");
+                    ? DateTimeOffset.FromUnixTimeMilliseconds(fbTimeStamp.Value)
+                    .LocalDateTime
+                    .ToString("hh:mm tt")
+                    : createdAt.ToLocalTime().ToString("hh:mm tt");
 
                     var messageReplyObj = chatMessage.MessageReply;
                     var replyTo = messageReplyObj?.ReplyTo;
@@ -224,8 +224,8 @@
                     : messageId.ToString();
 
                     <div class="message
-                                @messageClass
-                                @failedMessageClass"
+                                        @messageClass
+                                        @failedMessageClass"
                          data-scroll-to-bottom="@scrollToBottom"
                          id="@messageId">
 
@@ -251,23 +251,23 @@
                                         {
                                             <div class="replied-message" @onclick="() => ScrollToRepliedMessageAsync(fbMessageReplyId)">
                                                 <div class="replied-sender">@replyTo</div>
-                                                @if(messageReplyType == MessageReplyType.Text)
+                                                @if (messageReplyType == MessageReplyType.Text)
                                                 {
                                                     <div class="replied-text">@messageReply</div>
                                                 }
-                                                else if(messageReplyType == MessageReplyType.Image)
+                                                else if (messageReplyType == MessageReplyType.Image)
                                                 {
                                                     @foreach (var item in attacments)
                                                     {
                                                         <img class="reply-image-message" src="@item.Url" />
                                                     }
                                                 }
-                                                else if(messageReplyType == MessageReplyType.Video)
+                                                else if (messageReplyType == MessageReplyType.Video)
                                                 {
                                                     <div class="replied-text">Replied to video</div>
                                                 }
                                                 else
-                                                { 
+                                                {
                                                     <div class="replied-text">Replied to audio</div>
                                                 }
 
@@ -327,10 +327,12 @@
                                             <source src="@chatMessage.Message" type="audio/mpeg">
                                             Your browser does not support the audio tag.
                                         </audio>
-                                    }else{
+                                    }
+                                    else
+                                    {
                                         <span class="message-text">@chatMessage.Message</span>
                                     }
-                                   
+
                                 </div>
                             }
                             <div class="message-footer">
@@ -412,22 +414,22 @@
                                             </div>
                                         }
 
-                                          @if (file.IsVideo)
-                                    {
-                                        <video width="320" height="240" controls>
-                                            <source src="@(file.PreviewUrl + "#t=0.001")" type="video/mp4">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    }
-                                    else
-                                    {
-                                        <img @onclick="() => ShowCarousal(chatMessage.FileData, file.PreviewUrl)"
-                                             class="image-message @((file.IsEmoji || file.IsSticker) ? "not-clickable" : "clickable")"
-                                             src="@file.PreviewUrl"
-                                             style="@imageWidthStyle" />
-                                    }
+                                        @if (file.IsVideo)
+                                        {
+                                            <video width="320" height="240" controls>
+                                                <source src="@(file.PreviewUrl + "#t=0.001")" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        }
+                                        else
+                                        {
+                                            <img @onclick="() => ShowCarousal(chatMessage.FileData, file.PreviewUrl)"
+                                                 class="image-message @((file.IsEmoji || file.IsSticker) ? "not-clickable" : "clickable")"
+                                                 src="@file.PreviewUrl"
+                                                 style="@imageWidthStyle" />
+                                        }
                                     </div>
-                                  
+
                                 }
                             </div>
 
@@ -571,9 +573,9 @@
                              Color="@Color.Error"
                              Size="@Size.Large"
                              Style="background-color: rgba(0, 0, 0, 0.45);
-                                                                                                                                                                                                                padding: 5px;
-                                                                                                                                                                                                                border-radius:100px;
-                                                                                                                                                                                                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
+                                                                                                                                                                                                                        padding: 5px;
+                                                                                                                                                                                                                        border-radius:100px;
+                                                                                                                                                                                                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)" />
                 </div>
                 <div class="d-flex flex-column flex-column justify-center align-center" style="height:100%">
 
