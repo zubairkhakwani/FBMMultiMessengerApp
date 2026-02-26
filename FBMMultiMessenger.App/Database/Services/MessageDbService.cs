@@ -208,10 +208,17 @@ namespace FBMMultiMessenger.Database.Services
             }
             else
             {
-                if (source.Message.TrimStart().StartsWith("["))
+                if (source.Message.TrimStart().StartsWith("[") && source.Message.TrimStart().EndsWith("]"))
                 {
-                    messages = JsonSerializer.Deserialize<List<string>>(source.Message)
+                    try
+                    {
+                        messages = JsonSerializer.Deserialize<List<string>>(source.Message)
                                ?? new List<string> { source.Message };
+                    }
+                    catch(Exception ex)
+                    {
+                        messages = new List<string> { source.Message };
+                    }
                 }
                 else
                 {
