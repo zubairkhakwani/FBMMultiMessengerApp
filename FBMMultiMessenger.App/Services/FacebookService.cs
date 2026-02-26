@@ -5,16 +5,16 @@ namespace FBMMultiMessenger.Services
 {
     public class FacebookService : IFacebookService
     {
-        public async Task OpenProfile(string profileId)
+        public async Task OpenLink(string link)
         {
 #if ANDROID
-            await OpenProfileAndriod(profileId);
+            await OpenProfileAndriod(link);
 #elif WINDOWS
-            await OpenProfileWindows(profileId);
+            await OpenProfileWindows(link);
 #endif
         }
 
-        private async Task OpenProfileAndriod(string profileId)
+        private async Task OpenProfileAndriod(string link)
         {
 #if ANDROID
             await MainThread.InvokeOnMainThreadAsync(() =>
@@ -36,7 +36,7 @@ namespace FBMMultiMessenger.Services
                 // Use custom WebViewClient
                 webView.SetWebViewClient(new FacebookWebViewClient());
 
-                webView.LoadUrl($"https://m.facebook.com/{profileId}");
+                webView.LoadUrl(link);
 
                 // Close button
                 var closeButton = new Android.Widget.Button(activity) { Text = "✕" };
@@ -57,12 +57,12 @@ namespace FBMMultiMessenger.Services
         }
 
 
-        private async Task OpenProfileWindows(string profileId)
+        private async Task OpenProfileWindows(string link)
         {
 
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                var url = $"https://www.facebook.com/{profileId}";
+                var url = link;
 
                 try
                 {

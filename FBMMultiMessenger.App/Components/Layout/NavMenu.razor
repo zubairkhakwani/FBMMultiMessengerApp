@@ -55,6 +55,16 @@
                 </NavLink>
             </div>
 
+            @if (UserHelper.IsCurrentTrialSubscription || !UserHelper.HasActiveSubscription)
+            {
+                <div class="slideable">
+                    <NavLink href="/pricing" class="nav-link">
+                       <i class="fas fa-user"></i>
+                        <span>Packages</span>
+                    </NavLink>
+                </div>
+            }
+
             <div class="nav-link slideable" @onclick="Logout">
                 <i class="fa fa-sign-out-alt"></i>
                 <span>Logout</span>

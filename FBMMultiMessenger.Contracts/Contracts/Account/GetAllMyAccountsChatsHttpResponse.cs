@@ -10,6 +10,7 @@
         public int ChatId { get; set; } //Primary key of this chat table
         public string FbChatId { get; set; } = null!;
         public string? FbListingTitle { get; set; }
+        public string? FbListingId { get; set; }
         public string? FbListingImage { get; set; }
         public string? UserProfileImage { get; set; }
         public string? FbListingLocation { get; set; }

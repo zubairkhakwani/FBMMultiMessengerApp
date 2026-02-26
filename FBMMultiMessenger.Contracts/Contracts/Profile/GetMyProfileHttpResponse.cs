@@ -8,6 +8,7 @@
 
         public string StartedAt { get; set; } = string.Empty;
         public string ExpiredAt { get; set; } = string.Empty;
+        public bool HasActiveSubscription { get; set; }
         public string RemainingTimeText { get; set; } = string.Empty;
         public int RemainingDaysCount { get; set; }
 

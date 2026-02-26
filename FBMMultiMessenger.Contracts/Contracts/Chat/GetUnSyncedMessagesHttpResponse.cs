@@ -8,6 +8,7 @@ namespace FBMMultiMessenger.Contracts.Contracts.Chat
 {
     public class GetUnSyncedMessagesHttpResponse
     {
+        public bool HasActiveSubscription { get; set; }
         public List<SyncAccount> Accounts { get; set; }
         public List<SyncChat> Chats { get; set; }
         public DateTimeOffset LastSyncedAt { get; set; }

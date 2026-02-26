@@ -106,7 +106,7 @@ namespace FBMMultiMessenger
                     options.AddPolicy("ValidSubscription", policy =>
                     {
                         policy.RequireAuthenticatedUser(); // This will fail if token doesn't exist
-                        policy.AddRequirements(new ActiveSubscriptionRequirement());
+                        //policy.AddRequirements(new ActiveSubscriptionRequirement());
                     });
                 });
 

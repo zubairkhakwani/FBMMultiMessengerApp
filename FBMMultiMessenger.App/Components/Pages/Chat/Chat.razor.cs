@@ -121,6 +121,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private string? SelectedAccountName;
         private string? ChattingWithName;
         private string? ChattingWithId;
+        private string? CurrentChatListingId;
         private bool IsSelectedChatsAccountConnected;
         private string? SelectedChatListingTitle;
         private string? SelectedChatListingImage;
@@ -131,6 +132,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         private bool ShowChatMenuAction;
 
         private bool AccountStatusLoaded = false;
+        private bool HasActiveSubscription = true;
 
         private bool ShowMessageReply;
         private string MessageReply = string.Empty;
@@ -198,11 +200,39 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         private async Task SyncMessagesFromApi(bool updateUI = true)
         {
+            //once HasActiveSubscription set to false it will not try for syncing..
+            if (!HasActiveSubscription)
+            {
+                return;
+            }
+
             try
             {
                 var date = await SyncMessageDbService.GetLastSyncDateTime();
 
                 var newChats = await SyncMessagesService.GetUnSyncedMessages(date);
+
+                if(!newChats.IsSuccess && !newChats.Data.HasActiveSubscription)
+                {
+                    var message = !string.IsNullOrWhiteSpace(newChats.Message) ? newChats.Message : "You can only view your old messages, but new messages will only be shown when you have an active subscription";
+
+                    var options = new SweetAlertOptions
+                    {
+                        Title = $"No active subscription..",
+                        Message = message,
+                        Icon = "info",
+                        ConfirmButtonText = "Okay",
+                        ShowCancelButton = false
+                    };
+
+
+                    await JS.InvokeVoidAsync("myInterop.showSweetAlert", options);
+                    HasActiveSubscription = false;
+
+                    StateHasChanged();
+
+                    return;
+                }
 
                 if (newChats.IsSuccess && newChats.Data != null && (newChats.Data.Chats.Any() || newChats.Data.Accounts.Any()))
                 {
@@ -588,6 +618,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     StartedAt = receivedChat.CreatedAt,
                     IsAccountConnected = true,
                     IsRead = false,
+                    FbListingId = receivedChat.FbListingId,
                     Account = new GetMyChatAccountHttpResponse
                     {
                         Id = receivedChat.AccountId,
@@ -609,6 +640,11 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             chat.SenderName = receivedChat.MessagePreviewFrom;
             chat.FbListingImage = receivedChat.FbListingImage;
             chat.FbListingTitle = receivedChat.FbListingTitle ?? string.Empty;
+            if(!string.IsNullOrWhiteSpace(receivedChat.FbListingId))
+            {
+                chat.FbListingId = receivedChat.FbListingId;
+                CurrentChatListingId = receivedChat.FbListingId;
+            }
             chat.IsAccountConnected = true;
             chat.IsRead = receivedChat.ChatId == SelectedChatId;
 
@@ -904,6 +940,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 SelectedChatListingImage = chat.FbListingImage;
                 ChattingWithName = chat.ChattingWithName;
                 ChattingWithId = chat.ChattingWithId;
+                CurrentChatListingId = chat.FbListingId;
             }
         }
 

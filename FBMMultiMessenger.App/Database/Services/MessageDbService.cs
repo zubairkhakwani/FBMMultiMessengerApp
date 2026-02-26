@@ -178,6 +178,7 @@ namespace FBMMultiMessenger.Database.Services
                     ChatId = x.Id,
                     FbChatId = x.FBChatId!,
                     FbListingTitle = x.FbListingTitle,
+                    FbListingId = x.FbListingId,
                     FbListingLocation = x.FbListingLocation,
                     FbListingPrice = x.FbListingPrice,
                     FbListingImage = x.FBListingImage,
