@@ -183,7 +183,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             await ConfigurePushNotifications();
 
-            while(true)
+            while (true)
             {
                 try
                 {
@@ -191,7 +191,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
                     break;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     await Task.Delay(200);
                 }
@@ -212,7 +212,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
                 var newChats = await SyncMessagesService.GetUnSyncedMessages(date);
 
-                if(!newChats.IsSuccess && !newChats.Data.HasActiveSubscription)
+                if (!newChats.IsSuccess && newChats.Data != null && !newChats.Data.HasActiveSubscription)
                 {
                     var message = !string.IsNullOrWhiteSpace(newChats.Message) ? newChats.Message : "You can only view your old messages, but new messages will only be shown when you have an active subscription";
 
@@ -237,21 +237,21 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 if (newChats.IsSuccess && newChats.Data != null && (newChats.Data.Chats.Any() || newChats.Data.Accounts.Any()))
                 {
                     var success = await SyncMessageDbService.UpdateDbMessagesFromAPI(newChats.Data);
-                    if(success)
+                    if (success)
                     {
                         await SyncMessageDbService.UpdateLastSyncDateTime(newChats.Data.LastSyncedAt);
                     }
 
-                    if(updateUI)
+                    if (updateUI)
                     {
                         await GetAccountChats();
-                        
-                        if(AccountStatusLoaded)
+
+                        if (AccountStatusLoaded)
                         {
                             UpdateAccountStatuses();
                         }
 
-                        if(SelectedChatId  != null && newChats.Data.Chats.Any(c => c.Id == SelectedChatId.Value))
+                        if (SelectedChatId  != null && newChats.Data.Chats.Any(c => c.Id == SelectedChatId.Value))
                         {
                             await LoadChatMessage(SelectedChatId.Value);
                         }
@@ -260,13 +260,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
         }
 
-            
+
         #region Domain Logic
 
         private async Task SyncAndLoadChatMessages(int chatId)
@@ -516,17 +516,17 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 }
             }
 
-            if(SelectedChatId != null)
+            if (SelectedChatId != null)
             {
                 var selectedAccountId = AccountChats.FirstOrDefault(fa => fa.ChatId == SelectedChatId).Account.Id;
 
                 var result = AccountStatuses.TryGetValue(selectedAccountId, out bool isConnected);
 
-                if(result)
+                if (result)
                 {
                     IsSelectedChatsAccountConnected = isConnected;
                 }
-            }    
+            }
 
             StateHasChanged();
         }
@@ -540,7 +540,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             var currentUserId = $"App_{CurrentUser.Id}";
 
-            await SignalRService.ConnectAsync(currentUserId);
+            await SignalRService.ConnectAsync(currentUserId, _apiCts.Token);
 
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnHandleMessage += HandleMessageReceivedAsync;
@@ -640,7 +640,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
             chat.SenderName = receivedChat.MessagePreviewFrom;
             chat.FbListingImage = receivedChat.FbListingImage;
             chat.FbListingTitle = receivedChat.FbListingTitle ?? string.Empty;
-            if(!string.IsNullOrWhiteSpace(receivedChat.FbListingId))
+            if (!string.IsNullOrWhiteSpace(receivedChat.FbListingId))
             {
                 chat.FbListingId = receivedChat.FbListingId;
                 CurrentChatListingId = receivedChat.FbListingId;
