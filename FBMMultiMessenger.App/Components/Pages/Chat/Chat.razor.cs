@@ -164,13 +164,13 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             AddEventListneres();
 
-            CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
-
-            _ = ConnectToSignalR();
-
             await GetAccountChats();
 
             StateHasChanged();
+
+            CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
+
+            _ = ConnectToSignalR();
 
             await GetAccountStatuses();
 
@@ -485,7 +485,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
         public async Task GetAccountChats()
         {
-            var response = await MessageDbService.GetAllChats(CurrentUser.Id);
+            var response = await MessageDbService.GetAllChats(CurrentUser?.Id);
 
             IsChatsLoading = false;
 

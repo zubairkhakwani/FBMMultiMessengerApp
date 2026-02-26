@@ -144,14 +144,18 @@ namespace FBMMultiMessenger.Database.Services
             return result;
         }
 
-        public async Task<GetAllMyAccountsChatsHttpResponse> GetAllChats(int currentUserId)
+        public async Task<GetAllMyAccountsChatsHttpResponse> GetAllChats(int? currentUserId)
         {
+            //currentUserId == null check in where clause, because in case of inital chat load we are
+            //loading before currentuser loaded, because sometimes currentuser will take 2,3 seconds
+            //and from our side we make sure only current logged in user messages is saved, it is just extra level check.
+
             using var db = dbFactory.CreateDbContext();
             var chats = await db.Chats
                 .Include(a => a.Account)
                 .Include(cm => cm.ChatMessages)
                 .AsNoTracking()
-                .Where(u => u.UserId == currentUserId)
+                .Where(u => currentUserId == null || currentUserId == 0 || u.UserId == currentUserId)
                 .OrderByDescending(x => x.ChatMessages.Max(cm => (long?)cm.FBTimestamp))
                 .ToListAsync();
 
