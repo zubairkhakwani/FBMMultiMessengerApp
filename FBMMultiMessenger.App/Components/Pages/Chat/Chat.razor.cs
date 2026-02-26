@@ -409,6 +409,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             PreviewMediaFiles.Clear();
 
+            StateHasChanged();
+
             foreach (var chat in messages)
             {
                 //This is to call API 
@@ -446,6 +448,8 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                     Snackbar.Add(response?.Message ?? "Hmm, looks like something went wrong please contact administrator.", Severity.Error);
                 }
             }
+
+            StateHasChanged();
         }
 
 
