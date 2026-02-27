@@ -168,6 +168,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             StateHasChanged();
 
+            Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
 
             _ = ConnectToSignalR();
@@ -195,6 +196,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     await Task.Delay(200);
                 }
+            }
+        }
+
+        private void Connectivity_ConnectivityChanged(object? sender, ConnectivityChangedEventArgs e)
+        {
+            if (e.NetworkAccess == NetworkAccess.Internet)
+            {
+                _= SyncMessagesFromApi();
             }
         }
 

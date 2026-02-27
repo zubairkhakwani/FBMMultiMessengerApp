@@ -18,6 +18,8 @@ namespace FBMMultiMessenger.SignalR
         private bool _shouldReconnect = true;
         private string userId;
 
+        private Func<Exception?, Task>? _closedHandler;
+
         public SignalRService(IConfiguration configuration)
         {
             _baseURL = configuration.GetValue<string>("Urls:BaseUrl")!;
@@ -94,13 +96,15 @@ namespace FBMMultiMessenger.SignalR
                 }
             });
 
-            _hubConnection.Closed += async (error) =>
+            _closedHandler = async (error) =>
             {
                 if (_shouldReconnect)
                 {
                     await AttemptReconnect();
                 }
             };
+
+            _hubConnection.Closed += _closedHandler;
 
         }
 
@@ -139,6 +143,11 @@ namespace FBMMultiMessenger.SignalR
 
             if (_hubConnection != null)
             {
+                if (_closedHandler != null)
+                {
+                    _hubConnection.Closed -= _closedHandler;
+                }
+
                 await _hubConnection.StopAsync();
                 await _hubConnection.DisposeAsync();
                 _hubConnection = null;
