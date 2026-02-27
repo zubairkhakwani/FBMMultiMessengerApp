@@ -39,7 +39,6 @@ namespace FBMMultiMessenger.SignalR
         public async Task ConnectAsync(string userId)
         {
             this.userId = userId;
-            _shouldReconnect = true;
 
             while (true)
             {
@@ -49,7 +48,6 @@ namespace FBMMultiMessenger.SignalR
                     if (_hubConnection != null)
                     {
                         await DisconnectAsync();
-                        _shouldReconnect = true;
                     }
 
                     _hubConnection = new HubConnectionBuilder()
@@ -59,6 +57,9 @@ namespace FBMMultiMessenger.SignalR
                     RegisterEvents();
 
                     await _hubConnection.StartAsync();
+                    
+                    _shouldReconnect = true;
+
                     await _hubConnection.SendAsync("RegisterApp", $"{userId}");
 
                     //successfully connected, so breaking loop. if not connected it throw exception and while loop runs again.
@@ -141,6 +142,7 @@ namespace FBMMultiMessenger.SignalR
                 await _hubConnection.StopAsync();
                 await _hubConnection.DisposeAsync();
                 _hubConnection = null;
+                await Task.Delay(500);
             }
         }
     }
