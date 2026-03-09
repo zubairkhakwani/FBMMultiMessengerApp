@@ -3,6 +3,7 @@ using System;
 using FBMMultiMessenger.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FBMMultiMessenger.Migrations
 {
     [DbContext(typeof(MessengerDbContext))]
-    partial class MessengerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260304073214_UniqueIndexUpdatedInChatTable")]
+    partial class UniqueIndexUpdatedInChatTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.13");
@@ -164,9 +167,6 @@ namespace FBMMultiMessenger.Migrations
                     b.HasIndex("ChatId");
 
                     b.HasIndex("FBTimestamp");
-
-                    b.HasIndex("FbMessageId", "ChatId")
-                        .IsUnique();
 
                     b.ToTable("ChatMessages");
                 });
