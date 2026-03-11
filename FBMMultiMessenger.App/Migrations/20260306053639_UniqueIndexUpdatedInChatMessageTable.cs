@@ -10,7 +10,12 @@ namespace FBMMultiMessenger.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.Sql(@"DELETE FROM ChatMessages
+WHERE Id NOT IN (
+    SELECT MIN(Id)
+    FROM ChatMessages
+    GROUP BY FbMessageId, ChatId
+);");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatMessages_FbMessageId_ChatId",

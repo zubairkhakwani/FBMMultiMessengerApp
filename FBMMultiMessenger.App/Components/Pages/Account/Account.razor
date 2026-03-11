@@ -8,7 +8,7 @@
     <div class="accounts-toolbar">
 
         <!-- Header -->
-        <div class="main-toolbar">
+        @* <div class="main-toolbar">
             <h2 style="color: #333; margin: 0;">Accounts Management</h2>
             <div class="toolbar-left">
                 <button @onclick="AddNewAccountAsync" class="btn btn-primary btn-hide-mobile">
@@ -22,7 +22,7 @@
                     Download Format
                 </button>
             </div>
-        </div>
+        </div> *@
 
         <!-- FILTER BAR: Search & Filters -->
         <div class="filter-bar">
@@ -122,7 +122,7 @@
                     <MudMenu Icon="@Icons.Material.Filled.MoreHoriz" Dense="true" AnchorOrigin="Origin.BottomLeft" Style="align-self: auto;">
                         <MudPaper Style="min-width: 200px; max-width: 235px; box-shadow:none !important; padding:0 8px;">
 
-                            <MudButton OnClick="@(e => ConnectAccount(context.Id))"
+                            @* <MudButton OnClick="@(e => ConnectAccount(context.Id))"
                                        Size="Size.Small"
                                        StartIcon="@Icons.Material.Filled.OpenInBrowser"
                                        Color="Color.Success"
@@ -141,7 +141,7 @@
                                        FullWidth="true"
                                        Style="justify-content: flex-start; text-transform: none; min-height: 32px;">
                                 <span style="margin-left: 8px;">Edit</span>
-                            </MudButton>
+                            </MudButton> *@
 
                             <MudButton OnClick="@(e => RemoveAccountAsync(new List<int> { context.Id }))"
                                        Size="Size.Small"
@@ -169,9 +169,9 @@
         </PagerContent>
     </MudTable>
 
-    <button @onclick="AddNewAccountAsync" class="floating-add-button">
+    @* <button @onclick="AddNewAccountAsync" class="floating-add-button">
         <i class="fa-solid fa-plus"></i>
-    </button>
+    </button> *@
 </MudPaper>
 
 

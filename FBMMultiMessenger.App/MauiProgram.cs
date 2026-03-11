@@ -138,6 +138,7 @@ namespace FBMMultiMessenger
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
 
                 throw;
             }
