@@ -1,0 +1,136 @@
+@page "/api-keys"
+@layout MainLayout
+@attribute [Authorize]
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>API Keys</h1>
+        <p>Your personal key for connecting the FBM Multi Messenger browser extension to your account.</p>
+    </div>
+
+    <div class="cards-grid">
+
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">🔑</div>
+                <h3>Your API Key</h3>
+            </div>
+
+            @if (IsLoading)
+            {
+                <div class="state-block">
+                    <div class="loader"></div>
+                    <p class="state-text">Loading your API key...</p>
+                </div>
+            }
+            else if (!HasApiKey)
+            {
+                <div class="state-block">
+                    <p class="state-text">
+                        You have not generated an API key yet. Generate one to authenticate the
+                        FBM Multi Messenger browser extension without entering your account password.
+                    </p>
+                </div>
+
+                @if (ShowActionLoader)
+                {
+                    <button disabled class="btn-primary">
+                        <div class="loader"></div>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn-primary" @onclick="GenerateApiKeyAsync">Generate API Key</button>
+                }
+            }
+            else
+            {
+                <div class="form-group">
+                    <label class="form-label" for="apiKey">Secret key</label>
+                    <div class="key-field">
+                        <input id="apiKey"
+                               type="text"
+                               class="form-input key-input"
+                               value="@DisplayedKey"
+                               readonly />
+
+                        <button type="button"
+                                class="key-action"
+                                title="@(IsKeyVisible ? "Hide key" : "Reveal key")"
+                                @onclick="ToggleKeyVisibility">
+                            <i class="@(IsKeyVisible ? "fa-regular fa-eye-slash" : "fa-regular fa-eye")"></i>
+                        </button>
+
+                        <button type="button"
+                                class="key-action"
+                                title="Copy key"
+                                @onclick="CopyApiKeyAsync">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stat-list">
+                    <div class="stat-item">
+                        <span class="stat-label">Status</span>
+                        <span class="stat-value @(IsKeyActive ? "status-active" : "status-inactive")">
+                            @(IsKeyActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Created</span>
+                        <span class="stat-value">@CreatedAt</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Last updated</span>
+                        <span class="stat-value">@UpdatedAt</span>
+                    </div>
+                </div>
+
+                <div class="regenerate-block">
+                    <p class="state-text">
+                        Lost your key or think it has been exposed? Regenerating issues a new key and
+                        immediately invalidates the current one.
+                    </p>
+
+                    @if (ShowActionLoader)
+                    {
+                        <button disabled class="btn-primary">
+                            <div class="loader"></div>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn-primary" @onclick="RegenerateApiKeyAsync">Regenerate API Key</button>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="profile-card warning-card">
+            <div class="card-header">
+                <div class="card-icon warning-icon">🔒</div>
+                <h3>Keep this key confidential</h3>
+            </div>
+
+            <p class="warning-text">
+                Your API key identifies your FBM Multi Messenger account and grants access to it on your
+                behalf. Treat it exactly like a password.
+            </p>
+
+            <ul class="warning-list">
+                <li>Never share it with anyone, including people claiming to be from support.</li>
+                <li>Do not post it publicly or store it in shared documents or screenshots.</li>
+                <li>Do not send it by email, chat or any other unsecured channel.</li>
+                <li>Use it only with the official FBM Multi Messenger browser extension.</li>
+            </ul>
+
+            <p class="warning-text">
+                If you believe your key has been exposed, regenerate it immediately. The previous key
+                stops working straight away, and you will need to reconnect the extension with the new one.
+            </p>
+        </div>
+
+    </div>
+</div>

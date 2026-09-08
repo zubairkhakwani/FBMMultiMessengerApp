@@ -55,6 +55,13 @@
                 </NavLink>
             </div>
 
+            <div class="slideable">
+                <NavLink href="/api-keys" class="nav-link">
+                    <i class="fas fa-key"></i>
+                    <span>API Keys</span>
+                </NavLink>
+            </div>
+
             @if (UserHelper.IsCurrentTrialSubscription || !UserHelper.HasActiveSubscription)
             {
                 <div class="slideable">

@@ -77,6 +77,7 @@ namespace FBMMultiMessenger
                 builder.Services.AddScoped<IPricingService, PricingService>();
                 builder.Services.AddScoped<IPaymentService, PaymentService>();
                 builder.Services.AddScoped<IProxyService, ProxyService>();
+                builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
                 builder.Services.AddScoped<IAppService, AppService>();
                 builder.Services.AddScoped<IFacebookService, FacebookService>();
                 builder.Services.AddScoped<ChatEventDispatcherService, ChatEventDispatcherService>();

@@ -1,0 +1,232 @@
+.container {
+    max-width: 1450px;
+    margin: 1rem auto;
+    padding: 1em;
+}
+
+.page-header {
+    margin-bottom: 25px;
+}
+
+    .page-header h1 {
+        color: #2c3e50;
+        font-size: 28px;
+        margin-bottom: 5px;
+    }
+
+    .page-header p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(500px, 100%), 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.profile-card {
+    background: white;
+    border: 2px solid #e8ecef;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-bottom: 2px solid #e8ecef;
+}
+
+.card-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.warning-icon {
+    background: linear-gradient(135deg, #f39c12 0%, #c0392b 100%);
+}
+
+.card-header h3 {
+    color: #2c3e50;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-label {
+    display: block;
+    color: #2c3e50;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.key-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid #e8ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2c3e50;
+    transition: all 0.2s;
+}
+
+.key-input {
+    font-family: 'Consolas', 'Courier New', monospace;
+    letter-spacing: 0.5px;
+    background: #f8f9fa;
+    cursor: default;
+}
+
+    .key-input:focus {
+        outline: none;
+        border-color: #0866FF;
+        box-shadow: 0 0 0 3px rgba(8, 102, 255, 0.1);
+    }
+
+.key-action {
+    background: white;
+    border: 2px solid #e8ecef;
+    border-radius: 8px;
+    color: #7f8c8d;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 10px 13px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+    .key-action:hover {
+        color: #0866FF;
+        border-color: #0866FF;
+    }
+
+.state-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0 20px;
+    text-align: center;
+}
+
+.state-text {
+    color: #7f8c8d;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #e8ecef;
+}
+
+    .stat-list .stat-item:last-child {
+        border-bottom: none;
+    }
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.stat-value {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.status-active {
+    color: #2ed573;
+}
+
+.status-inactive {
+    color: #e74c3c;
+}
+
+.regenerate-block {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #e8ecef;
+}
+
+    .regenerate-block .state-text {
+        text-align: left;
+        margin-bottom: 15px;
+    }
+
+.btn-primary {
+    background: linear-gradient(135deg, #0866FF 0%, #042B5C 100%);
+    color: white;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(8, 102, 255, 0.3);
+    }
+
+.warning-card {
+    border-color: #f5d7a8;
+    background: #fffdf7;
+}
+
+.warning-text {
+    color: #6b5730;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+
+.warning-list {
+    color: #6b5730;
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 0 0 14px 20px;
+}
+
+@media (max-width: 600px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 0.5em;
+    }
+}

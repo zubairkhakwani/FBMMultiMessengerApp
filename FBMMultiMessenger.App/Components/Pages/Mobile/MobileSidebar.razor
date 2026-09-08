@@ -50,6 +50,12 @@
             </div>
             <span>Profile</span>
         </NavLink>
+        <NavLink href="/api-keys" class="mobile-menu-item">
+            <div class="mobile-menu-icon">
+                <i class="fas fa-key"></i>
+            </div>
+            <span>API Keys</span>
+        </NavLink>
 
         @if (UserHelper.IsCurrentTrialSubscription || !UserHelper.HasActiveSubscription)
         {
