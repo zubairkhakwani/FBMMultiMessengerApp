@@ -50,7 +50,6 @@ namespace FBMMultiMessenger.Components.Pages.Account
         {
             get;
             set;
-
         } = new();
 
         private List<UserAccountsHttpResponse> AccountsData = new List<UserAccountsHttpResponse>();
@@ -70,7 +69,7 @@ namespace FBMMultiMessenger.Components.Pages.Account
 
         protected override async Task OnInitializedAsync()
         {
-            _ = ConnectToSignalR();
+            //_ = ConnectToSignalR();
 
             AddEventListeners();
 

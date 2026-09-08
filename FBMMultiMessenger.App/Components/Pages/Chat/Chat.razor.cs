@@ -540,7 +540,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
         {
             var currentUserId = $"App_{CurrentUser.Id}";
 
-            await SignalRService.ConnectAsync(currentUserId, _apiCts.Token);
+            await SignalRService.ConnectAsync(currentUserId);
 
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnHandleMessage += HandleMessageReceivedAsync;
