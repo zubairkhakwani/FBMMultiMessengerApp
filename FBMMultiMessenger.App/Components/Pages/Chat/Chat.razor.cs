@@ -168,6 +168,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             StateHasChanged();
 
+            Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
             CurrentUser = await CurrentUserService.GetCurrentUser() ?? new();
 
             _ = ConnectToSignalR();
@@ -195,6 +196,14 @@ namespace FBMMultiMessenger.Components.Pages.Chat
                 {
                     await Task.Delay(200);
                 }
+            }
+        }
+
+        private void Connectivity_ConnectivityChanged(object? sender, ConnectivityChangedEventArgs e)
+        {
+            if (e.NetworkAccess == NetworkAccess.Internet)
+            {
+                _= SyncMessagesFromApi();
             }
         }
 
@@ -544,8 +553,28 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
             SignalRService.OnHandleMessage += HandleMessageReceivedAsync;
+
+            SignalRService.OnHandleChatInfoUpdate -= HandleChatInfoUpdateReceivedAsync;
+            SignalRService.OnHandleChatInfoUpdate += HandleChatInfoUpdateReceivedAsync;
         }
 
+        private async Task HandleChatInfoUpdateReceivedAsync(ChatInfoUpdatedSignalRModel chatMetaData)
+        {
+            _ = SyncMessagesFromApi(false);
+            var chats = FilteredAccountChats.Where(x => x.ChatId == chatMetaData.ChatId).ToList();
+
+            foreach(var chat in chats)
+            {
+                chat.FbListingId = chatMetaData.FbListingId;
+                chat.FbListingTitle = chatMetaData.FbListingTitle;
+                chat.FbListingImage = chatMetaData.FbListingImage;
+                chat.FbListingLocation = chatMetaData.FbListingLocation;
+                chat.FbListingPrice = chatMetaData.FbListingPrice;
+                chat.UserProfileImage = chatMetaData.OtherUserProfilePicture;
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
 
         //Handles chat messages
         private async Task HandleMessageReceivedAsync(HandleChatHttpResponse receivedChat)
@@ -1201,6 +1230,7 @@ namespace FBMMultiMessenger.Components.Pages.Chat
 
             BackButtonService.BackButtonPressed -= OnBackButtonPressed;
             SignalRService.OnHandleMessage -= HandleMessageReceivedAsync;
+            SignalRService.OnHandleChatInfoUpdate -= HandleChatInfoUpdateReceivedAsync;
             SignalRService.OnAccountStatusChange -= HandleAccountStatusChangedAsync;
             BlazorMauiCommunicator.OnNotificationClicked -= OnNotificaitonClicked;
 

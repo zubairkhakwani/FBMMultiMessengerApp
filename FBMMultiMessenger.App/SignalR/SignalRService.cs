@@ -10,6 +10,7 @@ namespace FBMMultiMessenger.SignalR
     {
         private HubConnection? _hubConnection;
         public event Func<HandleChatHttpResponse, Task> OnHandleMessage;
+        public event Func<ChatInfoUpdatedSignalRModel, Task> OnHandleChatInfoUpdate;
         public event Func<List<AccountStatusSignalRModel>, Task> OnAccountStatusChange;
         public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
 
@@ -17,6 +18,8 @@ namespace FBMMultiMessenger.SignalR
         private bool _isReconnecting = false;
         private bool _shouldReconnect = true;
         private string userId;
+
+        private Func<Exception?, Task>? _closedHandler;
 
         public SignalRService(IConfiguration configuration)
         {
@@ -39,7 +42,6 @@ namespace FBMMultiMessenger.SignalR
         public async Task ConnectAsync(string userId)
         {
             this.userId = userId;
-            _shouldReconnect = true;
 
             while (true)
             {
@@ -49,7 +51,6 @@ namespace FBMMultiMessenger.SignalR
                     if (_hubConnection != null)
                     {
                         await DisconnectAsync();
-                        _shouldReconnect = true;
                     }
 
                     _hubConnection = new HubConnectionBuilder()
@@ -59,6 +60,9 @@ namespace FBMMultiMessenger.SignalR
                     RegisterEvents();
 
                     await _hubConnection.StartAsync();
+                    
+                    _shouldReconnect = true;
+
                     await _hubConnection.SendAsync("RegisterApp", $"{userId}");
 
                     //successfully connected, so breaking loop. if not connected it throw exception and while loop runs again.
@@ -85,6 +89,14 @@ namespace FBMMultiMessenger.SignalR
                 }
             });
 
+            _hubConnection.On<ChatInfoUpdatedSignalRModel>("HandleChatInfoUpdated", async (messageData) =>
+            {
+                if (OnHandleChatInfoUpdate != null)
+                {
+                    await OnHandleChatInfoUpdate.Invoke(messageData);
+                }
+            });
+
             _hubConnection.On<List<AccountStatusSignalRModel>>("HandleAccountStatus", async (accountsStatus) =>
             {
                 if (OnAccountStatusChange != null)
@@ -93,13 +105,15 @@ namespace FBMMultiMessenger.SignalR
                 }
             });
 
-            _hubConnection.Closed += async (error) =>
+            _closedHandler = async (error) =>
             {
                 if (_shouldReconnect)
                 {
                     await AttemptReconnect();
                 }
             };
+
+            _hubConnection.Closed += _closedHandler;
 
         }
 
@@ -138,9 +152,15 @@ namespace FBMMultiMessenger.SignalR
 
             if (_hubConnection != null)
             {
+                if (_closedHandler != null)
+                {
+                    _hubConnection.Closed -= _closedHandler;
+                }
+
                 await _hubConnection.StopAsync();
                 await _hubConnection.DisposeAsync();
                 _hubConnection = null;
+                await Task.Delay(500);
             }
         }
     }
