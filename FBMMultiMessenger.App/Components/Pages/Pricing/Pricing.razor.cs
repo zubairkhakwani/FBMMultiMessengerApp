@@ -90,10 +90,13 @@ namespace FBMMultiMessenger.Components.Pages.Pricing
         private async Task HandlePaymentAlertsAsync()
         {
             var paymentStatusResponse = await PaymentService.GetMyStatus();
+
             var paymentStatus = paymentStatusResponse.Data;
 
             if (paymentStatus == null)
+            {
                 return;
+            }
 
             PaymentStatus = paymentStatus.Status;
 
