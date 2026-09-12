@@ -21,7 +21,7 @@ namespace FBMMultiMessenger.Services
         {
             var request = new ApiRequest<ChangePasswordHttpRequest>()
             {
-                ApiType = SD.ApiType.PUT,
+                ApiType = SD.ApiType.POST,
                 Url = "profile/me/changepassword",
                 Data = httpRequest
             };
@@ -32,7 +32,7 @@ namespace FBMMultiMessenger.Services
         {
             var request = new ApiRequest<EditProfileHttpRequest>()
             {
-                ApiType = SD.ApiType.PUT,
+                ApiType = SD.ApiType.POST,
                 Url = "profile/me/edit",
                 Data = httpRequest
 

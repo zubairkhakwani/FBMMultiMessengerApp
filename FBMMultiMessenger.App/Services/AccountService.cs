@@ -17,18 +17,11 @@ namespace FBMMultiMessenger.Services
         }
         public async Task<T> UpsertAccountAsync<T>(UpsertAccountHttpRequest httpRequest, int? accountId) where T : class, new()
         {
-            var apiType = SD.ApiType.POST;
-            var url = "account";
-
-            if (accountId is not null)
-            {
-                apiType = SD.ApiType.PUT;
-                url = $"account/{accountId}";
-            }
+            var url = accountId is not null ? $"account/{accountId}" : "account";
 
             var request = new ApiRequest<UpsertAccountHttpRequest>()
             {
-                ApiType = apiType,
+                ApiType = SD.ApiType.POST,
                 Url = url,
                 Data = httpRequest
             };

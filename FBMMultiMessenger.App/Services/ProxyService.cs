@@ -29,18 +29,11 @@ namespace FBMMultiMessenger.Services
 
         public async Task<BaseResponse<UpsertProxyHttpResponse>> UpsertProxyAsync(UpsertProxyHttpRequest httpRequest, int? proxyId)
         {
-            var apiType = SD.ApiType.POST;
-            var url = "proxy";
-
-            if (proxyId is not null)
-            {
-                apiType = SD.ApiType.PUT;
-                url = $"proxy/{proxyId}";
-            }
+            var url = proxyId is not null ? $"proxy/{proxyId}" : "proxy";
 
             var request = new ApiRequest<UpsertProxyHttpRequest>()
             {
-                ApiType = apiType,
+                ApiType = SD.ApiType.POST,
                 Url = url,
                 Data = httpRequest
             };

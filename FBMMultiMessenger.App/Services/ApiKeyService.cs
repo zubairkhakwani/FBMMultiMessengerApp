@@ -43,7 +43,7 @@ namespace FBMMultiMessenger.Services
         {
             var apiRequest = new ApiRequest<object>()
             {
-                ApiType = SD.ApiType.PUT,
+                ApiType = SD.ApiType.POST,
                 Url = "apikey/regenerate",
                 Data = null
             };

@@ -30,7 +30,7 @@ namespace FBMMultiMessenger.Services
         {
             var request = new ApiRequest<object>()
             {
-                ApiType = SD.ApiType.PUT,
+                ApiType = SD.ApiType.POST,
                 Url = $"chat/{chatId}/mark-as-read?lastLocalMessageId={lastLocalMessageId}",
                 Data = null
             };

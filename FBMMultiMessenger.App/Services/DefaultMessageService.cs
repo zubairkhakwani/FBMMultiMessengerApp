@@ -19,7 +19,7 @@ namespace FBMMultiMessenger.Services
         {
             var request = new ApiRequest<UpsertDefaultMessageHttpRequest>()
             {
-                ApiType =  defaultMessageId is null ? SD.ApiType.POST : SD.ApiType.PUT,
+                ApiType = SD.ApiType.POST,
                 Url =  defaultMessageId is null ? "defaultmessage" : $"defaultmessage/{defaultMessageId}",
                 Data = httpRequest
             };
