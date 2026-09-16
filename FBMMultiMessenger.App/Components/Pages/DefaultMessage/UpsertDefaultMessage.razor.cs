@@ -190,5 +190,10 @@ namespace FBMMultiMessenger.Components.Pages.DefaultMessage
         {
             mudDialog.Cancel();
         }
+
+        private void GoBack()
+        {
+            Navigation.NavigateTo("/Default-Messages");
+        }
     }
 }

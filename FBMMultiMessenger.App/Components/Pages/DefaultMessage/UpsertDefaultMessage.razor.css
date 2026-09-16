@@ -12,6 +12,7 @@ body {
 }
 
 .mobile-container {
+    position: relative;
     width: 100%;
     min-height: 100vh;
     display: flex;
@@ -19,6 +20,37 @@ body {
     gap: 11px;
     background: var(--primary-bg-clr);
 }
+
+.mobile-back-btn {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+    .mobile-back-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateX(-2px);
+    }
+
+    .mobile-back-btn:active {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(0.96);
+    }
 
 .header {
     text-align: center;

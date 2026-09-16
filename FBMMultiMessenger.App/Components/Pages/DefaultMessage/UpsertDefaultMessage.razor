@@ -4,6 +4,9 @@
 @if (PlatformHelper.IsMobilePlatform)
 {
     <div class="mobile-container">
+        <button type="button" class="mobile-back-btn" @onclick="GoBack" aria-label="Back">
+            <i class="fa-sharp fa-solid fa-arrow-left"></i>
+        </button>
         <div class="header">
             <div class="logo-circle">
                 @*  <div class="logo">
